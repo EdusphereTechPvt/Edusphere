@@ -2,32 +2,65 @@ const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema(
   {
-    uid: { type: String, unique: true },
-    fullName: { type: String, required: true, trim: true },
-    dob: { type: Date },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    uid: {
+      type: String,
+      unique: true
+    },
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 3
+    },
+    dob: {
+      type: Date,
+      required: true
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, "Invalid email format"]
+    },
     password: {
       type: String,
       required: function () {
-        return !this.googleId; // Google signup users don't need password
+        return !this.googleId;
       },
+      minlength: 6
     },
     role: {
       type: String,
-      enum: ["super_admin", "admin", "teacher", "student", "parent"],
-      required: true,
+      enum: ["super_admin", "admin", "teacher", "parent", "student"],
+      required: true
     },
-    avatar: String,
-    isActive: { type: Boolean, default: true },
-    lastLogin: Date,
-    refreshTokens: [String],
-    emailVerified: { type: Boolean, default: false },
-    googleId: String,
+    avatar: {
+      type: String
+    },
+    emailVerified: {
+      type: Boolean,
+      default: false
+    },
+    googleId: {
+      type: String
+    },
+    isActive: {
+      type: Boolean,
+      default: true
+    },
+    lastLogin: {
+      type: Date
+    },
+    refreshTokens: {
+      type: [String],
+      default: []
+    }
   },
   { timestamps: true }
 );
-
-//Uid generation 
+// UID auto-generate
 UserSchema.pre("save", function (next) {
   if (!this.uid) {
     const dobString = this.dob
