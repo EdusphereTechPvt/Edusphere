@@ -1,6 +1,6 @@
 const RequestDemo = require("../models/RequestDemoSchema");
 
-const addOrUpdateRequestDemo = async (req, res) => {
+const addRequestDemo = async (req, res) => {
   try {
     const { fullName, schoolName, email, phone, schoolSize, preferredDate, features, heardFrom, message } = req.body;
 
@@ -8,25 +8,6 @@ const addOrUpdateRequestDemo = async (req, res) => {
       return res.status(400).json({ 
         message: "Email and School Name are required", 
         status: false 
-      });
-    }
-
-    let demo = await RequestDemo.findOne({ email, schoolName });
-
-    if (demo) {
-      demo.fullName = fullName || demo.fullName;
-      demo.phone = phone || demo.phone;
-      demo.schoolSize = schoolSize || demo.schoolSize;
-      demo.preferredDate = preferredDate || demo.preferredDate;
-      demo.features = features?.length ? features : demo.features;
-      demo.heardFrom = heardFrom || demo.heardFrom;
-      demo.message = message || demo.message;
-
-      await demo.save();
-      return res.status(200).json({ 
-        message: "Demo request updated successfully", 
-        data: demo, 
-        status: true 
       });
     }
 
@@ -50,9 +31,9 @@ const addOrUpdateRequestDemo = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("RequestDemo Add/Update Error:", err);
+    console.error("RequestDemo Add Error:", err);
     res.status(500).json({ 
-      message: "Server error during demo add/update", 
+      message: "Server error during demo add", 
       status: false 
     });
   }
@@ -135,7 +116,7 @@ const deleteRequestDemo = async (req, res) => {
 };
 
 module.exports = { 
-  addOrUpdateRequestDemo, 
+  addRequestDemo, 
   getRequestDemoDetails, 
   deleteRequestDemo 
 };

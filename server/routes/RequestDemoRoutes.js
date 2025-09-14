@@ -1,10 +1,11 @@
 const express = require("express");
-const {addOrUpdateRequestDemo,getRequestDemoDetails,
-    deleteRequestDemo,} = require("../controllers/RequestDemoController");
+const {getRequestDemoDetails,
+    deleteRequestDemo,
+    addRequestDemo,} = require("../controllers/RequestDemoController");
 
 const router = express.Router();
 
-router.post("/add", addOrUpdateRequestDemo);
+router.post("/add", addRequestDemo);
 router.post("/search", getRequestDemoDetails);
 router.delete("/delete/:id", deleteRequestDemo);
 
