@@ -6,6 +6,11 @@ const swaggerFile = require("./utils/swagger-output.json");
 const mongoose = require("mongoose");
 const authRoutes = require('./routes/AuthRoutes');
 const requestdemoRoutes = require("./routes/RequestDemoRoutes");
+const studentprofileRoutes = require("./routes/StudentProfileRoutes");
+const teacherprofileRoutes = require("./routes/TeacherProfileRoutes");
+const TeacherProfile = require('./models/TeacherProfile');
+
+
 
 const app = express();
 
@@ -17,6 +22,12 @@ app.use(express.json());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 app.use('/auth', authRoutes);
 app.use('/requestdemo', requestdemoRoutes);
+app.use("/student", studentprofileRoutes);
+app.use("/teacher", teacherprofileRoutes);
+
+
+
+
 
 mongoose.connect(process.env.MONGO_URL, {
 }).then(() => {
