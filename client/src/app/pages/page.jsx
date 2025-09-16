@@ -1,6 +1,6 @@
 import { Button } from "@mui/material";
 import { HomePageConfig } from "../config/HomePageConfig";
-import CardComponent from "@/CardComponent/Index";
+import CardComponent from "@/app/components/CardComponent/Index";
 
 const page = () => {
   function DynamicRenderer({ config }) {
@@ -12,8 +12,6 @@ const page = () => {
       case "buttonGroup":
         return (
           <div className={config.styles.className} style={config.styles.inlineStyle}>
-            {console.log(config.styles)
-            }
             {config.buttons.map((btn, idx) => (
               <Button key={idx} className={btn.styles.className} variant={btn.variant || 'contained'} sx={btn.styles.inlineStyle}>{btn.text}</Button>
             ))}
