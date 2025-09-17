@@ -102,6 +102,7 @@ const page = () => {
         display: "flex",
         flexDirection: { xs: "column", md: "row" },
         p: "2rem",
+        pr: "3ewm",
         gap: "2rem",
         alignItems: { xs: "center", md: "flex-start" },
         textAlign: { xs: "center", md: "left" },
