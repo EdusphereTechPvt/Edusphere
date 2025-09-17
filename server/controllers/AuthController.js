@@ -3,20 +3,10 @@ const StudentProfile = require("../models/StudentProfile");
 const TeacherProfile = require("../models/TeacherProfile");
 const ParentProfile = require("../models/ParentProfile");
 const AdminProfile = require("../models/AdminProfile");
-//const JWT_SECRET = process.env.JWT_SECRET;
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const admin = require("../utils/Firebase");
 
-
-
-// if (!JWT_SECRET) {
-//   console.error("JWT_SECRET is not defined in .env");
-//   process.exit(1); 
-// }
-
-
-// login controller
 const loginController = async (req, res) => {
   try {
     const { type, uidOrEmail, password } = req.body;
@@ -45,7 +35,6 @@ const loginController = async (req, res) => {
         .status(401)
         .json({ message: "Incorrect password", status: false });
 
-
     user.lastLogin = new Date();
     await user.save();
 
@@ -63,22 +52,26 @@ const loginController = async (req, res) => {
     });
   } catch (err) {
     console.error("Login Error:", err);
-    res.status(500).json({ message: "Server error during login", status: false });
+    res
+      .status(500)
+      .json({ message: "Server error during login", status: false });
   }
 };
 
-//signup controller
 const signupController = async (req, res) => {
   try {
-    const { fullName, dob, email, password, role, extraData = {} } = req.body;
+    const { fullName, dob, email, password, role } = req.body;
 
-
-   // Signup controller
-if (!req.user || (req.user.role !== "admin" && req.user.role !== "super_admin")) {
-  return res.status(403).json({ message: "Only admin or super_admin can create accounts",
-     status: false });
-}
-
+    if (
+      (role !== "admin" && role !== "super_admin")
+    ) {
+      return res
+        .status(403)
+        .json({
+          message: "Only admin or super_admin can create accounts",
+          status: false,
+        });
+    }
 
     const existingUser = await User.findOne({ email });
     if (existingUser)
@@ -97,64 +90,6 @@ if (!req.user || (req.user.role !== "admin" && req.user.role !== "super_admin"))
       emailVerified: false,
     });
     await newUser.save();
-    switch (role) {
-      case "student":
-      
-        if (
-          !extraData.admissionId ||
-          !extraData.class ||
-          !extraData.section ||
-          !extraData.rollNumber ||
-          !extraData.dateOfBirth
-        ) {
-          return res
-            .status(400)
-            .json({ message: "Missing required student fields", status: false });
-        }
-        await new StudentProfile({ userId: newUser._id, ...extraData }).save();
-        break;
-
-      case "teacher":
-        if (
-          !extraData.employeeId ||
-          !extraData.subjects ||
-          !extraData.classes ||
-          !extraData.dateOfJoining
-        ) {
-          return res
-            .status(400)
-            .json({ message: "Missing required teacher fields", status: false });
-        }
-        await new TeacherProfile({ userId: newUser._id, ...extraData }).save();
-        break;
-
-      case "parent":
-        if (!extraData.occupation || !extraData.emergencyContact) {
-          return res
-            .status(400)
-            .json({ message: "Missing required parent fields", status: false });
-        }
-        await new ParentProfile({ userId: newUser._id, ...extraData }).save();
-        break;
-
-      case "admin":
-        if (
-          !extraData.employeeId ||
-          !extraData.designation ||
-          !extraData.department ||
-          !extraData.contactNumber ||
-          !extraData.dateOfJoining
-        ) {
-          return res
-            .status(400)
-            .json({ message: "Missing required admin fields", status: false });
-        }
-        await new AdminProfile({ userId: newUser._id, ...extraData }).save();
-        break;
-
-      default:
-        return res.status(400).json({ message: "Invalid role", status: false });
-    }
 
     res.status(201).json({
       message: "User registered successfully",
@@ -169,12 +104,13 @@ if (!req.user || (req.user.role !== "admin" && req.user.role !== "super_admin"))
   }
 };
 
-//verify token 
 const verifyToken = (req, res) => {
   try {
     const { token } = req.body;
     if (!token)
-      return res.status(401).json({ message: "No token provided", status: false });
+      return res
+        .status(401)
+        .json({ message: "No token provided", status: false });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     res.status(200).json({ status: true, decoded });
@@ -186,14 +122,15 @@ const verifyToken = (req, res) => {
   }
 };
 
-// google auth 
 const oAuthController = async (req, res) => {
   try {
-    const { token, role, dob, fullName, extraData = {} } = req.body;
+    const { token, role, dob, fullName} = req.body;
 
     const decodedToken = await admin.auth().verifyIdToken(token);
     if (!decodedToken)
-      return res.status(400).json({ message: "Invalid Google Token", status: false });
+      return res
+        .status(400)
+        .json({ message: "Invalid Google Token", status: false });
 
     let user = await User.findOne({ email: decodedToken.email });
 
@@ -208,22 +145,23 @@ const oAuthController = async (req, res) => {
       });
       await user.save();
 
-      
       switch (role) {
         case "student":
-          await new StudentProfile({ userId: user._id, ...extraData }).save();
+          await new StudentProfile({ userId: user._id }).save();
           break;
         case "teacher":
-          await new TeacherProfile({ userId: user._id, ...extraData }).save();
+          await new TeacherProfile({ userId: user._id }).save();
           break;
         case "parent":
-          await new ParentProfile({ userId: user._id, ...extraData }).save();
+          await new ParentProfile({ userId: user._id }).save();
           break;
         case "admin":
-          await new AdminProfile({ userId: user._id, ...extraData }).save();
+          await new AdminProfile({ userId: user._id }).save();
           break;
         default:
-          return res.status(400).json({ message: "Invalid role", status: false });
+          return res
+            .status(400)
+            .json({ message: "Invalid role", status: false });
       }
     }
 
