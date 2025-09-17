@@ -3,6 +3,13 @@ const swaggerAutogen = require("swagger-autogen")();
 
 const outputFile = "./utils/swagger-output.json";
 const endpointsFiles = ["./server.js"];
+const pathTagMap = {
+  "/api": "General",
+  "/auth": "Auth",
+  "/requestdemo": "RequestDemo",
+  "/student": "Student",
+  "/teacher": "Teacher"
+};
 
 const doc = {
   info: {
@@ -21,12 +28,13 @@ swaggerAutogen(outputFile, endpointsFiles, doc).then(() => {
   const swagger = JSON.parse(fs.readFileSync(outputFile));
 
   Object.keys(swagger.paths).forEach((path) => {
-    if (path.startsWith("/auth")) {
-        console.log(path)
-      Object.values(swagger.paths[path]).forEach((p) => (p.tags = ["Auth"]));
-    }
-    if (path.startsWith("/requestdemo")) {
-      Object.values(swagger.paths[path]).forEach((p) => (p.tags = ["RequestDemo"]));
+    for (const prefix in pathTagMap) {
+      if (path.startsWith(prefix)) {
+        const tag = pathTagMap[prefix];
+        Object.values(swagger.paths[path]).forEach((p) => {
+          p.tags = [tag];
+        });
+      }
     }
   });
 
