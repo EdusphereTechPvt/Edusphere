@@ -22,7 +22,7 @@ const Dropdown = ({ data, style = {}, onSelect }) => {
   return (
     <Box className={`${style.className}`} sx={{ ...style.inlineStyle }}>
       {data.label && (
-        <Box className="text-sm font-medium mb-2">{data.label}</Box>
+        <Box className="text-sm font-medium mb-2 text-gray-700">{data.label}</Box>
       )}
 
       <FormControl

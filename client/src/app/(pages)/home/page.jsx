@@ -1,8 +1,12 @@
+"use client"
+
 import { Button } from "@mui/material";
-import { HomePageConfig } from "../config/HomePageConfig";
+import { HomePageConfig } from "../../config/HomePageConfig";
 import CardComponent from "@/app/components/CardComponent/Index";
+import { useRouter } from "next/navigation";
 
 const page = () => {
+  const router = useRouter();
   function DynamicRenderer({ config }) {
     switch (config.type) {
       case "text":
@@ -13,7 +17,7 @@ const page = () => {
         return (
           <div className={config.styles.className} style={config.styles.inlineStyle}>
             {config.buttons.map((btn, idx) => (
-              <Button key={idx} className={btn.styles.className} variant={btn.variant || 'contained'} sx={btn.styles.inlineStyle}>{btn.text}</Button>
+              <Button key={idx} className={btn.styles.className} variant={btn.variant || 'contained'} sx={btn.styles.inlineStyle} onClick={()=>router.push(btn.action)}>{btn.text}</Button>
             ))}
           </div>
         );

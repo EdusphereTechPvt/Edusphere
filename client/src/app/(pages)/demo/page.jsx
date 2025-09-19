@@ -77,9 +77,9 @@ const page = () => {
           >
             {config.values.map((item, index) => {
               return (
-                <Accordion key={index}>
+                <Accordion key={index} sx={{padding: '10px'}}>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>{item.title}</Typography>
+                    <Typography sx={{ fontWeight:'bold'}}>{item.title}</Typography>
                   </AccordionSummary>
                   <Divider />
                   <AccordionDetails>
@@ -102,7 +102,7 @@ const page = () => {
         display: "flex",
         flexDirection: { xs: "column", md: "row" },
         p: "2rem",
-        pr: "3ewm",
+        px: "8rem",
         gap: "2rem",
         alignItems: { xs: "center", md: "flex-start" },
         textAlign: { xs: "center", md: "left" },
@@ -144,7 +144,7 @@ const page = () => {
       </Box>
 
       {/* form */}
-      <Box sx={{ width: {xs:"full", lg:"45%"} }}>
+      <Box sx={{ width: {xs:"full", lg:"35%"} }}>
         <Form type="demo" />
       </Box>
     </Box>

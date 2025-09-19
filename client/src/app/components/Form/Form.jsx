@@ -131,7 +131,7 @@ export default function Form({ type }) {
   );
 
   return (
-    <div className="flex flex-col gap-4 pt-6 max-w-4xl mx-auto px-2 lg:px-0">
+    <div className="flex flex-col gap-4 max-w-4xl mx-auto px-2 lg:px-0">
       {info && (
         <div className="mb-2">
           {info?.map((item, idx) => (
@@ -147,7 +147,7 @@ export default function Form({ type }) {
         </div>
       )}
 
-      <form className="p-6 rounded-lg shadow-xl">
+      <form className="p-6 rounded-lg shadow-[0px_0px_10px_rgba(0,0,0,0.25)]">
         {sections.map((section, idx) => (
           <div key={idx} className="mb-8">
             {section.title && section.title !== "Actions" && (
@@ -216,8 +216,8 @@ export default function Form({ type }) {
                         }`}
                       >
                         <Dropdown
-                          data={data || []}
-                          onSelect={(value) => handleChange(name, value)}
+                          data={data || {}}
+                          onSelect={(value) => handleChange(data.name, value)}
                           required={required}
                         />
                       </div>
@@ -288,7 +288,7 @@ export default function Form({ type }) {
                   case "checkBox":
                     return (
                       <Box key={i}>
-                        <label>{label}</label>
+                        <label className="font-medium text-gray-700">{label}</label>
                         <div className="mt-1.5">
                           {values.map((value, idx) => (
                             <div key={idx} className="flex gap-3">

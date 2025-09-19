@@ -325,7 +325,12 @@ const formConfig = {
               label: "School Size",
               placeholder: "Select Size",
               required: true,
-              items: [],
+              items: [
+                {value: "Less than 100", "label":"Less than 100"},
+                {value: "Between 100 and 250", "label":"Between 100 and 250"},
+                {value: "Between 250 and 500", "label":"Between 250 and 500"},
+                {value: "More than 500", "label":"More than 500"},
+              ],
             },
           },
           {
@@ -362,7 +367,12 @@ const formConfig = {
               label: "How did you hear about us?",
               placeholder: "Select an option",
               required: true,
-              items: [],
+              items: [
+                {value: "Facebook", "label":"Facebook"},
+                {value: "Google", "label":"Google"},
+                {value: "News Paper", "label":"New Paper"},
+                {value: "Instagram", "label":"Instagram"},
+              ],
             },
           },
         ],

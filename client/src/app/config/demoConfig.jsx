@@ -8,7 +8,7 @@ export const demoConfig = {
       title: "Experience Edusphere in Action",
       desc: "Request a personalized demo and discover how our comprehensive school management system can empower your institution.",
       styles: {
-        inlineStyle: { marginBottom: "1.5rem" },
+        inlineStyle: { marginBottom: "1.5rem", width:'70%' },
         className: "",
         titleStyle: {
           inlineStyle: {
@@ -158,6 +158,11 @@ export const demoConfig = {
       items: [
         {
           type: "dropdown",
+          styles:{
+            inlineStyle:{
+              width:"80%"
+            }
+          },
           values: [
             {
               title: "How long does a demo take?",
