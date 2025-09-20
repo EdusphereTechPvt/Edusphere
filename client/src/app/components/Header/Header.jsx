@@ -9,17 +9,19 @@ import {
   Link,
   Typography,
 } from "@mui/material";
-import generalConfig, { updateConfig } from "../../config/GeneralConfig";
+import generalConfig from "../../config/GeneralConfig";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Close } from "@mui/icons-material";
-import { formatConfig } from "@/app/utils/FormatConfig";
 import { getElements } from "@/app/services/ElementAccessService";
+import { useRouter } from "next/navigation";
+import { updateConfig } from "@/app/utils/FormatConfig";
 
 const Header = ({ path }) => {
   const [header, setHeader] = useState(generalConfig.header);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const toggleDrawer = (open) => () => setDrawerOpen(open);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchNavItems = async () => {

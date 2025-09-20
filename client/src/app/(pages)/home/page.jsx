@@ -34,7 +34,7 @@ const page = () => {
                 {config.value.buttons && (
                   <div className={config.styles.containerStyle.btnCotainerStyle.className} style={config.styles.containerStyle.btnCotainerStyle.inlineStyle}>
                     {config.value.buttons.map((btn, idx) => (
-                      <Button key={idx} className={btn.styles.className} variant={btn.variant || 'contained'} sx={btn.styles.inlineStyle}>{btn.text}</Button>
+                      <Button key={idx} className={btn.styles.className} variant={btn.variant || 'contained'} sx={btn.styles.inlineStyle} onClick={()=>router.push(btn.action)}>{btn.text}</Button>
                     ))}
                   </div>
                 )}

@@ -1078,6 +1078,7 @@ export const HomePageConfig = {
                 inlineStyle: {
                   color: "white",
                   textTransform: "none",
+                  fontWeight:"bold",
                   py: { xs: 1, sm: 1.2, md: 1.5 },
                   minWidth: { sm: 120, md: 140, lg: 160 },
                   fontSize: { xs: "0.6rem", sm: "0.8rem", md: "0.9rem" },

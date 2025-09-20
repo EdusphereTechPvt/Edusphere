@@ -1,6 +1,3 @@
-import { fontSize, fontWeight, justifyContent } from "@mui/system";
-import { formatConfig } from "../utils/FormatConfig";
-
 
 export const includeRoutes = ['/','/demo'];
 
@@ -74,7 +71,7 @@ const generalConfig = {
           {
             variant: "contained",
             text: "Request a Demo",
-            // onclick: () => alert("Request Demo clicked"),
+            onclick: () => window.location.href = "http://localhost:3000/demo",
             styles: {
                 inlineStyle:{
                    textTransform: 'none',
@@ -86,7 +83,7 @@ const generalConfig = {
           {
             variant: "contained",
             text: "Sign Up Now",
-            // onclick: () => alert("Sign Up clicked"),
+            onclick: () => window.location.href = "http://localhost:3000/signup",
            styles: {
                 inlineStyle:{
                    textTransform: 'none',
@@ -111,29 +108,5 @@ const generalConfig = {
   footer: {},
 };
 
-
-export const updateConfig = (generalConfig, elementPath, result)=>{
-    let locationToUpdate;
-    switch(elementPath){
-        case 'header':
-        locationToUpdate =  [
-          { key: "header", childType: "object" },
-          {
-            key: "sections",
-            childType: "array",
-          },
-          {
-            matchKey: "type",
-            matchValue: "navigate",
-          },
-          {
-            dataKey: "navItems",
-            data: result,
-          },
-        ]
-    }
-    generalConfig = formatConfig(generalConfig, locationToUpdate);
-    return generalConfig;
-}
 
 export default generalConfig;

@@ -1,3 +1,28 @@
+export const updateConfig = (generalConfig, elementPath, result)=>{
+    let locationToUpdate;
+    switch(elementPath){
+        case 'header':
+        locationToUpdate =  [
+          { key: "header", childType: "object" },
+          {
+            key: "sections",
+            childType: "array",
+          },
+          {
+            matchKey: "type",
+            matchValue: "navigate",
+          },
+          {
+            dataKey: "navItems",
+            data: result,
+          },
+        ]
+    }
+    generalConfig = formatConfig(generalConfig, locationToUpdate);
+    return generalConfig;
+}
+
+
 export const formatConfig = (config, location) => {
   if (!config || !location || !Array.isArray(location)) return config;
 
