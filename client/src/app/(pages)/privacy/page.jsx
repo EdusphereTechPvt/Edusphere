@@ -1,6 +1,6 @@
 "use client";
 
-import PrivacyPolicyConfig from "../../../config/PrivacyPolicyConfig";
+import PrivacyPolicyConfig from "../../config/PrivacyPolicyConfig";
 import React, { useRef } from "react";
 
 
