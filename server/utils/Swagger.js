@@ -8,7 +8,8 @@ const pathTagMap = {
   "/auth": "Auth",
   "/requestdemo": "RequestDemo",
   "/student": "Student",
-  "/teacher": "Teacher"
+  "/teacher": "Teacher",
+  "/permission": "Permission",
 };
 
 const doc = {
@@ -21,6 +22,10 @@ const doc = {
   tags: [
     { name: "Auth", description: "Authentication endpoints" },
     { name: "RequestDemo", description: "Demo request endpoints" },
+    { name: "Student", description: "Student profile management" },
+    { name: "Teacher", description: "Teacher profile management" },
+    { name: "Permission", description: "Element access control management" },
+    { name: "General", description: "General endpoints" },
   ],
 };
 

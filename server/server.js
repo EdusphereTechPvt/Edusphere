@@ -4,11 +4,11 @@ const dotenv = require("dotenv")
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./utils/swagger-output.json");
 const mongoose = require("mongoose");
+const elementRoutes = require('./routes/ElementRoutes');
 const authRoutes = require('./routes/AuthRoutes');
 const requestdemoRoutes = require("./routes/RequestDemoRoutes");
 const studentprofileRoutes = require("./routes/StudentProfileRoutes");
 const teacherprofileRoutes = require("./routes/TeacherProfileRoutes");
-const TeacherProfile = require('./models/TeacherProfile');
 
 
 
@@ -20,6 +20,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+app.use('/permission', elementRoutes)
 app.use('/auth', authRoutes);
 app.use('/requestdemo', requestdemoRoutes);
 app.use("/student", studentprofileRoutes);

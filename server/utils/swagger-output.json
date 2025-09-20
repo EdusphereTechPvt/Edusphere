@@ -15,12 +15,119 @@
     {
       "name": "RequestDemo",
       "description": "Demo request endpoints"
+    },
+    {
+      "name": "Student",
+      "description": "Student profile management"
+    },
+    {
+      "name": "Teacher",
+      "description": "Teacher profile management"
+    },
+    {
+      "name": "Permission",
+      "description": "Element access control management"
+    },
+    {
+      "name": "General",
+      "description": "General endpoints"
     }
   ],
   "schemes": [
     "http"
   ],
   "paths": {
+    "/permission/getElement": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "Permission"
+        ]
+      }
+    },
+    "/permission/addElement": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "example": "any"
+                },
+                "page": {
+                  "example": "any"
+                },
+                "type": {
+                  "example": "any"
+                },
+                "id": {
+                  "example": "any"
+                },
+                "label": {
+                  "example": "any"
+                },
+                "action": {
+                  "example": "any"
+                },
+                "actionValue": {
+                  "example": "any"
+                },
+                "collection": {
+                  "example": "any"
+                },
+                "enableFor": {
+                  "example": "any"
+                },
+                "order": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "Permission"
+        ]
+      }
+    },
     "/auth/signup": {
       "post": {
         "description": "",
