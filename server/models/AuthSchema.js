@@ -109,7 +109,7 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["super_admin", "admin", "teacher", "parent", "student"],
+      enum: ["admin", "teacher", "parent", "student"],
       required: true
     },
     avatar: {

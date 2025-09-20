@@ -63,12 +63,12 @@ const signupController = async (req, res) => {
     const { fullName, dob, email, password, role } = req.body;
 
     if (
-      (role !== "admin" && role !== "super_admin")
+      (role !== "admin")
     ) {
       return res
         .status(403)
         .json({
-          message: "Only admin or super_admin can create accounts",
+          message: "Only admin can create accounts",
           status: false,
         });
     }

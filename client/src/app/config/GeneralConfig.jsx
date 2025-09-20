@@ -1,5 +1,5 @@
 
-export const includeRoutes = ['/','/demo'];
+export const includeRoutes = ['/','/demo', '/contact', '/privacy'];
 
 const generalConfig = {
   header: {
@@ -58,7 +58,7 @@ const generalConfig = {
         styles: {
           inlineStyle: {
             flexDirection: {xs:"column", lg:"row"},
-            gap: {xs:"1.5rem", lg:"4rem"},
+            gap: {xs:"1.5rem", lg:"2em"},
             px: {xs:"1.5rem", md:"0rem"}
           },
             navStyle:{inlineStyle: { color: "black" , fontWeight:'500', fontSize:'1.2rem'}, className: "" }
