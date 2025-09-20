@@ -144,7 +144,7 @@ const page = () => {
       </Box>
 
       {/* form */}
-      <Box sx={{ width: {xs:"full", lg:"35%"} }}>
+      <Box sx={{ width: {xs:"full", lg:"45%"} }}>
         <Form type="demo" />
       </Box>
     </Box>
