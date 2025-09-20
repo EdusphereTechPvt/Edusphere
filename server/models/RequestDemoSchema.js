@@ -29,7 +29,7 @@ const RequestDemoSchema = new mongoose.Schema({
     type: [String], 
     default: [] }, 
     
-  heardFrom: { 
+  reference: { 
     type: String },
 
   message: { 
