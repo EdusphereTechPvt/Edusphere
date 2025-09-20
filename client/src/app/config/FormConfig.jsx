@@ -284,7 +284,9 @@ const formConfig = {
     ],
   },
   demo: {
-    api: {},
+    api: {
+      submit: "/requestdemo/add"
+    },
     sections: [
       {
         title: "",
@@ -303,13 +305,13 @@ const formConfig = {
           },
           {
             type: "email",
-            name: "emailAddress",
+            name: "email",
             label: "Email Address",
             placeholder: "Enter email address",
           },
           {
             type: "text",
-            name: "phoneNo.",
+            name: "phone",
             label: "Phone Number",
             placeholder: "Enter Your Phone Number",
           },
@@ -335,7 +337,7 @@ const formConfig = {
           },
           {
             type: "date",
-            name: "startingDate",
+            name: "preferredDate",
             label: "Preferred Demo Date",
           },
         ],
@@ -363,7 +365,7 @@ const formConfig = {
           {
             type: "dropdown",
             data: {
-              name: "refrence",
+              name: "reference",
               label: "How did you hear about us?",
               placeholder: "Select an option",
               required: true,
@@ -402,7 +404,7 @@ const formConfig = {
             type: "button",
             variant: "contained",
             text: "Submit Demo Request",
-            action: "save",
+            action: "submit",
           },
         ],
       },

@@ -2,7 +2,7 @@ const RequestDemo = require("../models/RequestDemoSchema");
 
 const addRequestDemo = async (req, res) => {
   try {
-    const { fullName, schoolName, email, phone, schoolSize, preferredDate, features, heardFrom, message } = req.body;
+    const { fullName, schoolName, email, phone, schoolSize, preferredDate, features, reference, message } = req.body;
 
     if (!email || !schoolName) {
       return res.status(400).json({ 
@@ -19,7 +19,7 @@ const addRequestDemo = async (req, res) => {
       schoolSize, 
       preferredDate, 
       features, 
-      heardFrom, 
+      reference, 
       message 
     });
 

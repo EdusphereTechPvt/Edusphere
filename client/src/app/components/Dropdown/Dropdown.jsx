@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FormControl,
   InputLabel,
@@ -9,7 +9,7 @@ import {
   OutlinedInput,
 } from "@mui/material";
 
-const Dropdown = ({ data, style = {}, onSelect }) => {
+const Dropdown = ({ data, resetFlag, style = {}, onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");
 
@@ -18,6 +18,10 @@ const Dropdown = ({ data, style = {}, onSelect }) => {
     setSelectedValue(value);
     onSelect?.(value);
   };
+
+  useEffect(()=>{
+    setSelectedValue("")
+  },[resetFlag])
 
   return (
     <Box className={`${style.className}`} sx={{ ...style.inlineStyle }}>

@@ -14,9 +14,11 @@ import {
   PersonOutline,
 } from "@mui/icons-material";
 import formConfig from "../../config/FormConfig";
+import { handleFormAction } from "@/app/services/FormService";
 
 export default function Form({ type }) {
   const [formData, setFormData] = useState({});
+  const [resetFlag, setResetFlag] = useState(false)
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -26,9 +28,11 @@ export default function Form({ type }) {
   const handleButtonAction = (action) => {
     if (action === "cancel") {
       setFormData({});
-    } else if (action === "save") {
-      console.log("Saving form data:", formData);
+      setResetFlag(!resetFlag)
+    } else if (action === "submit") {
+      handleFormAction(formData, config.api[action])
       setFormData({});
+      setResetFlag(!resetFlag)
     }
   };
 
@@ -217,6 +221,7 @@ export default function Form({ type }) {
                       >
                         <Dropdown
                           data={data || {}}
+                          resetFlag={resetFlag}
                           onSelect={(value) => handleChange(data.name, value)}
                           required={required}
                         />

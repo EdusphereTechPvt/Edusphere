@@ -220,7 +220,7 @@
                 "features": {
                   "example": "any"
                 },
-                "heardFrom": {
+                "reference": {
                   "example": "any"
                 },
                 "message": {
