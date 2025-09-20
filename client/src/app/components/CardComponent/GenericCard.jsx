@@ -7,13 +7,14 @@ const GenericCard = ({
   icon: Icon,
   title,
   desc,
+  additionalInfo = [],
   docUrl,
   onclick,
   styles = {},
 }) => (
   <Card
-    onClick={onclick || undefined}
-    sx={{
+  onClick={onclick || undefined}
+  sx={{
       maxWidth: 360,
       p: 2,
       textAlign: "center",
@@ -33,6 +34,7 @@ const GenericCard = ({
     }}
     className={styles.cardStyle?.className}
   >
+    {console.log(styles)}
     {avatar && (
       <Avatar
         src={avatar}
@@ -66,7 +68,7 @@ const GenericCard = ({
       className={styles.textContainerStyle?.className}
     >
       <Typography
-        sx={{...styles.textContainerStyle?.titleStyle?.inlineStyle }}
+        sx={{ ...styles.textContainerStyle?.titleStyle?.inlineStyle }}
         className={styles.textContainerStyle?.titleStyle?.className}
       >
         {title}
@@ -80,6 +82,27 @@ const GenericCard = ({
           {desc}
         </Typography>
       )}
+      {additionalInfo && additionalInfo.map((info, index) => {
+
+        const [key, value] = Object.entries(info)[0];
+
+        const baseStyle = styles.textContainerStyle?.additionalInfoStyle?.inlineStyle || {};
+        const baseClass = styles.textContainerStyle?.additionalInfoStyle?.className || "";
+
+        const keyStyle = styles.textContainerStyle?.additionalInfoStyle?.[key]?.inlineStyle || {};
+        const keyClass = styles.textContainerStyle?.additionalInfoStyle?.[key]?.className || "";
+        console.log(JSON.stringify(keyStyle),key, value)
+        return (
+          <Typography
+            key={index}
+            sx={{ ...baseStyle, ...keyStyle }}
+            className={`${baseClass} ${keyClass}`}
+          >
+            {value}
+          </Typography>
+        );
+      })}
+
       {docUrl && (
         <Box mt={1}>
           <Link href={docUrl} target="_blank" underline="hover">
