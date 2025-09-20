@@ -1,7 +1,7 @@
 import { formatConfig } from "../utils/FormatConfig";
 
 
-export const includeRoutes = ['/','/demo', '/contact'];
+export const includeRoutes = ['/','/demo', '/contact', '/privacy'];
 
 const generalConfig = {
   header: {
