@@ -64,7 +64,7 @@ const page = () => {
           </Box>
         );
 
-      case "dropdown":
+      case "accordion":
         return (
           <Box
             sx={{
@@ -102,8 +102,8 @@ const page = () => {
         display: "flex",
         flexDirection: { xs: "column", md: "row" },
         p: "2rem",
-        px: "8rem",
-        gap: "2rem",
+        px: {xs:"1.5rem", sm:"2rem", md:"3rem", lg:"4rem"},
+        gap: "3rem",
         alignItems: { xs: "center", md: "flex-start" },
         textAlign: { xs: "center", md: "left" },
       }}
@@ -134,7 +134,7 @@ const page = () => {
               </Typography>
             )}
 
-            <Box sx={{ mt: "1rem" }}>
+            <Box sx={{ mt: "1rem", alignItems: "center"}}>
               {section.items?.map((item, idx2) => (
                 <DynamicRenderer key={idx2} config={item} />
               ))}
@@ -144,7 +144,7 @@ const page = () => {
       </Box>
 
       {/* form */}
-      <Box sx={{ width: {xs:"full", lg:"45%"} }}>
+      <Box sx={{ width: {xs:"full", lg:"60%"} }}>
         <Form type="demo" />
       </Box>
     </Box>
