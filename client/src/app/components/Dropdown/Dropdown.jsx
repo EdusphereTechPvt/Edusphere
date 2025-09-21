@@ -26,7 +26,7 @@ const Dropdown = ({ data, resetFlag, style = {}, onSelect }) => {
   return (
     <Box className={`${style.className}`} sx={{ ...style.inlineStyle }}>
       {data.label && (
-        <Box className="text-sm font-medium mb-2 text-gray-700">{data.label}</Box>
+        <Box className="text-sm font-medium mb-[0.33rem] text-gray-700">{data.label}</Box>
       )}
 
       <FormControl
@@ -45,13 +45,14 @@ const Dropdown = ({ data, resetFlag, style = {}, onSelect }) => {
           onOpen={() => setIsOpen(true)}
           open={isOpen}
           label={data.placeholder}
+                
           sx={{ borderRadius: "0.35rem", ...style,}}
           MenuProps={{
             PaperProps: {
               sx: {
                 borderRadius: "0.35rem",
                 boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
-                mt: "0.5rem",
+                mt: "0.7rem",
               },
             },
           }}
