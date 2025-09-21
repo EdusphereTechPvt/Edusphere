@@ -11,6 +11,8 @@ const requestdemoRoutes = require("./routes/RequestDemoRoutes");
 const studentRoutes = require("./routes/StudentRoutes");
 const teacherRoutes = require("./routes/TeacherRoutes");
 const helpcenterroutes = require("./routes/HelpCenterRoutes");
+const classRoutes = require("./routes/ClassRoutes")
+const subjectRoutes = require("./routes/SubjectRoutes")
 
 const app = express();
 
@@ -27,6 +29,8 @@ app.use("/helpcenter", helpcenterroutes);
 app.use("/requestdemo", requestdemoRoutes);
 app.use("/student", studentRoutes);
 app.use("/teacher", teacherRoutes);
+app.use("/class", classRoutes);
+app.use("/subject", subjectRoutes);
 
 mongoose
   .connect(process.env.MONGO_URL, {})
