@@ -1,4 +1,5 @@
 const express = require('express');
+const cookieParser = require("cookie-parser");
 const cors = require("cors")
 const dotenv = require("dotenv")
 const swaggerUi = require("swagger-ui-express");
@@ -10,14 +11,13 @@ const requestdemoRoutes = require("./routes/RequestDemoRoutes");
 const studentprofileRoutes = require("./routes/StudentProfileRoutes");
 const teacherprofileRoutes = require("./routes/TeacherProfileRoutes");
 
-
-
 const app = express();
 
 dotenv.config();
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 app.use('/permission', elementRoutes)
@@ -25,10 +25,6 @@ app.use('/auth', authRoutes);
 app.use('/requestdemo', requestdemoRoutes);
 app.use("/student", studentprofileRoutes);
 app.use("/teacher", teacherprofileRoutes);
-
-
-
-
 
 mongoose.connect(process.env.MONGO_URL, {
 }).then(() => {

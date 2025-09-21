@@ -1,15 +1,14 @@
-
 // const mongoose = require("mongoose");
 
 // const TeacherProfileSchema = new mongoose.Schema({
-    
+
 //   userId: {
-//      type: mongoose.Schema.Types.ObjectId, 
+//      type: mongoose.Schema.Types.ObjectId,
 //      ref: "User", required: true,
 //       unique: true },
 
-//   employeeId: { 
-//     type: String, 
+//   employeeId: {
+//     type: String,
 //     unique: true, required: true,
 //      minlength: 3 },
 
@@ -17,15 +16,15 @@
 //      type: [String],
 //       required: true },
 
-//   classes: { 
-//     type: [String], 
+//   classes: {
+//     type: [String],
 //     required: true },
 
 //   qualification: {
 //      type: String,
 //       minlength: 3 },
 
-//   dateOfJoining: { 
+//   dateOfJoining: {
 //     type: Date,
 //      required: true },
 
@@ -42,56 +41,77 @@ const TeacherProfileSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
-    fullName: { 
-      type: String, 
+    schoolId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "School",
       required: true,
-       trim: true },
+    },
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-    dateOfBirth: { 
-      type: Date, 
-      required: true },
+    dateOfBirth: {
+      type: Date,
+      required: true,
+    },
 
     gender: {
-       type: String,
-        required: true },
-
-    phone: { 
       type: String,
-       required: true },
+      required: true,
+    },
 
-    email: { 
+    phone: {
       type: String,
-       required: true, 
-       unique: true },
+      required: true,
+    },
 
-    address: { 
-      type: String },
-
-    teacherId: { 
+    email: {
       type: String,
-       unique: true,
-        sparse: true },
+      required: true,
+      unique: true,
+    },
 
-    subjects: [{
-       type: String,
-        required: true }],
+    address: {
+      type: String,
+    },
 
-    classesAssigned: [{
-       type: String }],
+    teacherId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
+    subjects: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+
+    classesAssigned: [
+      {
+        type: String,
+      },
+    ],
 
     joiningDate: {
-       type: Date,
-        required: true },
+      type: Date,
+      required: true,
+    },
 
-    qualification: { 
-      type: String },
+    qualification: {
+      type: String,
+    },
 
     experienceYears: {
-       type: Number },
+      type: Number,
+    },
 
-    emergencyContact: { 
-      type: String },
+    emergencyContact: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

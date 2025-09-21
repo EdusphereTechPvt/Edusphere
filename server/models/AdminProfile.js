@@ -8,29 +8,30 @@ const AdminProfileSchema = new mongoose.Schema(
       required: true,
       unique: true
     },
+    schoolId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "School",
+      required: true
+    },
     employeeId: {
       type: String,
       unique: true,
-      required: true
+      sparse:true
     },
     designation: {
       type: String,
-      required: true,
       minlength: 3
     },
     department: {
       type: String,
-      required: true
     },
     contactNumber: {
       type: String,
-      required: true,
       minlength: 10,
       maxlength: 15
     },
     dateOfJoining: {
       type: Date,
-      required: true
     }
   },
   { timestamps: true }

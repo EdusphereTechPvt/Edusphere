@@ -1,6 +1,6 @@
 const User = require("../models/AuthSchema");
 const StudentProfile = require("../models/StudentProfile");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 
 
 const addOrUpdateStudent = async (req, res) => {

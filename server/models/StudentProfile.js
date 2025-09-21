@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const StudentProfileSchema = new mongoose.Schema(
@@ -7,52 +6,65 @@ const StudentProfileSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true
+      unique: true,
     },
     studentId: {
-       type: String,
-        unique: true,
-         sparse: true },
-
-    grade: { 
       type: String,
-       required: true },
-    section: { 
+      unique: true,
+      sparse: true,
+    },
+    schoolId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "School",
+      required: true,
+    },
+    grade: {
       type: String,
-       required: true },
+      required: true,
+    },
+    section: {
+      type: String,
+      required: true,
+    },
 
     enrollmentDate: {
-       type: Date,
-        required: true },
+      type: Date,
+      required: true,
+    },
 
     previousSchool: {
-       type: String },
+      type: String,
+    },
 
     guardianName: {
-       type: String,
-        required: true },
+      type: String,
+      required: true,
+    },
 
     relationshipToStudent: {
-       type: String,
-        required: true },
-
-    guardianContact: { 
       type: String,
-       required: true },
+      required: true,
+    },
 
-    allergies: { 
-      type: String },
+    guardianContact: {
+      type: String,
+      required: true,
+    },
+
+    allergies: {
+      type: String,
+    },
 
     medicalConditions: {
-       type: String },
+      type: String,
+    },
 
     emergencyContacts: {
-       type: String,
-        required: true }
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
 module.exports = mongoose.model("StudentProfile", StudentProfileSchema);
-
-
