@@ -10,6 +10,7 @@ const authRoutes = require('./routes/AuthRoutes');
 const requestdemoRoutes = require("./routes/RequestDemoRoutes");
 const studentprofileRoutes = require("./routes/StudentProfileRoutes");
 const teacherprofileRoutes = require("./routes/TeacherProfileRoutes");
+const helpcenterroutes = require("./routes/HelpCenterRoutes");
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(cookieParser());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 app.use('/permission', elementRoutes)
 app.use('/auth', authRoutes);
+app.use("/helpcenter", helpcenterroutes);
 app.use('/requestdemo', requestdemoRoutes);
 app.use("/student", studentprofileRoutes);
 app.use("/teacher", teacherprofileRoutes);
