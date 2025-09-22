@@ -49,18 +49,13 @@ function encrypt(text) {
 
 function decrypt(enc) {
   const ENC_KEY = getEncKey();
-  console.log("ENC_KEY",ENC_KEY)
   const data = Buffer.from(enc, "base64");
-  console.log("data",data)
   const iv = data.slice(0, IV_LENGTH);
-  console.log(iv)
   const tag = data.slice(IV_LENGTH, IV_LENGTH + 16);
-  console.log(tag)
   const ciphertext = data.slice(IV_LENGTH + 16);
   const decipher = crypto.createDecipheriv("aes-256-gcm", ENC_KEY, iv);
   decipher.setAuthTag(tag);
   const result = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
-  console.log(result)
   return result.toString("utf8");
 }
 
@@ -73,9 +68,7 @@ function signAccessToken(payload) {
 
 function verifyAccessToken(encryptedToken) {
   const JWT_SECRET = getJWTSecret();
-  console.log("JWT_SECRET",JWT_SECRET)
   const signed = decrypt(encryptedToken);
-  console.log("signed",signed)
   return jwt.verify(signed, JWT_SECRET);
 }
 
