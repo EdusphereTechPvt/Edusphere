@@ -190,7 +190,7 @@ const Header = ({ path }) => {
           <Box sx={{ display: "flex", flexDirection: "column", mt: "1rem" }}>
             {header.sections.map(
               (section, index) =>
-                ["nav", "action"].includes(section.type.toLowerCase()) &&
+                ["navigate", "action"].includes(section.type.toLowerCase()) &&
                 renderElements(section, index, true)
             )}
           </Box>

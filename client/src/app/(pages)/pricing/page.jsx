@@ -138,7 +138,7 @@ const Subscription = () => {
                 }}>
                     <Grid container spacing={3} wrap="nowrap" justifyContent="center">
                         {config.schoolLogos.map((logo, key) => (
-                            <Grid item xs={12} sm={6} md={4} sx={{ display: 'flex', flexShrink: 0 }}>
+                            <Grid key={key} item xs={12} sm={6} md={4} sx={{ display: 'flex', flexShrink: 0 }}>
                                 <Card className="flex-row items-center mx-2 my-5">
 
                                     <img src={logo} alt="" width="100px" className="w-40" />
