@@ -44,7 +44,7 @@ const getHelpCentersByType = async (req, res) => {
       type: item.type,
       title: item.title,
       description: item.description,
-      views: `${item.views} Views`,
+      views: item.views,
       likes: item.likes,
       dislikes: item.dislikes,
     }));
@@ -72,7 +72,7 @@ const getHelpCenters = async (req, res) => {
       type: item.type,
       title: item.title,
       description: item.description,
-      views: `${item.views} Views`,
+      views: item.views,
       likes: item.likes,
       dislikes: item.dislikes,
     }));
@@ -132,7 +132,7 @@ const updateDislikes = async (req, res) => {
       });
     }
 
-    article.dislikes += 1;
+    article.dislikes = Math.floor(article.dislikes/2);
     await article.save();
 
     res.status(200).json({
@@ -148,6 +148,33 @@ const updateDislikes = async (req, res) => {
     });
   }
 };
+
+const updateViews = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const article = await HelpCenter.findById(id);
+    if (!article) {
+      return res.status(404).json({
+        message: "Article not found",
+        status: false,
+      });
+    }
+    article.views += 1;
+    await article.save();
+
+    res.status(200).json({
+      message: "View count updated successfully",
+      data: article,
+      status: true,
+    });
+  } catch (err) {
+    console.error("Update View Error:", err);
+    res.status(500).json({
+      message: "Server error while updating view count",
+      status: false,
+    });
+  }
+}
 
 const deleteHelpCenter = async (req, res) => {
   try {
@@ -180,5 +207,6 @@ module.exports = {
   getHelpCentersByType,
   updateLikes,
   updateDislikes,
+  updateViews,
   deleteHelpCenter,
 };

@@ -17,6 +17,14 @@ export const updateConfig = (generalConfig, elementPath, result)=>{
             data: result,
           },
         ]
+        break;
+        case 'helpcenterrecords': 
+        locationToUpdate = [
+          { key: "tabs", childType: "array" },
+          { matchKey: "name", matchValue: result[0]?.type },
+          { dataKey: "items", data: result },
+          ]
+        break;
     }
     generalConfig = formatConfig(generalConfig, locationToUpdate);
     return generalConfig;
