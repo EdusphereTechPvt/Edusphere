@@ -1,5 +1,5 @@
 
-export const includeRoutes = ['/','/demo', '/contact', '/privacy'];
+export const includeRoutes = ['/','/demo', '/contact', '/privacy', '/pricing'];
 
 const generalConfig = {
   header: {
