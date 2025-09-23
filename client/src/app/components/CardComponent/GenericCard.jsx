@@ -34,7 +34,6 @@ const GenericCard = ({
     }}
     className={styles.cardStyle?.className}
   >
-    {console.log(styles)}
     {avatar && (
       <Avatar
         src={avatar}
@@ -91,7 +90,6 @@ const GenericCard = ({
 
         const keyStyle = styles.textContainerStyle?.additionalInfoStyle?.[key]?.inlineStyle || {};
         const keyClass = styles.textContainerStyle?.additionalInfoStyle?.[key]?.className || "";
-        console.log(JSON.stringify(keyStyle),key, value)
         return (
           <Typography
             key={index}
