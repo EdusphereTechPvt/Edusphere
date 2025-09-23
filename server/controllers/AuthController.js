@@ -33,7 +33,7 @@ const loginController = async (req, res) => {
     const session = await mongoose.startSession();
   session.startTransaction();
 
-    const { type, uidOrEmail, password } = req.body;
+    const { role, uidOrEmail, password } = req.body;
 
      const ip = req.ip;
     const ua = req.headers["user-agent"] || "";
@@ -48,10 +48,10 @@ const loginController = async (req, res) => {
       return res.status(404).json({ message: "User not found", status: false });
 
      if (user.lockedUntil && user.lockedUntil > new Date()) {
-      return res.status(423).json({ message: "Account locked. Try later or contact admin." });
+      return res.status(423).json({ message: "Account locked. Try later or contact admin.", status: false });
     }
 
-    if (user.role !== type)
+    if (user.role !== role)
       return res
         .status(400)
         .json({ message: "Invalid role for this user", status: false });
@@ -69,7 +69,7 @@ const loginController = async (req, res) => {
         user.lockedUntil = new Date(Date.now() + 15 * 60 * 1000); // lock 15 minutes
       }
       await user.save({session});
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid credentials", status: false });
     }
 
     user.failedLoginAttempts = 0;
@@ -159,19 +159,22 @@ const signupController = async (req, res) => {
     await school.save({ session });
 
     invite.used = true;
+    invite.usedBy = newUser._id;
+    invite.usedAt = new Date();
     await invite.save({ session });
 
     await session.commitTransaction();
 
     res.status(201).json({
       message: "Admin registered successfully",
+      status: true,
       uid: newUser._id,
       schoolId: school.schoolId,
     });
   } catch (err) {
     await session.abortTransaction();
     console.error("Signup Error:", err);
-    res.status(500).json({ message: err.message || "Server error during signup" });
+    res.status(500).json({ message: err.message || "Server error during signup", status: false });
   } finally {
     session.endSession();
   }
@@ -180,32 +183,31 @@ const signupController = async (req, res) => {
 const refreshController = async (req, res) => {
   try {
     const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
-    if (!refreshToken) return res.status(401).json({ message: "No refresh token" });
+    if (!refreshToken) return res.status(401).json({ message: "No refresh token", status: false });
 
     let payload;
     try {
       payload = verifyRefreshToken(refreshToken);
     } catch (e) {
-      return res.status(403).json({ message: "Invalid refresh token" });
+      return res.status(403).json({ message: "Invalid refresh token", status: false });
     }
 
     const { userId, jti } = payload;
     const user = await User.findById(userId);
-    if (!user) return res.status(403).json({ message: "Invalid token (user)" });
+    if (!user) return res.status(403).json({ message: "Invalid token (user)", status: false });
 
     const session = user.sessions.find(s => s.jti === jti);
 
     if (!session) {
       user.sessions = [];
       await user.save();
-      return res.status(403).json({ message: "Refresh token reuse detected. All sessions revoked." });
+      return res.status(403).json({ message: "Refresh token reuse detected. All sessions revoked.", status:false });
     }
-
     const matches = await bcrypt.compare(refreshToken, session.refreshTokenHash);
     if (!matches) {
       user.sessions = [];
       await user.save();
-      return res.status(403).json({ message: "Refresh token reuse detected. All sessions revoked." });
+      return res.status(403).json({ message: "Refresh token reuse detected. All sessions revoked.", status:false });
     }
 
     const newJti = genJti();
@@ -233,10 +235,10 @@ const refreshController = async (req, res) => {
     const csrf = crypto.randomBytes(24).toString("hex");
     res.cookie("csrfToken", csrf, { secure: cookieOptions.secure, sameSite: "Strict" });
 
-    res.json({ ok: true, csrf });
+    res.json({ status: true, csrf });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", status:false });
   }
 };
 
@@ -248,7 +250,7 @@ const logout = async (req, res) => {
       res.clearCookie("accessToken", cookieOptions);
       res.clearCookie("refreshToken", cookieOptions);
       res.clearCookie("csrfToken", { sameSite: "Strict", secure: cookieOptions.secure });
-      return res.json({ ok: true });
+      return res.json({ status: true, message: "Logged out" });
     }
 
     let payload;
@@ -258,7 +260,7 @@ const logout = async (req, res) => {
       res.clearCookie("accessToken", cookieOptions);
       res.clearCookie("refreshToken", cookieOptions);
       res.clearCookie("csrfToken", { sameSite: "Strict", secure: cookieOptions.secure });
-      return res.json({ ok: true });
+      return res.json({ status: true, message: "Logged out" });
     }
 
     const user = await User.findById(payload.userId);
@@ -270,10 +272,10 @@ const logout = async (req, res) => {
     res.clearCookie("accessToken", cookieOptions);
     res.clearCookie("refreshToken", cookieOptions);
     res.clearCookie("csrfToken", { sameSite: "Strict", secure: cookieOptions.secure });
-    return res.json({ ok: true });
+    return res.json({ status: true, message: "Logged out" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", status:false });
   }
 };
 
@@ -288,10 +290,10 @@ const revokeAll = async (req, res) => {
     res.clearCookie("accessToken", cookieOptions);
     res.clearCookie("refreshToken", cookieOptions);
     res.clearCookie("csrfToken", { sameSite: "Strict", secure: cookieOptions.secure });
-    res.json({ ok: true });
+    res.json({ status: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", status:false });
   }
 };
 
@@ -300,20 +302,20 @@ const revokeAll = async (req, res) => {
 const verify = async(req, res) => {
   try {
     const enc = req.cookies?.accessToken || (req.headers.authorization && req.headers.authorization.split(" ")[1]);
-    if (!enc) return res.status(401).json({ message: "No token" });
+    if (!enc) return res.status(401).json({ message: "No token", status: false });
     let decoded;
     try {
       const decryptToken = decodeURIComponent(enc);
       decoded = verifyAccessToken(decryptToken);
     } catch (e) {
-      return res.status(401).json({ message: "Invalid or expired token" });
+      return res.status(401).json({ message: "Invalid or expired token", status: false });
     }
     const user = await User.findById(decoded.userId).select("-password -sessions");
-    if (!user) return res.status(401).json({ message: "Unauthenticated" });
+    if (!user) return res.status(401).json({ message: "Unauthenticated", status: false });
     res.json({ user });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", status: false });
   }
 };
 
@@ -408,11 +410,11 @@ const generateInviteToken = async (req, res) => {
     res.status(201).json({
       inviteToken: token,
       schoolId,
-      expiresAt,
+      expiresAt, status: true
     });
   } catch (err) {
     console.error("Invite Token Error:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", status: false });
   }
 };
 

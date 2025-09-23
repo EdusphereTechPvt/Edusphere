@@ -189,7 +189,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "type": {
+                "role": {
                   "example": "any"
                 },
                 "uidOrEmail": {

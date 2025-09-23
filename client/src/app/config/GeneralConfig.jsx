@@ -99,7 +99,7 @@ const generalConfig = {
             variant: "contained",
             text: "Sign Up Now",
             onclick: () =>
-              (window.location.href = "http://localhost:3000/signup"),
+              (window.location.href = "http://localhost:3000/auth"),
             styles: {
               inlineStyle: {
                 textTransform: "none",
