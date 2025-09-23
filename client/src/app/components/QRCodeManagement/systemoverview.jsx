@@ -14,11 +14,11 @@ const SystemOverview = () => {
         const res = await fetch("/api/system-overview");
         // const data = await res.json();
 
-        // Expected data format from backend:
+        // Sample data format from backend
        const data = [
           { title: "Active QR Code Session", value: "Session 1" },
           { title: "Today's Check-ins", value: "250" },
-        //   { title: "Today's Check-outs", value: "230" },
+          // { title: "Today's Check-outs", value: "230" },
           { title: "Usage Analytics", value: "85%" }
         ]
 
@@ -34,7 +34,7 @@ const SystemOverview = () => {
   return (
     <Box>
       <Typography
-        variant="h6"
+        variant="h5"
         fontWeight="bold"
         color="text.primary"
         mb={2}
