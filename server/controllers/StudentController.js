@@ -13,6 +13,7 @@ const addOrUpdateStudent = async (req, res) => {
       address,
       grade,
       section,
+      schoolId,
       enrollmentDate,
       previousSchool,
       guardianName,
@@ -23,9 +24,9 @@ const addOrUpdateStudent = async (req, res) => {
       emergencyContacts
     } = req.body;
 
-    if (!fullName || !dob || !email || !grade || !section) {
+    if (!fullName || !dob || !email || !grade || !section || !schoolId) {
       return res.status(400).json({
-        message: "Full name, DOB, Email, Grade, and Section are required",
+        message: "Full name, DOB, Email, Grade, Section or School ID is required",
         status: false
       });
     }
@@ -71,6 +72,7 @@ const addOrUpdateStudent = async (req, res) => {
         grade,
         section,
         enrollmentDate,
+        schoolId,
         previousSchool,
         guardianName,
         relationshipToStudent,
@@ -156,6 +158,34 @@ const getStudentDetails = async (req, res) => {
   }
 };
 
+const getAllStudentsDetails = async (req,res) => {
+  try {
+
+    const students = await StudentProfile.find({schoolId: req.user.schoolId});
+
+    if (students.length === 0) {
+      return res.status(404).json({
+        data: [],
+        message: "No student found",
+        status: false
+      });
+    }
+
+    res.status(200).json({
+      data: students,
+      message: `${students.length} student(s) found successfully`,
+      status: true
+    });
+  }
+  catch(err){
+     console.error("Get Student Error:", err);
+    res.status(500).json({
+      message: "Server error while fetching student details",
+      status: false
+    });
+  }
+}
+
 
 const deleteStudent = async (req, res) => {
   try {
@@ -185,4 +215,4 @@ const deleteStudent = async (req, res) => {
   }
 };
 
-module.exports = { addOrUpdateStudent, getStudentDetails, deleteStudent };
+module.exports = { addOrUpdateStudent, getStudentDetails, deleteStudent, getAllStudentsDetails };

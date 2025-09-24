@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import {
   Table,
@@ -14,34 +15,33 @@ import {
 } from "@mui/material";
 import CustomPagination from "./Pagination";
 import { statusConfig } from "@/app/config/TableConfig";
-import { getBackgroundColor } from "../../utils/HelperFunctions";
-import Dropdown from "../Dropdown/Dropdown";
-
 
 export const TableComponent = ({
   topHeader = [],
-  headers,
+  headers = [],
   data = [],
   type,
+  onClick,
   pagination = false,
   className = "lg:text-base text-sm",
+  columnStyles,
   styles = {},
   colors = [],
+  clickableFields = [],
 }) => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
-  if (!pagination) {
-    setRowsPerPage(data.length);
-  }
-}, [data, pagination]);
-
+    if (!pagination) {
+      setRowsPerPage(data.length);
+    }
+  }, [data, pagination]);
 
   const startIndex = (page - 1) * rowsPerPage;
   const paginatedData = data?.slice(startIndex, startIndex + rowsPerPage);
   const date = new Date();
-  const currentDay = date.toLocaleDateString('en-US', { weekday: 'long' });
+  const currentDay = date.toLocaleDateString("en-US", { weekday: "long" });
 
   // get color
   const getStatusStyle = (status) =>
@@ -56,7 +56,7 @@ export const TableComponent = ({
           type,
           path,
           onClick,
-          icon,
+          Icon,
           variant,
           options = [],
           placeholder,
@@ -84,7 +84,7 @@ export const TableComponent = ({
                 className="flex items-center gap-2 px-2 py-1 text-sm sm:text-base font-medium transition relative"
                 style={styles}
               >
-                {icon && <span className="text-lg">{icon}</span>}
+                {Icon && <span className="text-lg">{Icon}</span>}
                 <span>{text}</span>
               </a>
             );
@@ -131,10 +131,10 @@ export const TableComponent = ({
                   ":hover": {
                     filter: "brightness(95%)",
                   },
-                  ...styles,
+                  ...styles.elementStyles,
                 }}
               >
-                {icon && <icon sx={styles?.iconStyles} />}
+                {Icon && <Icon style={{...styles.iconStyles}} sx={{color:"black", ...styles?.iconStyles}} />}
                 {text}
               </Button>
             );
@@ -145,6 +145,14 @@ export const TableComponent = ({
       }
     );
   };
+
+    const handleCellClick = (value) => {
+    console.log(value);
+    if (onClick) {
+      onClick(value);
+    }
+  };
+
 
 
   return (
@@ -199,21 +207,19 @@ export const TableComponent = ({
                 <TableCell
                   key={index}
                   sx={{
-                    fontSize: { xs: "0.70rem", lg: "0.85rem" },
-                    fontWeight: 500,
+                    width: `${100 / headers.length}%`,
+
+                    fontWeight: 600,
+                    whiteSpace: "normal",
+                    wordBreak: "break-word",
+                    px: { xs: 1, sm: 1.5, md: 2 },
                     color: "#9ca3af",
-                    borderLeft:
-                      type === "timetable"
-                        ? currentDay === header
-                          ? "2px solid #3b82f6 "
-                          : "1px solid #e5e7eb"
-                        : "none",
-                    borderRight:
-                      type === "timetable"
-                        ? currentDay === header
-                          ? "2px solid #3b82f6 "
-                          : "1px solid #e5e7eb"
-                        : "none",
+                    fontSize: {
+                      xs: "0.75rem",
+                      sm: "0.82rem",
+                      md: "0.87rem",
+                      lg: "0.9rem",
+                    },
                     ...styles?.headerCell,
                   }}
                 >
@@ -231,107 +237,76 @@ export const TableComponent = ({
                 const { bg, hoverBg, chipBg, chipColor } =
                   getStatusStyle(rowStatus);
 
-                switch (type) {
-                  case "timetable":
-                    return (
-                      <TableRow key={rowIndex}>
-                        {headers.map((header, colIndex) => (
-                          <TableCell
-                            key={colIndex}
-                            sx={{
-                              fontSize: { xs: "0.75rem", lg: "0.85rem" },
-                              fontWeight: header === "Time" ? "bold" : "500",
-                              borderRight:
-                                header === currentDay
-                                  ? "2px solid #3b82f6 "
-                                  : "1px solid #e5e7eb",
-                              textAlign: "center",
-                              backgroundColor:
-                                row[header] &&
-                                getBackgroundColor(row[header].status, colors),
-                              borderLeft:
-                                header === currentDay
-                                  ? "2px solid #3b82f6 "
-                                  : "1px solid #e5e7eb",
-                              borderRadius:
-                                row[header] &&
-                                row[header].status === "Current Period"
-                                  ? "20px"
-                                  : "0px",
-                            }}
-                          >
-                            {row[header] && row[header].value ? (
-                              row[header].value.split("\n").map((line, idx) => (
-                                <div
-                                  key={idx}
-                                  style={{
-                                    fontWeight: idx === 0 ? "bold" : "",
-                                  }}
-                                >
-                                  {line}
-                                </div>
-                              ))
-                            ) : (
-                              <div
-                                style={{
-                                  fontWeight: "500",
-                                  fontSize: "2.5rem",
-                                }}
-                              >
-                                -
-                              </div>
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    );
-                  default:
-                    return (
-                      <TableRow
-                        key={rowIndex}
-                        sx={{
-                          backgroundColor: bg,
-                          "&:hover": { backgroundColor: hoverBg },
-                        }}
-                      >
-                        {headers?.map((header, colIndex) => {
-                          const cellValue =
-                            row[header] || row[header.toLowerCase()];
+                return (
+                  <TableRow
+                    key={rowIndex}
+                    sx={{
+                      backgroundColor: bg,
+                      "&:hover": {
+                        backgroundColor: hoverBg,
+                      },
+                    }}
+                  >
+                    {headers?.map((header, colIndex) => {
+                      const cellValue =
+                        row[header] || row[header.toLowerCase()];
 
-                          return (
-                            <TableCell
-                              key={colIndex}
+                      // Check if current header is clickable
+                      const isClickable = clickableFields.includes(
+                        header.toLowerCase()
+                      );
+
+                      return (
+                        <TableCell
+                          key={colIndex}
+                          onClick={
+                            isClickable
+                              ? () => handleCellClick(cellValue)
+                              : undefined
+                          }
+                          sx={{
+                            cursor: isClickable ? "pointer" : "default",
+                            transition: "filter 0.2s",
+                            "&:hover": {
+                              filter: isClickable ? "brightness(0.7)" : "none",
+                            },
+                          }}
+                        >
+                          {header === "Status" ? (
+                            <Chip
+                              label={`● ${cellValue}`}
+                              size="small"
                               sx={{
-                                fontSize: { xs: "0.75rem", lg: "0.85rem" },
-                                fontWeight: 400,
+                                backgroundColor: chipBg,
+                                color: chipColor,
+                                fontSize: {
+                                  xs: "0.65rem",
+                                  sm: "0.75rem",
+                                  md: "0.85rem",
+                                },
+                                ...columnStyles?.[header],
+                              }}
+                            />
+                          ) : (
+                            <Typography
+                              sx={{
+                                fontSize: {
+                                  xs: "0.65rem",
+                                  sm: "0.75rem",
+                                  md: "0.85rem",
+                                },
+
+                                ...columnStyles?.[header],
                               }}
                             >
-                              {header === "Status" ? (
-                                <Chip
-                                  label={cellValue}
-                                  size="small"
-                                  sx={{
-                                    backgroundColor: chipBg,
-                                    color: chipColor,
-                                    fontWeight: "600",
-                                  }}
-                                />
-                              ) : header !== headers[0] ? (
-                                <Typography
-                                  variant="body2"
-                                  sx={{ color: "#6b7280" }}
-                                >
-                                  {cellValue}
-                                </Typography>
-                              ) : (
-                                cellValue
-                              )}
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    );
-                }
+                              {cellValue}
+                            </Typography>
+                          )}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
               })
             ) : (
               <TableRow>

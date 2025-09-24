@@ -14,7 +14,7 @@ const StudentProfileSchema = new mongoose.Schema(
       sparse: true,
     },
     schoolId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: "School",
       required: true,
     },

@@ -1,5 +1,5 @@
 const { verifyAccessToken } = require("../utils/tokenUtils");
-const User = require("../models/User");
+const User = require("../models/AuthSchema");
 
 module.exports = async function authGuard(req, res, next) {
   try {
@@ -12,10 +12,10 @@ module.exports = async function authGuard(req, res, next) {
     } catch (err) {
       return res.status(401).json({ message: "Invalid or expired token" });
     }
-
+    
     const user = await User.findById(decoded.userId).select("-password -sessions");
     if (!user) return res.status(401).json({ message: "User not found" });
-
+    console.log(user)
     req.user = user;
     next();
   } catch (err) {

@@ -1,21 +1,53 @@
-import { Pagination, Stack, MenuItem, Select, Typography } from "@mui/material";
+import {
+  Pagination,
+  Stack,
+  MenuItem,
+  Select,
+  Typography,
+  Box,
+} from "@mui/material";
 
-const CustomPagination = ({  
+const CustomPagination = ({
   RowBtn = true,
   totalValues,
   page,
   setPage,
   limit,
-  setLimit, }) => {
+  setLimit,
+}) => {
+  const totalPages = Math.ceil(totalValues / limit);
 
-    const totalPages = Math.ceil(totalValues / limit);
   return (
-    <div className="flex justify-between items-center flex-wrap gap-4">
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: { xs: "column", sm: "row" }, // column on mobile, row on bigger screens
+        justifyContent: "space-between",
+        alignItems: { xs: "flex-start", sm: "center" },
+        gap: 2,
+        flexWrap: "wrap",
+      }}
+    >
       {RowBtn && (
-        <div className="flex items-center gap-2">
-          <Typography variant="body2" className="text-gray-500">
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            flexWrap: "wrap",
+            width: { xs: "100%", sm: "auto" }, // full width on mobile
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{
+              color: "gray",
+              fontSize: { xs: "0.8rem", sm: "0.88rem" },
+            }}
+          >
             Rows per page:
           </Typography>
+
           <Select
             value={limit}
             onChange={(e) => {
@@ -24,9 +56,10 @@ const CustomPagination = ({
             }}
             sx={{
               height: 32,
+              // minWidth: { xs: "100%", sm: 80 },
               backgroundColor: "white",
               color: "black",
-              fontSize: "0.88rem",
+              fontSize: { xs: "0.8rem", sm: "0.88rem" },
               fontWeight: "500",
               ".MuiSelect-icon": { color: "black" },
               "& .MuiOutlinedInput-notchedOutline": {
@@ -47,10 +80,16 @@ const CustomPagination = ({
               </MenuItem>
             ))}
           </Select>
-        </div>
+        </Box>
       )}
 
-      <Stack spacing={2}>
+      {/* Pagination */}
+      <Stack
+        spacing={2}
+        sx={{
+          width: { xs: "100%", sm: "auto" }, // full width pagination on mobile
+        }}
+      >
         <Pagination
           count={totalPages}
           page={page}
@@ -59,6 +98,8 @@ const CustomPagination = ({
           onChange={(_, value) => setPage(value)}
           color="primary"
           sx={{
+            display: "flex",
+            justifyContent: { xs: "center", sm: "flex-end" }, // center on mobile, right on desktop
             backgroundColor: "#fff",
             border: "1px solid #d9d7d7",
             borderRadius: "6px",
@@ -78,7 +119,8 @@ const CustomPagination = ({
           }}
         />
       </Stack>
-    </div>
+    </Box>
   );
 };
+
 export default CustomPagination;

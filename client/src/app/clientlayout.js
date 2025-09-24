@@ -4,6 +4,8 @@ import { ToastContainer } from "react-toastify";
 import Header from "./components/Header/Header";
 import { usePathname } from "next/navigation";
 import { includeRoutes } from "./config/GeneralConfig";
+import { Provider } from "react-redux";
+import store from "./store";
 
 const ClientLayout = ({ children }) => {
   const [mounted, setMounted] = useState(false);
@@ -18,11 +20,11 @@ const ClientLayout = ({ children }) => {
   }
 
   return (
-    <>
+    <Provider store={store}>
       {includeRoutes.includes(path) && <Header path={path}/>}
       <ToastContainer />
       {children}
-    </>
+    </Provider>
   );
 };
 

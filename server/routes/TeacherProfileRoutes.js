@@ -4,11 +4,11 @@ const {
   addOrUpdateTeacher,
   getTeacherDetails,
   deleteTeacher,
-} = require("../controllers/TeacherProfileController");
+} = require("../controllers/TeacherController");
 
 // Routes
 router.post("/addOrUpdate", addOrUpdateTeacher);
-router.post("/get", getTeacherDetails);
+router.get("/search", getTeacherDetails);
 router.delete("/delete/:id", deleteTeacher);
 
 module.exports = router;
