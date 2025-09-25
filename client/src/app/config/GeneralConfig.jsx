@@ -1,5 +1,6 @@
 export const includeRoutes = [
   "/",
+  '/about',
   "/demo",
   "/contact",
   "/privacy",
