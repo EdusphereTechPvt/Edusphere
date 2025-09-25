@@ -71,13 +71,13 @@ api.interceptors.response.use(
         isRefreshing = false;
 
         store.dispatch(logout());
-        window.location.href = "/login";
+        window.location.href = "/auth/login";
         return Promise.reject(err);
       }
     }
 
     if(error.response?.status === 403){
-        window.location.href = '/403'
+        window.location.href = '/error/403'
     }
 
     return Promise.reject(error);

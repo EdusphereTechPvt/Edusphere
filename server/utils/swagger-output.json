@@ -46,14 +46,16 @@
         "description": "",
         "parameters": [
           {
-            "name": "page",
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "role",
-            "in": "query",
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "page": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -757,6 +759,12 @@
                   "example": "any"
                 },
                 "address": {
+                  "example": "any"
+                },
+                "status": {
+                  "example": "any"
+                },
+                "gender": {
                   "example": "any"
                 },
                 "grade": {

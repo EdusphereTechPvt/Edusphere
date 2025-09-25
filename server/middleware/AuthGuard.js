@@ -15,7 +15,6 @@ module.exports = async function authGuard(req, res, next) {
     
     const user = await User.findById(decoded.userId).select("-password -sessions");
     if (!user) return res.status(401).json({ message: "User not found" });
-    console.log(user)
     req.user = user;
     next();
   } catch (err) {

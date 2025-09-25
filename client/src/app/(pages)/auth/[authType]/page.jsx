@@ -1,12 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import { TextField, Typography, Button, Divider, Box } from "@mui/material";
-import { roles, authconfig } from "../../config/Authconfig.jsx";
+import { roles, authconfig } from "../../../config/Authconfig.jsx";
 import { showToast } from "@/app/utils/Toast.jsx";
 import { validateField } from "@/app/utils/Validator.jsx";
 import { authenticateUser } from "@/app/services/AuthService.jsx";
+import { useParams, useRouter } from "next/navigation.js";
 
 export default function AuthPage() {
+  const router = useRouter();
   const [activeRole, setActiveRole] = useState("admin");
   const [mode, setMode] = useState("signup");
   const [fields, setFields] = useState({});
@@ -16,7 +18,17 @@ export default function AuthPage() {
 
   const fieldsConfig = authconfig[mode]?.options?.[activeRole] || [];
 
-  // reset when mode or role changes
+  const {authType} = useParams();
+    if (!authType) return <p>Loading...</p>;
+
+    useEffect(()=>{
+      const type = ["login","signup"].includes(authType) ? authType : null;
+      if(type)
+        setMode(type)
+      else
+        window.location.href = '/404';
+    },[authType])
+
   useEffect(() => {
     const roleToUse = mode === "signup" ? "admin" : activeRole;
     if (activeRole !== roleToUse) setActiveRole(roleToUse);
@@ -92,7 +104,7 @@ export default function AuthPage() {
       setMode("login");
     }
     else if (status && mode === "login") {
-      // window.location.href = "/dashboard"; 
+      router.back();
     }
   } catch (err) {
     showToast("Authentication failed", "error");
