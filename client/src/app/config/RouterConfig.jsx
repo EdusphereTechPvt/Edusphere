@@ -1,0 +1,1 @@
+export const allowedListRoutes = ['teacher', 'student']

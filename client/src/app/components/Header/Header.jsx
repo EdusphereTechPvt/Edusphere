@@ -7,7 +7,7 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import generalConfig from "../../config/GeneralConfig";
+import generalConfig, { generalRoutes } from "../../config/GeneralConfig";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Close } from "@mui/icons-material";
 import { getElements } from "@/app/services/ElementAccessService";
@@ -21,12 +21,11 @@ const Header = ({ path }) => {
 
   const toggleDrawer = (open) => () => setDrawerOpen(open);
   const router = useRouter();
-  const navigation = 
 
   useEffect(() => {
     const fetchNavItems = async () => {
       try {
-        const result = await getElements("navbar");
+        const result = await getElements(generalRoutes.includes(path) ? "navbar" : path.split("/")[1]);
         updateConfig(generalConfig, "header", result);
         setHeader({ ...generalConfig.header });
       } catch (err) {

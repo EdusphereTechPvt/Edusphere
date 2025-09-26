@@ -1,36 +1,69 @@
 const ElementAccessController = require("../models/ElementAccessController");
+const { verifyAccessToken } = require("../utils/tokenUtils");
 
 const getElement = async(req,res) => {
- try {
-    const { page, role } = req.query;
+  try {
+    let rolesToCheck = ["default"];
+    
+    const token = req.cookies?.accessToken;
 
-    let query = {};
+    const {page} = req.body
+    if (token) {
+      try {
+        const decoded = verifyAccessToken(token);
 
-    if (page) query.page = page;
-    if (role) query.$or = [{ role }, { role: "default" }]; 
+        if (decoded?.role) {
+          rolesToCheck.push(decoded.role);
 
-    const elements = await ElementAccessController.find(query).sort({ order: 1 });
-    res.status(200).json(elements);
-  } catch (error) {
-    console.error("Error fetching element", error);
-    res.status(500).json({ message: "Failed to fetch element" });
+        }
+      } catch (err) {
+        console.warn("Invalid token, using default only");
+      }
+    }
+
+    // query
+    const elements = await ElementAccessController.find({
+      page: {$in: page},
+      enableFor: { $in: rolesToCheck },
+    }).sort({order: 1});
+
+    res.json({ success: true, elements });
+  } catch (err) {
+    console.error("Error fetching elements:", err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 }
 
 const addElement = async(req,res) => {
     try {
     const {
-      role = "default",
       page,
       type,
       id,
       label,
       action,
       actionValue,
+      actionUse,
       collection,
       enableFor = [],
       order = 0,
     } = req.body;
+
+     let rolesToCheck = ["default"];
+     const token = req.cookies?.accessToken;
+
+     if (token) {
+      try {
+        const decoded = verifyAccessToken(token);
+
+        if (decoded?.role) {
+          rolesToCheck.push(decoded.role);
+
+        }
+      } catch (err) {
+        console.warn("Invalid token, using default only");
+      }
+    }
 
     // Validate required fields
     if (!page || !type || !id) {
@@ -38,19 +71,19 @@ const addElement = async(req,res) => {
     }
 
     // Check if element already exists for same page + id
-    const exists = await ElementAccessController.findOne({ page, id, role });
+    const exists = await ElementAccessController.findOne({ page, id,  enableFor: { $in: rolesToCheck } });
     if (exists) {
       return res.status(409).json({ message: "Element already exists" });
     }
 
     const newElementAccessController = new ElementAccessController({
-      role,
       page,
       type,
       id,
       label,
       action,
       actionValue,
+      actionUse,
       collection,
       enableFor,
       order,
