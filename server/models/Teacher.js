@@ -41,10 +41,15 @@ const TeacherProfileSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    schoolId: {
-      type: mongoose.Schema.Types.ObjectId,
+     schoolId: {
+      type: String,
       ref: "School",
       required: true,
+    },
+    status:{
+      type: String,
+      required: true,
+      enum: ["Active", "On Hold", "Inactive"]
     },
     fullName: {
       type: String,
@@ -109,11 +114,17 @@ const TeacherProfileSchema = new mongoose.Schema(
       type: Number,
     },
 
-    emergencyContact: {
+    emergencyContactName: {
+      type: String,
+    },
+    emergencyContactRelation: {
+      type: String,
+    },
+    emergencyContactPhone: {
       type: String,
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("TeacherProfile", TeacherProfileSchema);
+module.exports = mongoose.model("Teacher", TeacherProfileSchema);

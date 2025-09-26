@@ -8,8 +8,8 @@ const mongoose = require("mongoose");
 const elementRoutes = require("./routes/ElementRoutes");
 const authRoutes = require("./routes/AuthRoutes");
 const requestdemoRoutes = require("./routes/RequestDemoRoutes");
-const studentprofileRoutes = require("./routes/StudentProfileRoutes");
-const teacherprofileRoutes = require("./routes/TeacherProfileRoutes");
+const studentRoutes = require("./routes/StudentRoutes");
+const teacherRoutes = require("./routes/TeacherRoutes");
 const helpcenterroutes = require("./routes/HelpCenterRoutes");
 
 const app = express();
@@ -25,8 +25,8 @@ app.use("/permission", elementRoutes);
 app.use("/auth", authRoutes);
 app.use("/helpcenter", helpcenterroutes);
 app.use("/requestdemo", requestdemoRoutes);
-app.use("/student", studentprofileRoutes);
-app.use("/teacher", teacherprofileRoutes);
+app.use("/student", studentRoutes);
+app.use("/teacher", teacherRoutes);
 
 mongoose
   .connect(process.env.MONGO_URL, {})
