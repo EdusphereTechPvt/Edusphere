@@ -1,4 +1,3 @@
-import { PlusOne } from "@mui/icons-material";
 const green = {
   chipBg: "#dcfce7",
   chipColor: "#15803d",
@@ -37,38 +36,3 @@ export const statusConfig = {
     chipColor: "#fff",
   },
 };
-
-export const topHeader = [
-  {
-    type: "button",
-    label: "Add Student",
-    Icon: PlusOne,
-    action: "/add-student",
-    actionType: "link",
-    variant: "contained",
-    text: "white",
-    styles: { 
-      elementStyles:{
-        backgroundColor: "var(--color-blue)", 
-        color: "black", 
-      },
-      iconStyles: { color: "black" } 
-    },
-  },
-  {
-    type: "button",
-    label: "Add Student",
-    Icon: PlusOne,
-    action: "/add-student",
-    actionType: "link",
-    variant: "contained",
-    text: "white",
-    styles: { 
-      elementStyles:{
-        // backgroundColor: "var(--color-blue)", 
-        color: "black", 
-      },
-      iconStyles: { color: "black" } 
-    },
-  },
-];

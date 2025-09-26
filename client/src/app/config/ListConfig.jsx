@@ -8,41 +8,36 @@ import {
   Delete,
 } from "@mui/icons-material";
 
+export const listConfig = {
+  //Just for information if there is a object inside the array then you can use like object[fieldName]
+  student: {
+    tableHeader: [
+        { map: "studentId", displayName: "ID" },
+        { name: "name", displayName: "Name" },
+        { name: "grade", displayName: "Class" },
+        { name: "section", displayName: "Section" },
+        { name: "gender", displayName: "Gender" },
+        { name: "status", displayName: "Status" }
+      ],
+      clickableFields:["id", "name"]
+  },
+  teacher: {
+    tableHeader: [
+        { map: "teacherId", displayName: "ID" },
+        { name: "name", displayName: "Name" },
+        { name: "email", displayName: "Email" },
+        { name: "phone", displayName: "Phone" },
+        { name: "gender", displayName: "Gender" },
+        { name: "status", displayName: "Status" }
+      ],
+      clickableFields:["id", "name"]
+  }
+}
+
 export const ProfileCardConfig = {
   student: {
     header: {
       title: "Student Profile Overview",
-      buttons: [
-        {
-          name: "edit",
-          displayName: "Edit",
-          action: "editStudent",
-          icon: Edit,
-          type: "link",
-          link: "/edit-student",
-          style: { variant: "contained", color: "white" },
-        },
-        {
-          name: "delete",
-          displayName: "Delete",
-          action: "deleteStudent",
-          icon: Delete,
-          type: "link",
-          link: "/delete-student",
-          style: {
-            variant: "contained",
-            color: "white",
-            backgroundColor: "var(--color-red)",
-          },
-        },
-      ],
-      subInfo: [
-        {
-          key: "id",
-          label: "Student ID",
-          valueGetter: (data) => `${data.id}`,
-        },
-      ],
     },
 
     fields: [
@@ -62,37 +57,6 @@ export const ProfileCardConfig = {
   teacher: {
     header: {
       title: "Teacher Profile Overview",
-      buttons: [
-        {
-          name: "edit",
-          displayName: "Edit",
-          action: "editTeacher",
-          icon: Edit,
-          type: "link",
-          link: "/edit-teacher",
-          style: { variant: "contained", color: "white" },
-        },
-        {
-          name: "delete",
-          displayName: "Delete",
-          action: "deleteTeacher",
-          icon: Delete,
-          type: "link",
-          link: "/delete-teacher",
-          style: {
-            variant: "contained",
-            color: "white",
-            backgroundColor: "var(--color-red)",
-          },
-        },
-      ],
-       subInfo: [
-        {
-          key: "id",
-          label: "Teacher ID",
-          valueGetter: (data) => `${data.id}`,
-        },
-      ],
     },
 
     fields: [
@@ -109,4 +73,3 @@ export const ProfileCardConfig = {
     ],
   },
 };
-

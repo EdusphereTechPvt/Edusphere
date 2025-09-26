@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import CustomPagination from "./Pagination";
 import { statusConfig } from "@/app/config/TableConfig";
+import { handleAction } from "@/app/utils/HelperFunctions";
 
 export const TableComponent = ({
   topHeader = [],
@@ -52,7 +53,10 @@ export const TableComponent = ({
     return items?.map(
       (
         {
-          text,
+          id,
+          label,
+          action,
+          actionValue,
           type,
           path,
           onClick,
@@ -72,7 +76,7 @@ export const TableComponent = ({
                 key={idx}
                 sx={{ fontWeight: "bold", fontSize: "0.9rem", ...styles }}
               >
-                {text}
+                {label}
               </Typography>
             );
 
@@ -85,7 +89,7 @@ export const TableComponent = ({
                 style={styles}
               >
                 {Icon && <span className="text-lg">{Icon}</span>}
-                <span>{text}</span>
+                <span>{label}</span>
               </a>
             );
 
@@ -94,7 +98,7 @@ export const TableComponent = ({
               <Dropdown
                 key={idx}
                 data={{
-                  label: text,
+                  label: label,
                   placeholder: placeholder,
                   required: required,
                   items: options,
@@ -119,23 +123,25 @@ export const TableComponent = ({
               <Button
                 key={idx}
                 variant={variant || "contained"}
-                onClick={onClick}
+                onClick={()=>handleAction(action,actionValue)}
                 sx={{
                   borderRadius: "1.5rem",
                   width: "100%",
                   flexWrap: "nowrap",
-                  gap: 2,
+                  gap: '0.5rem',
                   display: "flex",
                   alignItems: "center",
+                  padding:'1rem',
                   textTransform: "none",
+                  fontSize:'1rem',
                   ":hover": {
                     filter: "brightness(95%)",
                   },
                   ...styles.elementStyles,
                 }}
               >
-                {Icon && <Icon style={{...styles.iconStyles}} sx={{color:"black", ...styles?.iconStyles}} />}
-                {text}
+                {Icon && <Icon sx={{...styles?.iconStyles}} />}
+                <div style={{...styles?.labelStyles}}>{label}</div>
               </Button>
             );
 
@@ -146,14 +152,12 @@ export const TableComponent = ({
     );
   };
 
-    const handleCellClick = (value) => {
+    const handleCellClick = (header,value) => {
     console.log(value);
     if (onClick) {
-      onClick(value);
+      onClick(header,value);
     }
   };
-
-
 
   return (
     <div className={`${className}`}>
@@ -261,7 +265,7 @@ export const TableComponent = ({
                           key={colIndex}
                           onClick={
                             isClickable
-                              ? () => handleCellClick(cellValue)
+                              ? () => handleCellClick(header,cellValue)
                               : undefined
                           }
                           sx={{

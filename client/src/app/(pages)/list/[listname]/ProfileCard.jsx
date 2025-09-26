@@ -13,10 +13,11 @@ import {
 } from "@mui/material";
 import { statusConfig } from "@/app/config/TableConfig";
 import { ProfileCardConfig } from "@/app/config/ListConfig";
+import { handleAction } from "@/app/utils/HelperFunctions";
 
 const ProfileCard = ({ role, data }) => {
   const { header, fields = [], quickLinks = [] } = ProfileCardConfig[role];
-  const { name, id, className, section, avatar, Class } = data;
+
 
   const getAttendanceColor = (value) => {
     if (value < 40) return "var(--color-red)";
@@ -163,21 +164,19 @@ const ProfileCard = ({ role, data }) => {
 
           {/* Buttons */}
           <Box sx={{ display: "flex", gap: 1 }}>
-            {header?.buttons?.map((btn, idx) => (
-              <Tooltip title={btn.displayName} key={idx} arrow>
+            {data?.buttons?.map((btn, idx) => (
+              btn.type === 'iconbutton' && 
+              <Tooltip title={btn.label} key={idx} arrow>
                 <Button
-                  variant={btn.style.variant}
+                  variant={btn.variant}
+                  color={btn.color}
                   sx={{
-                    ...btn.style,
+                    ...btn.styles.elementStyles,
                     textTransform: "none",
                     minWidth: 0,
                   }}
                   onClick={() => {
-                    if (btn.type === "link" && btn.link) {
-                      window.location.href = btn.link;
-                    } else if (btn.action) {
-                      btn.action(data);
-                    }
+                    handleAction(btn.action,btn.actionValue)
                   }}
                 >
                   <btn.icon
@@ -194,8 +193,8 @@ const ProfileCard = ({ role, data }) => {
         {/* Avatar & Name */}
         <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
           <Avatar
-            src={avatar || ""}
-            alt={name}
+            src={data?.avatar || ""}
+            alt={name || ""}
             imgProps={{ loading: "lazy" }}
             sx={{
               width: { xs: 75, sm: 80, md: 85, lg: 90 },
@@ -207,35 +206,36 @@ const ProfileCard = ({ role, data }) => {
             fontWeight={600}
             sx={{ fontSize: { xs: "0.95rem", sm: "1.05rem", md: "1.1rem" } }}
           >
-            {name}
+            {data.name}
           </Typography>
 
-          {header?.subInfo?.map((item) => {
-            const value = item.valueGetter
-              ? item.valueGetter(data)
-              : data[item.key];
-            if (!value) return null;
-            return (
-              <Typography
-                key={item.key}
-                sx={{
-                  fontSize: { xs: "0.7rem", sm: "0.8rem" },
-                  color: "text.secondary",
-                }}
-              >
-                {item.label}: {value}
-              </Typography>
-            );
-          })}
+          <Typography
+            sx={{
+              fontSize: { xs: "0.7rem", sm: "0.8rem" },
+              color: "text.secondary",
+            }}
+          >
+            ID: {data.id}
+          </Typography>
 
-          {(className || Class) && section && (
+          {data.grade && (
             <Typography
               sx={{
                 fontSize: { xs: "0.7rem", sm: "0.8rem" },
                 color: "text.secondary",
               }}
             >
-              Class: {className || Class}, Section {section}
+              Class: {data.grade}
+            </Typography>
+          )}
+          {data.section && (
+            <Typography
+              sx={{
+                fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                color: "text.secondary",
+              }}
+            >
+              Section: {data.section}
             </Typography>
           )}
         </Box>
