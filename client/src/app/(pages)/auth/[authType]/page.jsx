@@ -26,7 +26,7 @@ export default function AuthPage() {
       if(type)
         setMode(type)
       else
-        window.location.href = '/404';
+        window.location.href = '/error/404';
     },[authType])
 
   useEffect(() => {

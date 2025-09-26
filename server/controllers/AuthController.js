@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/AuthSchema");
-const StudentProfile = require("../models/StudentProfile");
-const TeacherProfile = require("../models/TeacherProfile");
+const Student = require("../models/Student");
+const Teacher = require("../models/Teacher");
 const ParentProfile = require("../models/ParentProfile");
 const School = require("../models/SchoolSchema");
 const AdminProfile = require("../models/AdminProfile");
@@ -344,10 +344,10 @@ const oAuthController = async (req, res) => {
 
       switch (role) {
         case "student":
-          await new StudentProfile({ userId: user._id }).save();
+          await new Student({ userId: user._id }).save();
           break;
         case "teacher":
-          await new TeacherProfile({ userId: user._id }).save();
+          await new Teacher({ userId: user._id }).save();
           break;
         case "parent":
           await new ParentProfile({ userId: user._id }).save();
