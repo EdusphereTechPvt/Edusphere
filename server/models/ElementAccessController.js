@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 
 const ElementAccessControllerSchema = new mongoose.Schema({
-  role: {
-    type: String,
-    default: "default",
-  },
   page: { type: String, required: true },
   type: {
     type: String,
@@ -15,6 +11,7 @@ const ElementAccessControllerSchema = new mongoose.Schema({
   label: { type: String },
   action: { type: String },
   actionValue: { type: String }, 
+  actionUse: {type:String},
   collection: { type: String },
   enableFor: [{ type: String }],
   order: { type: Number, default: 0 },

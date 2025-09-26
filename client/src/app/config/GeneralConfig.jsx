@@ -1,12 +1,16 @@
-export const includeRoutes = [
+export const excludeRoutes = [
+  "/auth/login","/auth/signup"
+];
+
+export const generalRoutes = [
   "/",
   '/about',
   "/demo",
   "/contact",
   "/privacy",
   "/pricing",
-  "/help",
-];
+  "/help"
+]
 
 const generalConfig = {
   header: {
@@ -100,7 +104,7 @@ const generalConfig = {
             variant: "contained",
             text: "Sign Up Now",
             onclick: () =>
-              (window.location.href = "http://localhost:3000/auth"),
+              (window.location.href = "http://localhost:3000/auth/signup"),
             styles: {
               inlineStyle: {
                 textTransform: "none",
