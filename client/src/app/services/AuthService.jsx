@@ -1,9 +1,8 @@
 import { showToast } from "../utils/Toast";
 
 export const authenticateUser = async (mode, role, fields) => {
-    console.log("Authenticating", mode, role, fields);
   try {
-    const response = await fetch(`http://localhost:5000/auth/${mode}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/auth/${mode}`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -27,3 +26,58 @@ export const authenticateUser = async (mode, role, fields) => {
     return false;
   }
 };
+
+
+export const isUserAvailable = async (params) => {
+  try{
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/auth/search`,{
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ params }),
+    })
+
+    const data = await response.json();
+
+    if(!data.status){
+      showToast(data.message, "error")
+      return false;
+    }
+
+    showToast("User verified successfully", "success");
+    return data.status
+  }
+  catch(err){
+    showToast("Error Fetching User", "error")
+    return false;
+  }
+}
+
+export const updatePassword = async(email, password) => {
+  try{
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/auth/changepassword`,{
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    })
+
+    const data = await response.json();
+
+    if(!data.status){
+      showToast(data.message, "error")
+      return false;
+    }
+
+    showToast("Password updated successfully", "success");
+    return data.status
+  }
+  catch(err){
+    showToast("Error Updating Password", "error")
+    return false;
+  }
+}

@@ -1,9 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { TextField, Typography, Button, Divider, Box } from "@mui/material";
-import { roles, authconfig } from "../../../config/Authconfig.jsx";
+import { roles, authconfig } from "@/app/config/AuthConfig.jsx";
 import { showToast } from "@/app/utils/Toast.jsx";
-import { validateField } from "@/app/utils/Validator.jsx";
+import { matchPassword, validateField } from "@/app/utils/Validator.jsx";
 import { authenticateUser } from "@/app/services/AuthService.jsx";
 import { useParams, useRouter } from "next/navigation.js";
 
@@ -18,16 +18,16 @@ export default function AuthPage() {
 
   const fieldsConfig = authconfig[mode]?.options?.[activeRole] || [];
 
-  const {authType} = useParams();
-    if (!authType) return <p>Loading...</p>;
+  const { authType } = useParams();
+  if (!authType) return <p>Loading...</p>;
 
-    useEffect(()=>{
-      const type = ["login","signup"].includes(authType) ? authType : null;
-      if(type)
-        setMode(type)
-      else
-        window.location.href = '/error/404';
-    },[authType])
+  useEffect(() => {
+    const type = ["login", "signup"].includes(authType) ? authType : null;
+    if (type)
+      setMode(type)
+    else
+      window.location.href = '/error/404';
+  }, [authType])
 
   useEffect(() => {
     const roleToUse = mode === "signup" ? "admin" : activeRole;
@@ -46,7 +46,6 @@ export default function AuthPage() {
     setFields(initialFields);
   }, [mode, activeRole]);
 
-  // check button disabled state
   useEffect(() => {
     const hasErrors = Object.values(error).some((e) => e);
 
@@ -77,40 +76,37 @@ export default function AuthPage() {
     setError((prev) => ({ ...prev, [field.name]: !validate }));
   };
 
-  const matchPassword = (pass, confirmPass) => {
-    if (pass !== confirmPass) {
-      showToast("Passwords do not match", "error");
-      return false;
-    }
-    return true;
-  };
-
   const handleCheckboxChange = (e) => {
     setState((prev) => ({ ...prev, [e.target.name]: e.target.checked }));
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-   if (!fields || Object.values(fields).every(val => !val || val.trim() === "")) {
-    console.warn("Skipping API call: empty fields");
-    return;
-  }
-
-
-  try {
-    const status = await authenticateUser(mode, activeRole, fields);
-    if (status && mode === "signup") {
-      setMode("login");
+    if (!fields || Object.values(fields).every(val => !val || val.trim() === "")) {
+      console.warn("Skipping API call: empty fields");
+      return;
     }
-    else if (status && mode === "login") {
-      router.back();
+
+
+    try {
+      const status = await authenticateUser(mode, activeRole, fields);
+      if (status && mode === "signup") {
+        setMode("login");
+      }
+      else if (status && mode === "login") {
+        const prev = document.referrer;
+        if (prev.includes("/forgotpassword")) {
+          router.replace("/dashboard");
+        } else {
+          router.back();
+        }
+      }
+    } catch (err) {
+      showToast("Authentication failed", "error");
+      console.error(err);
     }
-  } catch (err) {
-    showToast("Authentication failed", "error");
-    console.error(err);
-  }
-};
+  };
 
 
   const handleOAuthSubmit = (provider) => {
@@ -139,25 +135,22 @@ export default function AuthPage() {
                   const isActive = activeRole === value;
                   return (
                     <button
-                    type="button"
+                      type="button"
                       key={value}
                       onClick={() => setActiveRole(value)}
                       className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 flex flex-col items-center gap-1
-                ${
-                  isActive
-                    ? "border-blue-500 bg-blue-50 shadow-md"
-                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                }`}
+                ${isActive
+                          ? "border-blue-500 bg-blue-50 shadow-md"
+                          : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                        }`}
                     >
                       <Icon
-                        className={`w-6 h-6 ${
-                          isActive ? "text-blue-600" : "text-gray-400"
-                        }`}
+                        className={`w-6 h-6 ${isActive ? "text-blue-600" : "text-gray-400"
+                          }`}
                       />
                       <span
-                        className={`font-semibold text-sm ${
-                          isActive ? "text-blue-600" : "text-gray-800"
-                        }`}
+                        className={`font-semibold text-sm ${isActive ? "text-blue-600" : "text-gray-800"
+                          }`}
                       >
                         {label}
                       </span>
@@ -210,7 +203,7 @@ export default function AuthPage() {
 
           {mode === "login" && (
             <Typography align="left" sx={{ fontSize: 13 }}>
-              <button className="text-blue-600 font-medium hover:underline">
+              <button className="text-blue-600 font-medium hover:underline cursor-pointer" onClick={() => router.push("/forgotpassword")}>
                 Forgot your password?
               </button>
             </Typography>
@@ -307,7 +300,7 @@ export default function AuthPage() {
               ? "Don't have an account?"
               : "Already have an account?"}{" "}
             <button
-            type="button"
+              type="button"
               onClick={() => setMode(mode === "login" ? "signup" : "login")}
               className="text-blue-600 font-medium hover:underline"
             >

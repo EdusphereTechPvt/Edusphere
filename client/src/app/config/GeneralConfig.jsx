@@ -1,5 +1,5 @@
 export const excludeRoutes = [
-  "/auth/login","/auth/signup"
+  "/auth/login","/auth/signup","/forgotpassword"
 ];
 
 export const generalRoutes = [

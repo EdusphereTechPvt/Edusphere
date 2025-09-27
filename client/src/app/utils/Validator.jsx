@@ -22,3 +22,11 @@ export const validateField = (field,value) => {
     showToast(error, "error");
     return error === undefined;
 }
+
+export const matchPassword = (pass, confirmPass) => {
+    if (pass !== confirmPass) {
+      showToast("Passwords do not match", "error");
+      return false;
+    }
+    return true;
+  };
