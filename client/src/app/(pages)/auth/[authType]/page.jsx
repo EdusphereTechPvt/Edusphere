@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { TextField, Typography, Button, Divider, Box } from "@mui/material";
-import { roles, authconfig } from "@/app/config/AuthConfig.jsx";
+import { roles, authconfig } from "@/app/config/Authconfig.jsx";
 import { showToast } from "@/app/utils/Toast.jsx";
 import { matchPassword, validateField } from "@/app/utils/Validator.jsx";
 import { authenticateUser } from "@/app/services/AuthService.jsx";
