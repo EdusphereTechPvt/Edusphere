@@ -8,8 +8,8 @@ const addOrUpdateStudent = async (req, res) => {
     session.startTransaction();
   try {
     const {
-      fullName,
-      dob,
+      name,
+      dateOfBirth,
       email,
       phone,
       address,
@@ -28,9 +28,9 @@ const addOrUpdateStudent = async (req, res) => {
       emergencyContacts
     } = req.body;
 
-    if (!fullName || !dob || !email || !grade || !section || !schoolId || !status || !gender) {
+    if (!name || !dateOfBirth || !email || !grade || !section || !schoolId || !status || !gender) {
       return res.status(400).json({
-        message: "Full name, DOB, Email, Grade, Section or School ID is required",
+        message: "Full name, dateOfBirth, Email, Grade, Section or School ID is required",
         status: false
       });
     }
@@ -40,13 +40,13 @@ const addOrUpdateStudent = async (req, res) => {
 
     if (!user) {
       
-      const dobString = new Date(dob).toISOString().split("T")[0].replace(/-/g, "");
-      const passwordPlain = `${fullName.split(" ")[0]}@${dobString}`;
+      const dateOfBirthString = new Date(dateOfBirth).toISOString().split("T")[0].replace(/-/g, "");
+      const passwordPlain = `${name.split(" ")[0]}@${dateOfBirthString}`;
       const hashedPassword = await bcrypt.hash(passwordPlain, 10);
 
       user = new User({
-        fullName,
-        dob,
+        name,
+        dateOfBirth,
         email,
         phone,
         address,
@@ -58,8 +58,8 @@ const addOrUpdateStudent = async (req, res) => {
       await user.save({session});
     } else {
     
-      user.fullName = fullName || user.fullName;
-      user.dob = dob || user.dob;
+      user.name = name || user.name;
+      user.dateOfBirth = dateOfBirth || user.dateOfBirth;
       user.phone = phone || user.phone;
       user.address = address || user.address;
       await user.save({session});
@@ -121,9 +121,9 @@ const addOrUpdateStudent = async (req, res) => {
 };
 
 const getStudentDetails = async (req, res) => {
-  const { fullName = "", email = "", grade = "", section = "" } = req.body;
+  const { name = "", email = "", grade = "", section = "" } = req.body;
 
-  if (![fullName, email, grade, section].some(Boolean)) {
+  if (![name, email, grade, section].some(Boolean)) {
     return res.status(400).json({
       message: "At least one search field is required",
       status: false
@@ -136,10 +136,11 @@ const getStudentDetails = async (req, res) => {
     if (section) query.section = { $regex: section, $options: "i" };
 
     let students = await Student.find(query).populate("userId");
+    console.log(students)
 
-    if (fullName || email) {
+    if (name || email) {
       students = students.filter(s =>
-        (fullName && s.userId.fullName.toLowerCase().includes(fullName.toLowerCase())) ||
+        (name && s.userId.name.toLowerCase().includes(name.toLowerCase())) ||
         (email && s.userId.email.toLowerCase().includes(email.toLowerCase()))
       );
     }
@@ -168,9 +169,12 @@ const getStudentDetails = async (req, res) => {
 
 const getAllStudentsList = async (req, res) => {
   try {
-    const students = await Student.find({ schoolId: req.user.schoolId })
-      .populate("userId", "fullName email dob role avatar isActive"); 
 
+    console.log(req.user)
+    const students = await Student.find({ schoolId: req.user.schoolId })
+      .populate("userId", "name email dateOfBirth role avatar isActive"); 
+
+      console.log(students)
     if (!students || students.length === 0) {
       return res.status(404).json({
         data: [],
@@ -181,9 +185,9 @@ const getAllStudentsList = async (req, res) => {
 
      const formattedStudents = students.map((student) => ({
       studentId: student.studentId,
-      name: student.userId?.fullName,
+      name: student.userId?.name,
       email: student.userId?.email,
-      dob: student.userId?.dob,
+      dateOfBirth: student.userId?.dateOfBirth,
       role: student.userId?.role,
       avatar: student.userId?.avatar,
       isActive: student.userId?.isActive,
@@ -214,11 +218,11 @@ const getProfileCardData = async(req,res) => {
     let keyValue = req.body.value
 
     let studentProfileData = await Student.findOne({ keyName:keyValue })
-      .populate("userId", "fullName email dob role avatar isActive"); 
+      .populate("userId", "name email dateOfBirth role avatar isActive"); 
 
       const formattedStudents = {
       id: studentProfileData.studentId,
-      name: studentProfileData.userId?.fullName,
+      name: studentProfileData.userId?.name,
       avatar: studentProfileData.userId?.avatar,
       grade: studentProfileData.grade,
       section: studentProfileData.section

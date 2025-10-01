@@ -37,4 +37,4 @@ const AdminProfileSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-module.exports = mongoose.model("AdminProfile", AdminProfileSchema);
+module.exports = mongoose.model("Admin", AdminProfileSchema);

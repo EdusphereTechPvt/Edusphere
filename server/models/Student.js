@@ -18,6 +18,10 @@ const StudentProfileSchema = new mongoose.Schema(
       ref: "School",
       required: true,
     },
+    name: {
+      type: String,
+      required: true
+    },
     grade: {
       type: String,
       required: true,

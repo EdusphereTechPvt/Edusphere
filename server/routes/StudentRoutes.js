@@ -6,8 +6,8 @@ const RoleGuard = require("../middleware/RoleGuard");
 const router = express.Router();
 
 router.post("/addOrUpdate", addOrUpdateStudent);
-router.post("/search",AuthGuard, RoleGuard("student/list"), getStudentDetails);
-router.get("/getAll/",AuthGuard, RoleGuard("student/list"), getAllStudentsList);
+router.post("/search",AuthGuard, RoleGuard(), getStudentDetails);
+router.post("/getAll/",AuthGuard, RoleGuard(), getAllStudentsList);
 router.post("/getProfileCardData", getProfileCardData)
 router.delete("/delete/:id", deleteStudent);
 

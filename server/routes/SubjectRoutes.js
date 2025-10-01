@@ -1,10 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const { addOrUpdateSubject, getSubjects, deleteSubject } = require("../controllers/SubjectController");
+const {deleteSubject, getAllSubjectsList, save, getSubjectDetails } = require("../controllers/SubjectController");
+const AuthGuard = require("../middleware/AuthGuard");
+const RoleGuard = require("../middleware/RoleGuard");
 
 
-router.post("/addOrUpdate", addOrUpdateSubject);
-router.get("/list", getSubjects);
-router.delete("/delete/:id", deleteSubject);
+router.post("/save",AuthGuard, RoleGuard(), save);
+router.post("/search",AuthGuard, RoleGuard(), getSubjectDetails);
+router.post("/getAll/",AuthGuard, RoleGuard(), getAllSubjectsList);
+router.post("/delete",AuthGuard, RoleGuard(), deleteSubject);
 
 module.exports = router;

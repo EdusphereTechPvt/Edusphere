@@ -3,130 +3,101 @@ const User = require("../models/AuthSchema");
 const Teacher = require("../models/Teacher");
 
 
-const addOrUpdateTeacher = async (req, res) => {
+const save = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
     const {
-      schoolId,
-      status,
-      fullName,
-      dob,
-      gender,
+      _id,
+      name,
       phone,
       email,
       address,
-      subjects,
-      classesAssigned,
-      joiningDate,
+      dateOfBirth,
+      gender,
       qualification,
       experienceYears,
+      classes,
+      sections,
+      subjects,
+      isActive,
+      joiningDate,
       emergencyContactName,
       emergencyContactRelation,
       emergencyContactPhone
     } = req.body;
 
-    if (!email || !fullName || !dob || !schoolId) {
-      return res.status(400).json({
-        message: "Full Name, DOB, Email and School ID are required",
-        status: false,
-      });
-    }
+    const { schoolId } = req.user;
 
+    if (!name || !email || !dateOfBirth || !schoolId) {
+      return res.status(400).json({ message: "Full Name, Date of Birth, Email and School ID are required", status: false });
+    }
 
     let user = await User.findOne({ email }).session(session);
 
-    if (!user) {
-      
-      const dobString = new Date(dob).toISOString().split("T")[0].replace(/-/g, "");
-      const password = `${fullName.split(" ")[0]}@${dobString}`;
-
-      user = new User({
-        fullName,
-        dob,
-        email,
-        password, 
-        role: "teacher",
-      });
-
-      await user.save({session});
+    if (user && !_id && user.role !== "teacher") {
+      return res.status(403).json({ message: "Email already exists with different role", status: false });
     }
 
-    
+    if (!user) {
+      const dateOfBirthString = new Date(dateOfBirth).toISOString().split("T")[0].replace(/-/g, "");
+      const password = `${name.split(" ")[0]}@${dateOfBirthString}`;
+      user = new User({ name, dateOfBirth: dateOfBirth, email, password, role: "teacher" });
+      await user.save({ session });
+    }
+
     let teacher = await Teacher.findOne({ userId: user._id, schoolId }).session(session);
 
     if (teacher) {
-      teacher.fullName = fullName;
-      teacher.dateOfBirth = dob;
-      teacher.status = status
-      teacher.gender = gender;
-      teacher.phone = phone;
-      teacher.email = email;
-      teacher.address = address;
-      teacher.subjects = subjects;
-      teacher.classesAssigned = classesAssigned;
-      teacher.joiningDate = joiningDate;
-      teacher.qualification = qualification;
-      teacher.experienceYears = experienceYears;
-      teacher.emergencyContactName = emergencyContactName;
-      teacher.emergencyContactRelation = emergencyContactRelation;
-      teacher.emergencyContactPhone = emergencyContactPhone;
-
-      await teacher.save({session});
-
-      return res.status(200).json({
-        message: "Teacher updated successfully",
-        data: teacher,
-        status: true,
-      });
+      const emailConflict = await Teacher.findOne({ email, _id: { $ne: teacher._id } }).session(session);
+      if (emailConflict) {
+        return res.status(403).json({ message: "Email already exists for another teacher", status: false });
+      }
+      Object.assign(teacher, { name, dateOfBirth, gender, phone, email, address, subjects, classes, sections, joiningDate, qualification, experienceYears, emergencyContactName, emergencyContactRelation, emergencyContactPhone, isActive });
+      await teacher.save({ session });
+      await session.commitTransaction();
+      return res.status(200).json({ message: "Teacher updated successfully", data: teacher, status: true });
     }
 
-    
     const newTeacher = new Teacher({
       userId: user._id,
       schoolId,
-      fullName,
-      dateOfBirth: dob,
+      name,
+      dateOfBirth,
       gender,
-      status,
       phone,
       email,
       address,
-      teacherId: `TEACH-${Date.now()}`,
       subjects,
-      classesAssigned,
+      classes,
+      sections,
       joiningDate,
       qualification,
       experienceYears,
       emergencyContactName,
       emergencyContactRelation,
-      emergencyContactPhone
+      emergencyContactPhone,
+      isActive,
+      teacherId: `TEACH-${Date.now()}`
     });
 
-    await newTeacher.save({session});
-
+    await newTeacher.save({ session });
     await session.commitTransaction();
 
-    res.status(201).json({
-      message: "Teacher added successfully",
-      data: newTeacher,
-      status: true,
-    });
+    res.status(201).json({ message: "Teacher added successfully", data: newTeacher, status: true });
   } catch (err) {
-    await session.abortTransaction()
-    console.error("Teacher Add/Update Error:", err);
-    res.status(500).json({
-      message: "Server error during teacher add/update",
-      status: false,
-    });
+    await session.abortTransaction();
+    res.status(500).json({ message: "Server error during teacher add/update", status: false });
+  } finally {
+    session.endSession();
   }
 };
 
-
 const getTeacherDetails = async (req, res) => {
-  const { fullName = "", email = "", phone = "" } = req.body;
+  const { id, teacherId, name = "", email = "", phone = "" } = req.body;
 
-  if (![fullName, email, phone].some(Boolean)) {
+  // ensure at least one search field is provided
+  if (![id, teacherId, name, email, phone].some(Boolean)) {
     return res.status(400).json({
       message: "At least one search field is required",
       status: false,
@@ -134,12 +105,25 @@ const getTeacherDetails = async (req, res) => {
   }
 
   const searchFields = {};
-  if (fullName) searchFields.fullName = { $regex: fullName, $options: "i" };
-  if (email) searchFields.email = { $regex: email, $options: "i" };
-  if (phone) searchFields.phone = { $regex: phone, $options: "i" };
+
+  if (id && mongoose.Types.ObjectId.isValid(id)) {
+    searchFields._id = id;
+  }
+  if (teacherId) {
+    searchFields.teacherId = teacherId;
+  }
+  if (name) {
+    searchFields.name = { $regex: name, $options: "i" };
+  }
+  if (email) {
+    searchFields.email = { $regex: email, $options: "i" };
+  }
+  if (phone) {
+    searchFields.phone = { $regex: phone, $options: "i" };
+  }
 
   try {
-    const response = await Teacher.find(searchFields).populate("userId");
+    const response = await Teacher.find(searchFields);
 
     if (response.length === 0) {
       return res.status(404).json({
@@ -171,9 +155,8 @@ const getTeacherDetails = async (req, res) => {
 
 const getAllTeachersList = async (req, res) => {
   try {
-    console.log(req.user)
     const teachers = await Teacher.find({ schoolId: req.user.schoolId })
-      .populate("userId", "fullName email dob role avatar isActive"); 
+      .populate("userId", "name email dateOfBirth role avatar isActive"); 
 
     if (!teachers || teachers.length === 0) {
       return res.status(404).json({
@@ -185,15 +168,15 @@ const getAllTeachersList = async (req, res) => {
 
      const formattedteachers = teachers.map((teacher) => ({
       teacherId: teacher.teacherId,
-      name: teacher.userId?.fullName,
+      name: teacher.userId?.name,
       email: teacher.userId?.email,
       phone: teacher.phone,
-      dob: teacher.userId?.dob,
+      dateOfBirth: teacher.userId?.dateOfBirth,
       role: teacher.userId?.role,
       avatar: teacher.userId?.avatar,
       isActive: teacher.userId?.isActive,
       gender: teacher.gender,
-      status: teacher.status,
+      status: teacher.isActive,
     }));
 
     res.status(200).json({
@@ -213,15 +196,18 @@ const getAllTeachersList = async (req, res) => {
 const getProfileCardData = async(req,res) => {
   try{
 
-    let keyName = req.body.key;
-    let keyValue = req.body.value
+    let keyName = req.body.searchBy.key;
+    let keyValue = req.body.searchBy.value
 
-    let teacherProfileData = await Teacher.findOne({ keyName:keyValue })
-      .populate("userId", "fullName email dob role avatar isActive"); 
+    console.log(keyName, keyValue)
+
+    let teacherProfileData = await Teacher.findOne({ [keyName]:keyValue })
+      .populate("userId", "name email dateOfBirth role avatar isActive"); 
 
       const formattedTeachers = {
+        _id: teacherProfileData._id,
       id: teacherProfileData.teacherId,
-      name: teacherProfileData.fullName,
+      name: teacherProfileData.name,
       avatar: teacherProfileData.userId?.avatar,
       qualification: teacherProfileData.qualification,
       address: teacherProfileData.address
@@ -243,9 +229,11 @@ const getProfileCardData = async(req,res) => {
 
 
 const deleteTeacher = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction()
   try {
-    const { id } = req.params;
-    const teacher = await Teacher.findByIdAndDelete(id);
+    const { id } = req.body;
+    const teacher = await Teacher.findByIdAndDelete(id).session(session);
 
     if (!teacher) {
       return res.status(404).json({
@@ -254,13 +242,16 @@ const deleteTeacher = async (req, res) => {
       });
     }
 
-    await User.findByIdAndDelete(teacher.userId);
+    await User.findByIdAndDelete(teacher.userId).session(session);
+
+    session.commitTransaction()
 
     res.status(200).json({
       message: "Teacher deleted successfully",
       status: true,
     });
   } catch (err) {
+    session.abortTransaction()
     console.error("Delete teacher error:", err);
     res.status(500).json({
       message: "Server error while deleting teacher",
@@ -269,4 +260,4 @@ const deleteTeacher = async (req, res) => {
   }
 };
 
-module.exports = { addOrUpdateTeacher, getTeacherDetails, deleteTeacher,getAllTeachersList,getProfileCardData };
+module.exports = { save, getTeacherDetails, deleteTeacher,getAllTeachersList,getProfileCardData };

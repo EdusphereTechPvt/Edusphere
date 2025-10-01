@@ -19,13 +19,13 @@ const UserSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
-    fullName: {
+    name: {
       type: String,
       required: true,
       trim: true,
       minlength: 3,
     },
-    dob: {
+    dateOfBirth: {
       type: Date,
       required: true,
     },
@@ -76,13 +76,13 @@ const UserSchema = new mongoose.Schema(
 
 UserSchema.pre("save", async function (next) {
   if (!this.uid) {
-    const dobString = this.dob
-      ? this.dob.toISOString().split("T")[0].replace(/-/g, "")
+    const dateOfBirthString = this.dateOfBirth
+      ? this.dateOfBirth.toISOString().split("T")[0].replace(/-/g, "")
       : "00000000";
-    const namePart = this.fullName
-      ? this.fullName.substring(0, 4).toUpperCase()
+    const namePart = this.name
+      ? this.name.substring(0, 4).toUpperCase()
       : "USER";
-    this.uid = `${this.role.toUpperCase()}${dobString}${namePart}`;
+    this.uid = `${this.role.toUpperCase()}${dateOfBirthString}${namePart}`;
   }
   if (!this.isModified("password")) return next();
   const salt = await bcrypt.genSalt(SALT_ROUNDS);

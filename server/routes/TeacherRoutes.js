@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
-  addOrUpdateTeacher,
+  save,
   getTeacherDetails,
   deleteTeacher,
   getAllTeachersList,
@@ -11,10 +11,10 @@ const AuthGuard = require("../middleware/AuthGuard");
 const RoleGuard = require("../middleware/RoleGuard");
 
 // Routes
-router.post("/addOrUpdate", addOrUpdateTeacher);
-router.get("/search", getTeacherDetails);
-router.get("/getAll/",AuthGuard, RoleGuard("teacher/list"), getAllTeachersList);
+router.post("/save",AuthGuard, RoleGuard(), save);
+router.post("/search",AuthGuard, RoleGuard(), getTeacherDetails);
+router.post("/getAll/",AuthGuard, RoleGuard(), getAllTeachersList);
 router.post("/getProfileCardData", getProfileCardData)
-router.delete("/delete/:id", deleteTeacher);
+router.post("/delete",AuthGuard, RoleGuard(), deleteTeacher);
 
 module.exports = router;

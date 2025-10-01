@@ -1,37 +1,3 @@
-// const mongoose = require("mongoose");
-
-// const TeacherProfileSchema = new mongoose.Schema({
-
-//   userId: {
-//      type: mongoose.Schema.Types.ObjectId,
-//      ref: "User", required: true,
-//       unique: true },
-
-//   employeeId: {
-//     type: String,
-//     unique: true, required: true,
-//      minlength: 3 },
-
-//   subjects: {
-//      type: [String],
-//       required: true },
-
-//   classes: {
-//     type: [String],
-//     required: true },
-
-//   qualification: {
-//      type: String,
-//       minlength: 3 },
-
-//   dateOfJoining: {
-//     type: Date,
-//      required: true },
-
-// }, { timestamps: true });
-
-// module.exports = mongoose.model("TeacherProfile", TeacherProfileSchema);
-
 const mongoose = require("mongoose");
 
 const TeacherProfileSchema = new mongoose.Schema(
@@ -41,30 +7,20 @@ const TeacherProfileSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-     schoolId: {
+    schoolId: {
       type: String,
       ref: "School",
       required: true,
     },
-    status:{
+    teacherId: {
       type: String,
-      required: true,
-      enum: ["Active", "On Hold", "Inactive"]
+      unique: true,
+      sparse: true,
     },
-    fullName: {
+    name: {
       type: String,
       required: true,
       trim: true,
-    },
-
-    dateOfBirth: {
-      type: Date,
-      required: true,
-    },
-
-    gender: {
-      type: String,
-      required: true,
     },
 
     phone: {
@@ -77,29 +33,20 @@ const TeacherProfileSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-
     address: {
       type: String,
     },
-
-    teacherId: {
-      type: String,
-      unique: true,
-      sparse: true,
+    dateOfBirth: {
+      type: Date,
+      required: true,
     },
-
-    subjects: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
-
-    classesAssigned: [
-      {
-        type: String,
-      },
-    ],
+    gender: {
+      type: String,
+      required: true,
+    },
+    subjects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subject" }],
+    classes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class" }],
+    sections: [{ type: mongoose.Schema.Types.ObjectId, ref: "Section" }],
 
     joiningDate: {
       type: Date,
@@ -108,12 +55,12 @@ const TeacherProfileSchema = new mongoose.Schema(
 
     qualification: {
       type: String,
+      required: true,
     },
-
     experienceYears: {
       type: Number,
+      required: true,
     },
-
     emergencyContactName: {
       type: String,
     },
@@ -122,6 +69,10 @@ const TeacherProfileSchema = new mongoose.Schema(
     },
     emergencyContactPhone: {
       type: String,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }

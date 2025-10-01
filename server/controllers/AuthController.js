@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 const User = require("../models/AuthSchema");
 const Student = require("../models/Student");
 const Teacher = require("../models/Teacher");
-const ParentProfile = require("../models/ParentProfile");
+const Parent = require("../models/Parent");
 const School = require("../models/SchoolSchema");
-const AdminProfile = require("../models/AdminProfile");
+const Admin = require("../models/Admin");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
@@ -137,7 +137,7 @@ const signupController = async (req, res) => {
   session.startTransaction();
 
   try {
-    const { fullName, dob, email, password, inviteToken } = req.body;
+    const { name, dateOfBirth, email, password, inviteToken } = req.body;
 
     const invite = await InviteToken.findOne({ token: inviteToken }).session(
       session
@@ -157,8 +157,8 @@ const signupController = async (req, res) => {
     }
 
     const newUser = new User({
-      fullName,
-      dob: new Date(dob),
+      name,
+      dateOfBirth: new Date(dateOfBirth),
       email,
       password,
       role: "admin",
@@ -166,14 +166,11 @@ const signupController = async (req, res) => {
     });
     await newUser.save({ session });
 
-    const adminProfile = new AdminProfile({
+    const admin = new Admin({
       userId: newUser._id,
       schoolId: school._id,
     });
-    await adminProfile.save({ session });
-
-    school.adminId.push(newUser._id);
-    await school.save({ session });
+    await admin.save({ session });
 
     invite.used = true;
     invite.usedBy = newUser._id;
@@ -456,7 +453,7 @@ const verify = async (req, res) => {
 
 const oAuthController = async (req, res) => {
   try {
-    const { token, role, dob, fullName } = req.body;
+    const { token, role, dateOfBirth, name } = req.body;
 
     const decodedToken = await admin.auth().verifyIdToken(token);
     if (!decodedToken)
@@ -468,8 +465,8 @@ const oAuthController = async (req, res) => {
 
     if (!user) {
       user = new User({
-        fullName: fullName || decodedToken.name,
-        dob: dob || null,
+        name: name || decodedToken.name,
+        dateOfBirth: dateOfBirth || null,
         email: decodedToken.email,
         googleId: decodedToken.uid,
         role,
@@ -485,10 +482,10 @@ const oAuthController = async (req, res) => {
           await new Teacher({ userId: user._id }).save();
           break;
         case "parent":
-          await new ParentProfile({ userId: user._id }).save();
+          await new Parent({ userId: user._id }).save();
           break;
         case "admin":
-          await new AdminProfile({ userId: user._id }).save();
+          await new Admin({ userId: user._id }).save();
           break;
         default:
           return res
@@ -554,6 +551,19 @@ const generateInviteToken = async (req, res) => {
   }
 };
 
+const ping = async(req,res) => {
+   try {
+    res.status(200).json({
+      status: true,
+      authorized: true,
+      message: "User is online & authorized",
+    });
+  } catch (err) {
+    console.error("Ping Error:", err);
+    res.status(500).json({ status: false, authorized: false, message: "Server error" });
+  }
+};
+
 module.exports = {
   loginController,
   signupController,
@@ -565,4 +575,5 @@ module.exports = {
   refreshController,
   generateInviteToken,
   oAuthController,
+  ping
 };
