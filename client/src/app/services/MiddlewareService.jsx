@@ -79,6 +79,9 @@ api.interceptors.response.use(
     if(error.response?.status === 403){
         window.location.href = '/error/403'
     }
+    if(error.response?.status === 401){
+        window.location.href = '/error/401'
+    }
 
     return Promise.reject(error);
   }

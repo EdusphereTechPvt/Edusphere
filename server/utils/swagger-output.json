@@ -41,10 +41,25 @@
     "http"
   ],
   "paths": {
-    "/permission/getElement": {
+    "/api/distinct-values": {
       "post": {
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-page",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
@@ -62,6 +77,56 @@
           "200": {
             "description": "OK"
           },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "tags": [
+          "General"
+        ]
+      }
+    },
+    "/permission/getElement": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "page": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -75,6 +140,11 @@
       "post": {
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
@@ -122,6 +192,9 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "409": {
             "description": "Conflict"
           },
@@ -139,15 +212,20 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "fullName": {
+                "name": {
                   "example": "any"
                 },
-                "dob": {
+                "dateOfBirth": {
                   "example": "any"
                 },
                 "email": {
@@ -167,6 +245,9 @@
           "201": {
             "description": "Created"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -180,6 +261,11 @@
       "post": {
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "user-agent",
             "in": "header",
@@ -237,6 +323,11 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
@@ -252,6 +343,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -269,6 +363,11 @@
       "post": {
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
@@ -289,6 +388,9 @@
           "200": {
             "description": "OK"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -305,6 +407,11 @@
       "post": {
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "user-agent",
             "in": "header",
@@ -361,6 +468,11 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
@@ -377,6 +489,9 @@
           "200": {
             "description": "OK"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -392,9 +507,19 @@
     "/auth/logout": {
       "post": {
         "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal Server Error"
@@ -410,6 +535,11 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
@@ -421,10 +551,10 @@
                 "role": {
                   "example": "any"
                 },
-                "dob": {
+                "dateOfBirth": {
                   "example": "any"
                 },
-                "fullName": {
+                "name": {
                   "example": "any"
                 }
               }
@@ -437,6 +567,9 @@
           },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal Server Error"
@@ -451,6 +584,11 @@
       "post": {
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
@@ -477,6 +615,9 @@
           "201": {
             "description": "Created"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -490,6 +631,11 @@
       "post": {
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
@@ -516,6 +662,9 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -528,9 +677,19 @@
     "/helpcenter/all": {
       "get": {
         "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal Server Error"
@@ -550,11 +709,19 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -577,11 +744,19 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -604,11 +779,19 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -631,11 +814,19 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -658,11 +849,19 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -681,12 +880,17 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "fullName": {
+                "name": {
                   "example": "any"
                 },
                 "schoolName": {
@@ -724,6 +928,9 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -738,12 +945,17 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "fullName": {
+                "name": {
                   "example": "any"
                 },
                 "schoolName": {
@@ -766,6 +978,9 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -787,11 +1002,19 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -810,15 +1033,20 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "fullName": {
+                "name": {
                   "example": "any"
                 },
-                "dob": {
+                "dateOfBirth": {
                   "example": "any"
                 },
                 "email": {
@@ -880,6 +1108,9 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -899,12 +1130,25 @@
             "type": "string"
           },
           {
+            "name": "x-page",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "fullName": {
+                "page": {
+                  "example": "any"
+                },
+                "name": {
                   "example": "any"
                 },
                 "email": {
@@ -946,13 +1190,35 @@
       }
     },
     "/student/getAll/": {
-      "get": {
+      "post": {
         "description": "",
         "parameters": [
           {
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "x-page",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "page": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -982,6 +1248,11 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
@@ -1001,6 +1272,9 @@
           "200": {
             "description": "OK"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -1019,11 +1293,19 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -1037,29 +1319,35 @@
         ]
       }
     },
-    "/teacher/addOrUpdate": {
+    "/teacher/save": {
       "post": {
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "x-page",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "schoolId": {
+                "page": {
                   "example": "any"
                 },
-                "status": {
-                  "example": "any"
-                },
-                "fullName": {
-                  "example": "any"
-                },
-                "dob": {
-                  "example": "any"
-                },
-                "gender": {
+                "name": {
                   "example": "any"
                 },
                 "phone": {
@@ -1071,19 +1359,31 @@
                 "address": {
                   "example": "any"
                 },
-                "subjects": {
+                "dateOfBirth": {
                   "example": "any"
                 },
-                "classesAssigned": {
-                  "example": "any"
-                },
-                "joiningDate": {
+                "gender": {
                   "example": "any"
                 },
                 "qualification": {
                   "example": "any"
                 },
                 "experienceYears": {
+                  "example": "any"
+                },
+                "classes": {
+                  "example": "any"
+                },
+                "sections": {
+                  "example": "any"
+                },
+                "subjects": {
+                  "example": "any"
+                },
+                "isActive": {
+                  "example": "any"
+                },
+                "joiningDate": {
                   "example": "any"
                 },
                 "emergencyContactName": {
@@ -1109,6 +1409,12 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -1121,12 +1427,22 @@
     "/teacher/search": {
       "get": {
         "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
           },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -1141,13 +1457,35 @@
       }
     },
     "/teacher/getAll/": {
-      "get": {
+      "post": {
         "description": "",
         "parameters": [
           {
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "x-page",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "page": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -1177,6 +1515,11 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
@@ -1196,6 +1539,9 @@
           "200": {
             "description": "OK"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -1214,11 +1560,19 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -1236,6 +1590,11 @@
       "post": {
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
@@ -1277,6 +1636,9 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -1287,6 +1649,11 @@
       "get": {
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "className",
             "in": "query",
@@ -1301,6 +1668,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal Server Error"
@@ -1317,11 +1687,19 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -1337,24 +1715,38 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "id": {
+                "subjectId": {
                   "example": "any"
                 },
-                "subjectName": {
+                "name": {
                   "example": "any"
                 },
-                "subjectCode": {
+                "description": {
                   "example": "any"
                 },
-                "department": {
+                "classIds": {
                   "example": "any"
                 },
-                "category": {
+                "teacherIds": {
+                  "example": "any"
+                },
+                "schoolId": {
+                  "example": "any"
+                },
+                "credits": {
+                  "example": "any"
+                },
+                "isActive": {
                   "example": "any"
                 }
               }
@@ -1368,6 +1760,12 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -1378,6 +1776,11 @@
       "get": {
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "subjectName",
             "in": "query",
@@ -1392,6 +1795,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal Server Error"
@@ -1408,11 +1814,19 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"

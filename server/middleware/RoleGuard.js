@@ -1,7 +1,11 @@
 const AccessControl = require("../models/AccessControl");
-const School = require("../models/SchoolSchema")
+const Admin = require("../models/Admin");
+const Parent = require("../models/Parent");
+const School = require("../models/SchoolSchema");
+const Student = require("../models/Student");
+const Teacher = require("../models/Teacher");
 
-module.exports = function roleGuard(page) {
+module.exports = function roleGuard() {
   return async function (req, res, next) {
     try {
       let user = req.user;
@@ -9,7 +13,8 @@ module.exports = function roleGuard(page) {
 
       const method = req.method;
 
-      // Look up permissions in DB
+      const page = req.query.page || req.headers["x-page"] || req.body.page;
+
       const permission = await AccessControl.findOne({
         role: user.role,
         page,
@@ -17,11 +22,16 @@ module.exports = function roleGuard(page) {
         allowed: true,
       });
 
+      console.log(user.role, page,method)
+      console.log("Permission" , permission)
+
       if (!permission) {
         return res.status(403).json({ message: "Forbidden: Access denied" });
       }
 
-      const schoolDetails = await School.findOne({adminId: user._id})
+      const userProfile = await getUserProfile(user._id, user.role)
+
+      const schoolDetails = await School.findOne({_id: userProfile.schoolId})
 
       if (schoolDetails) {
         user = {
@@ -39,3 +49,18 @@ module.exports = function roleGuard(page) {
     }
   };
 };
+
+
+const getUserProfile = async(id,role) => {
+
+  switch(role){
+    case "admin":
+      return await Admin.findOne({userId: id})
+    case "teacher":
+      return await Teacher.findOne({userId: id})
+    case "student":
+      return await Student.findOne({userId:id})
+    case "parent":
+      return await Parent.findOne({userId: id})
+  }
+}
