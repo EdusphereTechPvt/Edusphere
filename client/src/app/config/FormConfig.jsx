@@ -1,8 +1,14 @@
 const formConfig = {
   teacher: {
     api: {
-      fetch: "/teacher/get",
+      fetch: "/teacher/search",
       submit: "/teacher/save",
+      page: {
+        mode: {
+          add: "/form/teacher/add",
+          edit: "/form/teacher/edit"
+        }
+      }
     },
     info: [
       {
@@ -14,15 +20,31 @@ const formConfig = {
             "text-xl sm:text-2xl md:text-3xl font-bold text-[var(--color-text)]",
           inlineStyle: {},
         },
+        mode: {
+          add: {
+            value: "Add New Teacher"
+          },
+          edit: {
+            value: "Edit Teacher"
+          }
+        }
       },
       {
         type: "desc",
-        value: "Fill in the destails below to add new teacher.",
+        value: "Fill in the details below to add new teacher.",
         tag: "p",
         styles: {
           className: "text-[var(--color-text-secondary)] mb-2",
           inlineStyle: {},
         },
+        mode: {
+          add: {
+            value: "Fill in the details below to add new teacher."
+          },
+          edit: {
+            value: "Fill in the details below to edit teacher."
+          }
+        }
       },
     ],
     sections: [
@@ -31,62 +53,169 @@ const formConfig = {
         fields: [
           {
             type: "text",
-            name: "fullName",
+            name: "name",
             label: "Full Name",
             placeholder: "Enter full name",
+            required: true
           },
           {
+            type: "date",
+            name: "dateOfBirth",
+            label: "Date of Birth",
+            placeholder: "Enter Date of Birth",
+            required: true
+          },
+          {
+            type: "dropdown",
+            name: "gender",
+            label: "Gender",
+            placeholder: "Gender",
+            required: true,
+            items: [
+              { id: "Male", value: 'Male' },
+              { id: "Female", value: 'Female' },
+              { id: "Others", value: 'Others' }
+            ]
+          },
+        ],
+      },
+      {
+        title: "Contact Information",
+        fields: [
+          {
             type: "text",
-            name: "contactNumber",
+            name: "phone",
             label: "Contact Number",
             placeholder: "Enter contact number",
+            required: true,
+            minLenght: 10
           },
           {
             type: "email",
-            name: "emailAddress",
+            name: "email",
             label: "Email Address",
             placeholder: "Enter email address",
+            required: true
           },
-        ],
+          {
+            type: "textArea",
+            name: "address",
+            label: "Address",
+            placeholder: "Address"
+          },
+        ]
+      },
+      {
+        title: "Academic Information",
+        fields: [
+          {
+            type: "text",
+            name: "qualification",
+            label: "Qualification",
+            placeholder: "Select Qualification",
+            required: true,
+          },
+          {
+            type: "text",
+            name: "experienceYears",
+            label: "Experience",
+            placeholder: "Select Experience",
+            required: true,
+          },
+          {
+            type: "date",
+            name: "joiningDate",
+            label: "Joining Date",
+            placeholder: "Select Date of Joining",
+            required: true,
+          },
+        ]
       },
       {
         title: "Assignment Details",
         fields: [
           {
-            type: "dropdown",
-            data: {
-              name: "qualifications",
-              label: "Qualifications",
-              placeholder: "Select qualification",
-              required: true,
-              items: [],
-            },
+            type: "multiselect",
+            name: "classes",
+            label: "Assigned Classes",
+            placeholder: "Select classes",
+            items: [],
+            isDistinct: true,
+            styles: {
+              selectStyle: {
+                height: "3.5rem"
+              }
+            }
           },
           {
-            type: "dropdown",
-            data: {
-              name: "assignedSubjects",
-              label: "Assigned Subjects",
-              placeholder: "Select subjects",
-              required: true,
-              items: [],
-            },
+            type: "multiselect",
+            name: "sections",
+            label: "Assigned Sections",
+            placeholder: "Select sections",
+            isDistinct: true,
+            dependancy: ["classes"],
+            items: [],
+            styles: {
+              selectStyle: {
+                height: "3.5rem"
+              }
+            }
           },
           {
-            type: "dropdown",
-            data: {
-              name: "assignedClasses",
-              label: "Assigned Classes",
-              placeholder: "Select classes",
-              required: true,
-              items: [],
-            },
+            type: "multiselect",
+            name: "subjects",
+            label: "Assigned Subjects",
+            placeholder: "Select subjects",
+            isDistinct: true,
+            dependancy: ["sections"],
+            items: [],
+            styles: {
+              selectStyle: {
+                height: "3.5rem"
+              }
+            }
           },
         ],
       },
       {
-        title: "Identification",
-        fields: [{ type: "qr", name: "qrId", label: "Generate QR ID" }],
+        title: "Emergency Contact Information",
+        fields: [
+          {
+            type: "text",
+            name: "emergencyContactName",
+            label: "Contact Name",
+            placeholder: "Emergency Contact Name",
+            required: false,
+          },
+          {
+            type: "text",
+            name: "emergencyContactRelation",
+            label: "Relation To Teacher",
+            placeholder: "Enter the relation to teacher",
+            required: false,
+          },
+          {
+            type: "text",
+            name: "emergencyContactPhone",
+            label: "Contact Phone",
+            placeholder: "Emergency Contact Phone",
+            required: false,
+          },
+        ],
+      },
+      {
+        fields: [
+          {
+            type: "checkBox",
+            name: "isActive",
+            values: [
+              { name: "isActive", text: "Active" }
+            ],
+            styles: {
+              className: "font-bold text-black"
+            }
+          },
+        ]
       },
       {
         title: "Actions",
@@ -102,7 +231,15 @@ const formConfig = {
             type: "button",
             variant: "contained",
             text: "Save Teacher",
-            action: "save",
+            action: "submit",
+            mode: {
+              add: {
+                text: "Save Teacher"
+              },
+              edit: {
+                text: "Update Teacher"
+              }
+            }
           },
         ],
       },
@@ -145,26 +282,22 @@ const formConfig = {
             label: "Student Name",
             placeholder: "Enter student's full name",
           },
-          { type: "date", name: "dob", label: "Date of Birth" },
+          { type: "date", name: "dateOfBirth", label: "Date of Birth" },
           {
             type: "dropdown",
-            data: {
-              name: "gender",
-              label: "Gender",
-              placeholder: "Select gender",
-              required: true,
-              items: [],
-            },
+            name: "gender",
+            label: "Gender",
+            placeholder: "Select gender",
+            required: true,
+            items: [],
           },
           {
             type: "dropdown",
-            data: {
-              name: "class",
-              label: "Class",
-              placeholder: "Select class",
-              required: true,
-              items: [],
-            },
+            name: "class",
+            label: "Class",
+            placeholder: "Select class",
+            required: true,
+            items: [],
           },
         ],
       },
@@ -231,13 +364,11 @@ const formConfig = {
         fields: [
           {
             type: "dropdown",
-            data: {
-              name: "selectClasses",
-              label: "Select Class",
-              placeholder: "Select Class",
-              required: true,
-              items: [],
-            },
+            name: "selectClasses",
+            label: "Select Class",
+            placeholder: "Select Class",
+            required: true,
+            items: [],
           },
         ],
       },
@@ -293,7 +424,7 @@ const formConfig = {
         fields: [
           {
             type: "text",
-            name: "fullName",
+            name: "name",
             label: "Full Name",
             placeholder: "Enter full name",
           },
@@ -322,18 +453,16 @@ const formConfig = {
         fields: [
           {
             type: "dropdown",
-            data: {
-              name: "schoolSize",
-              label: "School Size",
-              placeholder: "Select Size",
-              required: true,
-              items: [
-                {value: "Less than 100", "label":"Less than 100"},
-                {value: "Between 100 and 250", "label":"Between 100 and 250"},
-                {value: "Between 250 and 500", "label":"Between 250 and 500"},
-                {value: "More than 500", "label":"More than 500"},
-              ],
-            },
+            name: "schoolSize",
+            label: "School Size",
+            placeholder: "Select Size",
+            required: true,
+            items: [
+              { value: "Less than 100", "label": "Less than 100" },
+              { value: "Between 100 and 250", "label": "Between 100 and 250" },
+              { value: "Between 250 and 500", "label": "Between 250 and 500" },
+              { value: "More than 500", "label": "More than 500" },
+            ],
           },
           {
             type: "date",
@@ -364,18 +493,16 @@ const formConfig = {
         fields: [
           {
             type: "dropdown",
-            data: {
-              name: "reference",
-              label: "How did you hear about us?",
-              placeholder: "Select an option",
-              required: true,
-              items: [
-                {value: "Facebook", "label":"Facebook"},
-                {value: "Google", "label":"Google"},
-                {value: "News Paper", "label":"New Paper"},
-                {value: "Instagram", "label":"Instagram"},
-              ],
-            },
+            name: "reference",
+            label: "How did you hear about us?",
+            placeholder: "Select an option",
+            required: true,
+            items: [
+              { value: "Facebook", "label": "Facebook" },
+              { value: "Google", "label": "Google" },
+              { value: "News Paper", "label": "New Paper" },
+              { value: "Instagram", "label": "Instagram" },
+            ],
           },
         ],
       },
@@ -405,6 +532,476 @@ const formConfig = {
             variant: "contained",
             text: "Submit Demo Request",
             action: "submit",
+          },
+        ],
+      },
+    ],
+  },
+  subject: {
+    api: {
+      fetch: "/subject/search",
+      submit: "/subject/save",
+      page: {
+        mode: {
+          add: "/form/subject/add",
+          edit: "/form/subject/edit"
+        }
+      }
+    },
+    info: [
+      {
+        type: "title",
+        value: "Add New Subject",
+        tag: "h1",
+        styles: {
+          className:
+            "text-xl sm:text-2xl md:text-3xl font-bold text-[var(--color-text)]",
+          inlineStyle: {},
+        },
+        mode: {
+          add: {
+            value: "Add New Subject"
+          },
+          edit: {
+            value: "Edit Subject"
+          }
+        }
+      },
+      {
+        type: "desc",
+        value: "Fill in the details below to add a new subject.",
+        tag: "p",
+        styles: {
+          className: "text-[var(--color-text-secondary)] mb-2",
+          inlineStyle: {},
+        },
+        mode: {
+          add: {
+            value: "Fill in the details below to add new subject."
+          },
+          edit: {
+            value: "Fill in the details below to edit subject."
+          }
+        }
+      },
+    ],
+    sections: [
+      {
+        title: "Subject Information",
+        fields: [
+          {
+            type: "text",
+            name: "name",
+            label: "Subject Name",
+            placeholder: "e.g., Math",
+            required: true,
+          },
+          {
+            type: "text",
+            name: "description",
+            label: "Description",
+            placeholder: "e.g., The Subject is based on Mathematics",
+            required: true,
+          },
+          {
+            type: "text",
+            name: "subjectCode",
+            label: "Subject Code (Optional)",
+            placeholder: "e.g., MATH101",
+            required: false,
+          },
+          {
+            type: "text",
+            name: "credits",
+            label: "Credit (Optional)",
+            placeholder: "e.g., 10",
+            required: false,
+          },
+          {
+            type: "multiselect",
+            name: "classIds",
+            label: "Classes",
+            placeholder: "Enter the classes associated with the subject",
+            isDistinct: true,
+            required: false,
+            items: [],
+            styles: {
+              selectStyle: {
+                height: "3.5rem",
+              }
+            }
+          },
+          {
+            type: "multiselect",
+            name: "teacherIds",
+            label: "Teachers",
+            placeholder: "Enter the teachers associated with the subject",
+            required: false,
+            isDistinct: true,
+            items: [],
+            styles: {
+              selectStyle: {
+                height: "3.5rem"
+              }
+            }
+          },
+          {
+            type: "checkBox",
+            name: "isActive",
+            values: [
+              { name: "isActive", text: "Active" }
+            ],
+            styles: {
+              className: "font-bold text-black"
+            }
+          },
+        ],
+      },
+      {
+        title: "Actions",
+        fields: [
+          {
+            type: "button",
+            text: "Cancel",
+            variant: "outlined",
+            action: "cancel",
+          },
+          {
+            type: "button",
+            text: "Save Subject",
+            variant: "contained",
+            action: "submit",
+            mode: {
+              add: {
+                text: "Save Subject"
+              },
+              edit: {
+                text: "Update Subject"
+              }
+            }
+          },
+        ],
+      },
+    ],
+  },
+  class: {
+    api: {
+      fetch: "/class/search",
+      submit: "/class/save",
+      page: {
+        mode: {
+          add: "/form/class/add",
+          edit: "/form/class/edit"
+        }
+      }
+    },
+    info: [
+      {
+        type: "title",
+        value: "Add New Class",
+        tag: "h1",
+        styles: {
+          className:
+            "text-xl sm:text-2xl md:text-3xl font-bold text-[var(--color-text)]",
+          inlineStyle: {},
+        },
+        mode: {
+          add: {
+            value: "Add New Class"
+          },
+          edit: {
+            value: "Edit Class"
+          }
+        }
+      },
+      {
+        type: "desc",
+        value: "Fill in the details below to add a new Class.",
+        tag: "p",
+        styles: {
+          className: "text-[var(--color-text-secondary)] mb-2",
+          inlineStyle: {},
+        },
+        mode: {
+          add: {
+            value: "Fill in the details below to add new class."
+          },
+          edit: {
+            value: "Fill in the details below to edit class."
+          }
+        }
+      },
+    ],
+    sections: [
+      {
+        title: "Class Information",
+        fields: [
+          {
+            type: "text",
+            name: "name",
+            label: "Class Name",
+            placeholder: "e.g., 10th",
+            required: true,
+          },
+          {
+            type: "text",
+            name: "gradeLevel",
+            label: "Grade (in number)",
+            placeholder: "e.g., 10",
+            required: true,
+          },
+          {
+            type: "text",
+            name: "academicYear",
+            label: "Academic Year",
+            placeholder: "e.g., 2025-2026",
+            required: false,
+          },
+          {
+            type: "multiselect",
+            name: "sections",
+            label: "Sections",
+            placeholder: "Select the sections to include",
+            required: false,
+            items: [],
+            isDistinct: true,
+            styles: {
+              selectStyle: {
+                height: "3.5rem",
+              }
+            }
+          },
+          {
+            type: "multiselect",
+            name: "subjects",
+            label: "Subjects",
+            placeholder: "Select the Subjects to be included",
+            required: true,
+            items: [],
+            isDistinct: true,
+            styles: {
+              selectStyle: {
+                height: "3.5rem"
+              }
+            }
+          },
+          {
+            type: "text",
+            name: "comments",
+            label: "Description",
+            placeholder: "e.g., This class belongs to students of class 10",
+            required: false,
+          },
+        ],
+      },
+      {
+        fields: [
+          {
+
+            type: "checkBox",
+            name: "isActive",
+            values: [
+              { name: "isActive", text: "Active" }
+            ],
+            styles: {
+              className: "font-bold text-black"
+            }
+          }
+        ]
+      },
+      {
+        title: "Actions",
+        fields: [
+          {
+            type: "button",
+            text: "Cancel",
+            variant: "outlined",
+            action: "cancel",
+          },
+          {
+            type: "button",
+            text: "Save Subject",
+            variant: "contained",
+            action: "submit",
+            mode: {
+              add: {
+                text: "Save Class"
+              },
+              edit: {
+                text: "Update Class"
+              }
+            }
+          },
+        ],
+      },
+    ],
+  },
+  section: {
+    api: {
+      fetch: "/section/search",
+      submit: "/section/save",
+      page: {
+        mode: {
+          add: "/form/section/add",
+          edit: "/form/section/edit"
+        }
+      }
+    },
+    info: [
+      {
+        type: "title",
+        value: "Add New Section",
+        tag: "h1",
+        styles: {
+          className:
+            "text-xl sm:text-2xl md:text-3xl font-bold text-[var(--color-text)]",
+          inlineStyle: {},
+        },
+        mode: {
+          add: {
+            value: "Add New Section"
+          },
+          edit: {
+            value: "Edit Section"
+          }
+        }
+      },
+      {
+        type: "desc",
+        value: "Fill in the details below to add a new Section.",
+        tag: "p",
+        styles: {
+          className: "text-[var(--color-text-secondary)] mb-2",
+          inlineStyle: {},
+        },
+        mode: {
+          add: {
+            value: "Fill in the details below to add new section."
+          },
+          edit: {
+            value: "Fill in the details below to edit section."
+          }
+        }
+      },
+    ],
+    sections: [
+      {
+        title: "Section Information",
+        fields: [
+          {
+            type: "text",
+            name: "name",
+            label: "Section Name",
+            placeholder: "e.g., A",
+            required: true,
+          },
+          {
+            type: "text",
+            name: "capacity",
+            label: "Capacity (in number)",
+            placeholder: "e.g., 50",
+            required: true,
+          },
+          {
+            type: "dropdown",
+            name: "classId",
+            label: "Select Class",
+            placeholder: "e.g., Class 10",
+            required: true,
+            items: [],
+            isDistinct: true
+          },
+          {
+            type: "text",
+            name: "roomNumber",
+            label: "Room Number",
+            placeholder: "e.g., 2025-2026",
+            required: false,
+          },
+          {
+            type: "dropdown",
+            name: "classTeacher",
+            label: "Select Class Teacher",
+            placeholder: "e.g., Mr. Ashutosh",
+            required: true,
+            items: [],
+            isDistinct: true,
+          },
+          {
+            type: "multiselect",
+            required: false,
+            name: "students",
+            label: "Students",
+            placeholder: "Select the students",
+            items: [],
+            isDistinct: true,
+            dependancy: ["classId"],
+            styles: {
+              selectStyle: {
+                height: "3.5rem",
+              }
+            }
+          },
+          {
+            type: "multiselect",
+            name: "teachers",
+            label: "Teachers",
+            placeholder: "Select the teachers",
+            required: true,
+            items: [],
+            isDistinct: true,
+            styles: {
+              selectStyle: {
+                height: "3.5rem"
+              }
+            }
+          },
+          {
+            type: "text",
+            name: "comments",
+            label: "Description",
+            placeholder: "e.g., This class belongs to students of class 10",
+            required: false,
+          },
+        ],
+      },
+      {
+        fields: [
+          {
+
+            type: "checkBox",
+            name: "isActive",
+            values: [
+              { name: "isActive", text: "Active" }
+            ],
+            styles: {
+              className: "font-bold text-black"
+            }
+          }
+        ]
+      },
+      {
+        title: "Actions",
+        fields: [
+          {
+            type: "button",
+            text: "Cancel",
+            variant: "outlined",
+            action: "cancel",
+          },
+          {
+            type: "button",
+            text: "Save Subject",
+            variant: "contained",
+            action: "submit",
+            mode: {
+              add: {
+                text: "Save Subject"
+              },
+              edit: {
+                text: "Update Subject"
+              }
+            }
           },
         ],
       },

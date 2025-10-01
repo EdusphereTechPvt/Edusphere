@@ -2,7 +2,7 @@ const RequestDemo = require("../models/RequestDemoSchema");
 
 const addRequestDemo = async (req, res) => {
   try {
-    const { fullName, schoolName, email, phone, schoolSize, preferredDate, features, reference, message } = req.body;
+    const { name, schoolName, email, phone, schoolSize, preferredDate, features, reference, message } = req.body;
 
     if (!email || !schoolName) {
       return res.status(400).json({ 
@@ -12,7 +12,7 @@ const addRequestDemo = async (req, res) => {
     }
 
     const newDemo = new RequestDemo({ 
-      fullName, 
+      name, 
       schoolName, 
       email, 
       phone, 
@@ -41,9 +41,9 @@ const addRequestDemo = async (req, res) => {
 
 
 const getRequestDemoDetails = async (req, res) => {
-  const { fullName = "", schoolName = "", email = "", phone = "" } = req.body;
+  const { name = "", schoolName = "", email = "", phone = "" } = req.body;
 
-  if (![fullName, schoolName, email, phone].some(Boolean)) {
+  if (![name, schoolName, email, phone].some(Boolean)) {
     return res.status(400).json({ 
       message: "At least one search field is required", 
       status: false 
@@ -51,7 +51,7 @@ const getRequestDemoDetails = async (req, res) => {
   }
 
   const searchFields = {};
-  if (fullName) searchFields.fullName = { $regex: fullName, $options: "i" };
+  if (name) searchFields.name = { $regex: name, $options: "i" };
   if (schoolName) searchFields.schoolName = { $regex: schoolName, $options: "i" };
   if (email) searchFields.email = { $regex: email, $options: "i" };
   if (phone) searchFields.phone = { $regex: phone, $options: "i" };

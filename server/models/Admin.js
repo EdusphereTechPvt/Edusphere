@@ -16,7 +16,8 @@ const AdminProfileSchema = new mongoose.Schema(
     employeeId: {
       type: String,
       unique: true,
-      sparse:true
+      sparse:true,
+      default: () => `EMP-${Date.now()}-${Math.floor(Math.random()*1000)}`
     },
     designation: {
       type: String,
@@ -36,4 +37,4 @@ const AdminProfileSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-module.exports = mongoose.model("AdminProfile", AdminProfileSchema);
+module.exports = mongoose.model("Admin", AdminProfileSchema);

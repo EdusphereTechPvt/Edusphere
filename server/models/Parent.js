@@ -33,4 +33,4 @@ const ParentProfileSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("ParentProfile", ParentProfileSchema);
+module.exports = mongoose.model("Parent", ParentProfileSchema);

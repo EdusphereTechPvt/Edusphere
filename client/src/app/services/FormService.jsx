@@ -1,6 +1,7 @@
 import { showToast } from "../utils/Toast";
+import api from "./MiddlewareService";
 
-export const handleFormAction = async (data, api, options = {}) => {
+export const handleFormAction = async (data, api, page = "default", options = {}) => {
   const {
     pendingMessage = "Processing...",
     successMessage = "Action completed successfully!",
@@ -17,8 +18,10 @@ export const handleFormAction = async (data, api, options = {}) => {
       `${process.env.NEXT_PUBLIC_BACKEND_API}${api}`,
       {
         method: "POST",
+        credentials: 'include',
         headers: {
           "Content-Type": "application/json",
+          "x-page": page
         },
         body: JSON.stringify(data),
       }
@@ -43,3 +46,15 @@ export const handleFormAction = async (data, api, options = {}) => {
     throw error;
   }
 };
+
+
+export const getFormData = async (route, page, id) => {
+  const response = await api.post(route, {
+    id: id
+  }, {
+    headers: { "x-page": page },
+    withCredentials: true
+  });
+
+  return response.data || {};
+}

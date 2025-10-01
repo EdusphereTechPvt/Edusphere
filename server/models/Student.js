@@ -14,9 +14,13 @@ const StudentProfileSchema = new mongoose.Schema(
       sparse: true,
     },
     schoolId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: "School",
       required: true,
+    },
+    name: {
+      type: String,
+      required: true
     },
     grade: {
       type: String,
@@ -26,7 +30,11 @@ const StudentProfileSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
+    gender: {
+      type: String,
+      enum: ["Male", "Female"],
+      required: true
+    },
     enrollmentDate: {
       type: Date,
       required: true,
@@ -63,8 +71,13 @@ const StudentProfileSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    status:{
+      type: String,
+      required: true,
+      enum: ["Active", "On Hold", "Inactive"]
+    }
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("StudentProfile", StudentProfileSchema);
+module.exports = mongoose.model("Student", StudentProfileSchema);

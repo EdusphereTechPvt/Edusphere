@@ -1,26 +1,39 @@
+export const excludeRoutes = [
+  "/auth/login", "/auth/signup", "/forgotpassword"
+];
 
-export const includeRoutes = ['/','/demo', '/contact', '/privacy', '/pricing'];
+export const generalRoutes = [
+  "/",
+  '/about',
+  "/demo",
+  "/contact",
+  "/privacy",
+  "/pricing",
+  "/help"
+]
+
+export const errorRoutes = ["/error/404", "/error/403", "/error/401"]
 
 const generalConfig = {
   header: {
     styles: {
       inlineStyle: {
         display: "flex",
-        justifyContent: {lg:"space-between"},
+        justifyContent: { lg: "space-between" },
         alignItems: "center",
-        py: {xs:"0.4rem", sm:"0.6rem", md:"0.8rem", lg:"1rem"},
-        px: {xs:"0.7rem", sm:"0.8rem", md:"1.4rem", lg:"2rem"},
+        py: { xs: "0.4rem", sm: "0.6rem", md: "0.8rem", lg: "1rem" },
+        px: { xs: "0.7rem", sm: "0.8rem", md: "1.4rem", lg: "2rem" },
         backgroundColor: "white",
         boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
         position: "sticky",
         top: 0,
         zIndex: 1100,
       },
-      drawerStyle:{
-        inlineStyle:{
-            width: "17rem",
-            alignItems: "center"
-        }
+      drawerStyle: {
+        inlineStyle: {
+          width: "17rem",
+          alignItems: "center",
+        },
       },
     },
     sections: [
@@ -34,6 +47,7 @@ const generalConfig = {
             display: "flex",
             alignItems: "center",
             gap: "1rem",
+            cursor: 'pointer'
           },
           imgStyle: {
             inlineStyle: {
@@ -57,11 +71,18 @@ const generalConfig = {
         navItems: [],
         styles: {
           inlineStyle: {
-            flexDirection: {xs:"column", lg:"row"},
-            gap: {xs:"1.5rem", lg:"2em"},
-            px: {xs:"1.5rem", md:"0rem"}
+            flexDirection: { xs: "column", lg: "row" },
+            gap: { xs: "1.5rem", lg: "2em" },
+            px: { xs: "1.5rem", md: "1rem", lg: 0 },
           },
-            navStyle:{inlineStyle: { color: "black" , fontWeight:'500', fontSize:'1.2rem'}, className: "" }
+          navStyle: {
+            inlineStyle: {
+              color: "black",
+              fontWeight: "600",
+              fontSize: "1.2rem",
+            },
+            className: "",
+          },
         },
       },
       {
@@ -71,42 +92,43 @@ const generalConfig = {
           {
             variant: "contained",
             text: "Request a Demo",
-            onclick: () => window.location.href = "http://localhost:3000/demo",
+            onclick: () =>
+              (window.location.href = "http://localhost:3000/demo"),
             styles: {
-                inlineStyle:{
-                   textTransform: 'none',
-                   fontSize: {xs:"0.7rem", lg:'0.9rem'},
-                   fontWeight: "bold"
-                }
+              inlineStyle: {
+                textTransform: "none",
+                fontSize: { xs: "0.7rem", lg: "0.9rem" },
+                fontWeight: "bold",
+              },
             },
           },
           {
             variant: "contained",
             text: "Sign Up Now",
-            onclick: () => window.location.href = "http://localhost:3000/signup",
-           styles: {
-                inlineStyle:{
-                   textTransform: 'none',
-                     fontSize: {xs:"0.7rem",  lg:'0.9rem'},
-                   backgroundColor: "#e8eef3",
-                   color:"black",
-                   fontWeight: "bold",         
-                }
+            onclick: () =>
+              (window.location.href = "http://localhost:3000/auth/signup"),
+            styles: {
+              inlineStyle: {
+                textTransform: "none",
+                fontSize: { xs: "0.7rem", lg: "0.9rem" },
+                backgroundColor: "#e8eef3",
+                color: "black",
+                fontWeight: "bold",
+              },
             },
           },
         ],
-        styles:{
-          inlineStyle:{
-            justifyContent:"center",
-            mt:{xs:"2rem", md: "0rem"}
-          }
-        }
+        styles: {
+          inlineStyle: {
+            justifyContent: "center",
+            mt: { xs: "2rem", md: "1.rem", lg: 0 },
+          },
+        },
       },
     ],
   },
 
   footer: {},
 };
-
 
 export default generalConfig;
