@@ -31,7 +31,36 @@ export const listConfig = {
         { name: "status", displayName: "Status" }
       ],
       clickableFields:["id", "name"]
-  }
+  },
+  subject: {
+    tableHeader: [
+        { map: "subjectId", displayName: "ID" },
+        { name: "name", displayName: "Name" },
+        { name: "code", displayName: "Code" },
+        { name: "credits", displayName: "Credits" },
+        { name: "status", displayName: "Status" }
+      ],
+      // clickableFields:["id", "name"]
+  },
+  class: {
+    tableHeader: [
+        { map: "classId", displayName: "ID" },
+        { name: "name", displayName: "Name" },
+        { name: "academicYear", displayName: "Year" },
+        { name: "status", displayName: "Status" }
+      ],
+      clickableFields:["id", "name"]
+  },
+  section: {
+    tableHeader: [
+        { map: "sectionId", displayName: "ID" },
+        { name: "class[name]", displayName: "Class" },
+        { name: "name", displayName: "Section" },
+        { name: "classTeacher[name]", displayName: "Class Teacher" },
+        { name: "isActive", displayName: "Status"}
+      ],
+      // clickableFields:["id", "name"]
+  },
 }
 
 export const ProfileCardConfig = {
@@ -43,7 +72,7 @@ export const ProfileCardConfig = {
     fields: [
       { key: "attendance", label: "Attendance", type: "progress" },
       { key: "status", label: "Status", type: "chip" },
-      { key: "dob", label: "Date of Birth", type: "text" },
+      { key: "dateOfBirth", label: "Date of Birth", type: "text" },
       { key: "phone", label: "Phone Number", type: "text" },
     ],
 
@@ -57,6 +86,24 @@ export const ProfileCardConfig = {
   teacher: {
     header: {
       title: "Teacher Profile Overview",
+    },
+
+    fields: [
+      { key: "attendance", label: "Attendance", type: "progress" },
+      { key: "status", label: "Employment Status", type: "chip" },
+      { key: "subject", label: "Subject", type: "text" },
+      { key: "experience", label: "Experience", type: "text" },
+    ],
+
+    quickLinks: [
+      { label: "Full Profile", icon: <AccountCircle />, action: () => {} },
+      { label: "Class Management", icon: <ClassIcon />, action: () => {} },
+      { label: "Student Reports", icon: <School />, action: () => {} },
+    ],
+  },
+  class: {
+    header: {
+      title: "Class Overview",
     },
 
     fields: [

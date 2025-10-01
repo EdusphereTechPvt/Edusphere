@@ -1,34 +1,26 @@
-export const updateConfig = (generalConfig, elementPath, result)=>{
-    let locationToUpdate;
-    switch(elementPath){
-        case 'header':
-        locationToUpdate =  [
-          { key: "header", childType: "object" },
-          {
-            key: "sections",
-            childType: "array",
-          },
-          {
-            matchKey: "type",
-            matchValue: "navigate",
-          },
-          {
-            dataKey: "navItems",
-            data: result,
-          },
-        ]
-        break;
-        case 'helpcenterrecords': 
-        locationToUpdate = [
-          { key: "tabs", childType: "array" },
-          { matchKey: "name", matchValue: result[0]?.type },
-          { dataKey: "items", data: result },
-          ]
-        break;
+export const updateConfig = (config, options) => {
+  const { fieldName, matchKey, matchValue, newData } = options;
+
+  const traverse = (node) => {
+    if (!node) return;
+
+    if (Array.isArray(node)) {
+      node.forEach(traverse);
+    } else if (typeof node === "object") {
+      // If matchKey/matchValue are provided, only update if it matches
+      const matches = !matchKey || node[matchKey] === matchValue;
+
+      if (matches && node[fieldName] !== undefined) {
+        node[fieldName] = newData;
+      }
+
+      Object.values(node).forEach(traverse);
     }
-    generalConfig = formatConfig(generalConfig, locationToUpdate);
-    return generalConfig;
-}
+  };
+
+  traverse(config);
+  return config;
+};
 
 
 export const formatConfig = (config, location) => {
@@ -53,7 +45,7 @@ export const formatConfig = (config, location) => {
         traverse(obj[targetIndex], locIndex + 1);
       }
     }
-    
+
     else if (step.dataKey && step.data !== undefined) {
       if (Array.isArray(obj)) {
         obj.forEach(o => {

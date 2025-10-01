@@ -16,6 +16,7 @@ const Page = () => {
   const [selected, setSelected] = useState(null);
   const [profileCardData, setProfileCardData] = useState(null);
   const [fetchedData, setFetchedData] = useState([]);
+  const [updateFlag, setUpdateFlag] = useState(false)
   const [elements, setElements] = useState([]);
 
   const { listname } = useParams();
@@ -34,7 +35,7 @@ const Page = () => {
       setElements(elements);
     };
     fetchData();
-  }, [listname]);
+  }, [listname, updateFlag]);
 
   useEffect(()=>{
     const fetchProfileCardData = async() => {
@@ -46,7 +47,6 @@ const Page = () => {
 
       let elements = await getElements(`list/${listname}/profilecard`)
       elements = formatElement("profile", elements)
-      console.log(elements)
       setProfileCardData({...profileCardData, buttons: elements})
     }
     fetchProfileCardData()
@@ -54,7 +54,7 @@ const Page = () => {
 
   const { headers, data } = formatTable(
     fetchedData,
-    listConfig[listname].tableHeader
+    listConfig[listname]?.tableHeader || []
   );
 
   return (
@@ -123,7 +123,7 @@ const Page = () => {
                 transition={{ duration: 0.4, ease: "easeInOut" }}
                 className="flex-1 flex justify-center items-center order-1 md:order-2"
               >
-                <ProfileCard role={listname} data={profileCardData || {}} />
+                <ProfileCard role={listname} data={profileCardData || {}} updateFlag={updateFlag} setUpdateFlag={setUpdateFlag}/>
               </motion.div>
             )}
         </AnimatePresence>

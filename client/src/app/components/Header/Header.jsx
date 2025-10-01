@@ -25,8 +25,13 @@ const Header = ({ path }) => {
   useEffect(() => {
     const fetchNavItems = async () => {
       try {
-        const result = await getElements(generalRoutes.includes(path) ? "navbar" : path.split("/")[1]);
-        updateConfig(generalConfig, "header", result);
+        const result = await getElements(generalRoutes.includes(path) ? "navbar" : "navbarApp");
+        updateConfig(generalConfig.header, {
+          fieldName: "navItems",
+          matchKey: "type",
+          matchValue: "navigate",
+          newData: result
+        });
         setHeader({ ...generalConfig.header });
       } catch (err) {
         console.error("Error fetching navbar items:", err);
@@ -44,7 +49,7 @@ const Header = ({ path }) => {
       {/* hemburger Icon from smller screen */}
       <IconButton
         color="black"
-        sx={{ display: { lg: "none"  } }}
+        sx={{ display: { lg: "none" } }}
         onClick={toggleDrawer(true)}
       >
         <MenuIcon />
@@ -54,7 +59,7 @@ const Header = ({ path }) => {
       {header.sections.map(
         (section, index) =>
           section.type === "logo" && (
-            <DynamicRenderer key={index} config={section} index={index} onClick={()=>router.push("/")}/>
+            <DynamicRenderer key={index} config={section} index={index} onClick={() => router.push("/")} />
           )
       )}
 
@@ -63,7 +68,7 @@ const Header = ({ path }) => {
         {header.sections.map(
           (section, index) =>
             section.type === "navigate" && (
-              <DynamicRenderer key={index} config={section} index={index} path={path}/>
+              <DynamicRenderer key={index} config={section} index={index} path={path} />
             )
         )}
       </Box>

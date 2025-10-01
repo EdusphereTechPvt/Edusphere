@@ -3,14 +3,16 @@ import api from "./MiddlewareService";
 
 export const getListDetails = async (listname) => {
   try {
-    const response = await api.get(`/${listname}/getAll`)
+    const response = await api.post(`/${listname}/getAll`, {}, {
+      headers: { "x-page": `/list/${listname}` },
+      withCredentials: true
+    })
 
     if (!response.data.status) {
-      showToast("Failed to fetch list details", "error")
-      throw new Error("Failed to fetch list details");
+      showToast(response.data.message || "Failed to fetch list details", "error")
     }
 
-    showToast("Data Fetched Successfully", "success")
+    showToast(response.data.message || "Data Fetched Successfully", "success")
     return response.data;
   } catch (error) {
     showToast("Failed to fetch list details", "error")
@@ -19,18 +21,31 @@ export const getListDetails = async (listname) => {
   }
 };
 
-export const getProfileCardData = async(listname, searchBy) => {
-  try{
-  const response = await api.post(`/${listname}/getProfileCardData`,{searchBy})
-  if (!response.data.status) {
+export const getProfileCardData = async (listname, searchBy) => {
+  try {
+    const response = await api.post(`/${listname}/getProfileCardData`, { searchBy })
+    if (!response.data.status) {
       showToast("Failed to fetch profile details", "error")
       throw new Error("Failed to fetch list details");
     }
 
-  return response.data.data;
+    return response.data.data;
   }
-  catch(err){
+  catch (err) {
     console.error("Error fetch profile data", err)
     throw err;
   }
+}
+
+export const handleDeleteData = async (actionValue, id) => {
+  const response = await api.post(actionValue, {
+    id
+  }, {
+    headers: { "x-page": actionValue },
+    withCredentials: true
+  })
+
+  showToast(response.data.message, response.data.status ? "success" : "error")
+
+  return response.data.status
 }

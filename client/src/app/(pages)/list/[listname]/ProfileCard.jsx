@@ -13,11 +13,23 @@ import {
 } from "@mui/material";
 import { statusConfig } from "@/app/config/TableConfig";
 import { ProfileCardConfig } from "@/app/config/ListConfig";
-import { handleAction } from "@/app/utils/HelperFunctions";
+import { useHandleAction } from "@/app/utils/HelperFunctions";
+import DeleteModal from "@/app/components/Modal/DeleteModal";
+import { handleDeleteData } from "@/app/services/ListService";
 
-const ProfileCard = ({ role, data }) => {
+const ProfileCard = ({ role, data, updateFlag, setUpdateFlag }) => {
   const { header, fields = [], quickLinks = [] } = ProfileCardConfig[role];
 
+  const { handleAction, modalProps, closeModal } = useHandleAction();
+
+  const handleDelete = async() =>{
+    const res = await handleDeleteData(modalProps.actionValue, modalProps.data.id)
+
+    if(res){
+      closeModal();
+      setUpdateFlag(!updateFlag)
+    }
+  }
 
   const getAttendanceColor = (value) => {
     if (value < 40) return "var(--color-red)";
@@ -136,14 +148,23 @@ const ProfileCard = ({ role, data }) => {
   };
 
   return (
+    <>
+    {modalProps && (
+      <DeleteModal
+      open={!!modalProps}
+      onClose={closeModal}
+      onConfirm={handleDelete}
+      data={modalProps.data}
+      />
+    )}
     <Card
-      sx={{
-        maxWidth: 450,
-        borderRadius: 3,
-        height: "100%",
-        boxShadow: "none",
-        border: "1px solid #D3D4D9",
-      }}
+    sx={{
+      maxWidth: 450,
+      borderRadius: 3,
+      height: "100%",
+      boxShadow: "none",
+      border: "1px solid #D3D4D9",
+    }}
     >
       <CardContent>
         {/* Header */}
@@ -154,11 +175,11 @@ const ProfileCard = ({ role, data }) => {
             justifyContent: "space-between",
             mb: 3,
           }}
-        >
+          >
           <Typography
             fontWeight={600}
             sx={{ fontSize: { xs: "0.9rem", sm: "1rem", md: "1.1rem" } }}
-          >
+            >
             {header?.title}
           </Typography>
 
@@ -176,14 +197,14 @@ const ProfileCard = ({ role, data }) => {
                     minWidth: 0,
                   }}
                   onClick={() => {
-                    handleAction(btn.action,btn.actionValue)
+                    handleAction(btn.action,btn.actionValue,btn.actionUse,{label: btn.label, id: data._id})
                   }}
-                >
+                  >
                   <btn.icon
                     sx={{
                       fontSize: { sm: "0.9rem", md: "1rem", lg: "1.15rem" },
                     }}
-                  />
+                    />
                 </Button>
               </Tooltip>
             ))}
@@ -201,11 +222,11 @@ const ProfileCard = ({ role, data }) => {
               height: { xs: 75, sm: 80, md: 85, lg: 90 },
               mb: 1,
             }}
-          />
+            />
           <Typography
             fontWeight={600}
             sx={{ fontSize: { xs: "0.95rem", sm: "1.05rem", md: "1.1rem" } }}
-          >
+            >
             {data.name}
           </Typography>
 
@@ -214,26 +235,26 @@ const ProfileCard = ({ role, data }) => {
               fontSize: { xs: "0.7rem", sm: "0.8rem" },
               color: "text.secondary",
             }}
-          >
+            >
             ID: {data.id}
           </Typography>
 
           {data.grade && (
             <Typography
-              sx={{
-                fontSize: { xs: "0.7rem", sm: "0.8rem" },
-                color: "text.secondary",
-              }}
+            sx={{
+              fontSize: { xs: "0.7rem", sm: "0.8rem" },
+              color: "text.secondary",
+            }}
             >
               Class: {data.grade}
             </Typography>
           )}
           {data.section && (
             <Typography
-              sx={{
-                fontSize: { xs: "0.7rem", sm: "0.8rem" },
-                color: "text.secondary",
-              }}
+            sx={{
+              fontSize: { xs: "0.7rem", sm: "0.8rem" },
+              color: "text.secondary",
+            }}
             >
               Section: {data.section}
             </Typography>
@@ -248,7 +269,7 @@ const ProfileCard = ({ role, data }) => {
           <Typography
             fontWeight={600}
             sx={{ fontSize: { xs: "0.85rem", sm: "0.95rem" }, mb: 1 }}
-          >
+            >
             Quick Links
           </Typography>
           {quickLinks.map((link, idx) => (
@@ -268,13 +289,14 @@ const ProfileCard = ({ role, data }) => {
                 color: idx !== 0 ? "#334155" : undefined,
                 border: idx !== 0 ? "1px solid #9999" : undefined,
               }}
-            >
+              >
               {link.label}
             </Button>
           ))}
         </Box>
       </CardContent>
     </Card>
+  </>
   );
 };
 

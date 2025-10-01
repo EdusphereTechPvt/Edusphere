@@ -15,7 +15,8 @@ import {
 } from "@mui/material";
 import CustomPagination from "./Pagination";
 import { statusConfig } from "@/app/config/TableConfig";
-import { handleAction } from "@/app/utils/HelperFunctions";
+import { useHandleAction } from "@/app/utils/HelperFunctions";
+import Dropdown from "../Dropdown/Dropdown";
 
 export const TableComponent = ({
   topHeader = [],
@@ -30,6 +31,7 @@ export const TableComponent = ({
   colors = [],
   clickableFields = [],
 }) => {
+  const {handleAction} = useHandleAction()
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -57,6 +59,7 @@ export const TableComponent = ({
           label,
           action,
           actionValue,
+          actionUse,
           type,
           path,
           onClick,
@@ -97,12 +100,7 @@ export const TableComponent = ({
             return (
               <Dropdown
                 key={idx}
-                data={{
-                  label: label,
-                  placeholder: placeholder,
-                  required: required,
-                  items: options,
-                }}
+                data={items}
                 onSelect={(value) => console.log("from dropdown", value)}
                 styles={styles}
               />
@@ -123,7 +121,7 @@ export const TableComponent = ({
               <Button
                 key={idx}
                 variant={variant || "contained"}
-                onClick={()=>handleAction(action,actionValue)}
+                onClick={()=>handleAction(action,actionValue,actionUse)}
                 sx={{
                   borderRadius: "1.5rem",
                   width: "100%",
@@ -153,7 +151,6 @@ export const TableComponent = ({
   };
 
     const handleCellClick = (header,value) => {
-    console.log(value);
     if (onClick) {
       onClick(header,value);
     }

@@ -1,4 +1,5 @@
 import { showToast } from "../utils/Toast";
+import api from "./MiddlewareService";
 
 export const authenticateUser = async (mode, role, fields) => {
   try {
@@ -81,3 +82,39 @@ export const updatePassword = async(email, password) => {
     return false;
   }
 }
+
+export const ping = async (page) => {
+  try {
+    const response = await api.post(
+      `/ping`,
+      {},
+      {
+        headers: { "x-page": page },
+        withCredentials: true
+      }
+    );
+    
+    if (!response.data.status) {
+      showToast("Unauthorized, please login", "error");
+      throw new Error("Unauthorized");
+    }
+
+    showToast("Connected & authorized", "success");
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      if (error.response.status === 401 || error.response.status === 403) {
+        showToast("Unauthorized, please login", "error");
+      } else {
+        showToast(`Server error (${error.response.status})`, "warning");
+      }
+    } else if (error.request) {
+      showToast("You are offline", "warning");
+    } else {
+      showToast("Unexpected error", "warning");
+    }
+
+    console.error("Ping Error:", error);
+    return null;
+  }
+};
