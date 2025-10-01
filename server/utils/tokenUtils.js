@@ -76,7 +76,6 @@ function verifyAccessToken(encryptedToken) {
 function signRefreshToken(payload /* { userId, jti } */) {
   const JWT_REFRESH_SECRET = getJWTRefreshSecret();
   const REFRESH_EXPIRES = getRefreshExpires();
-  console.log("payload", payload);
   return jwt.sign(payload, JWT_REFRESH_SECRET, {
     expiresIn: REFRESH_EXPIRES,
   });

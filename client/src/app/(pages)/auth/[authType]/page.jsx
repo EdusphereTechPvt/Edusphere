@@ -42,7 +42,7 @@ export default function AuthPage() {
     );
 
     setError({});
-    setDisabled(true); // reset button
+    setDisabled(true);
     setFields(initialFields);
   }, [mode, activeRole]);
 
@@ -59,13 +59,11 @@ export default function AuthPage() {
     setDisabled(hasErrors || !requiredAccepted || !allFilled);
   }, [error, state, mode, fields]);
 
-  // only update value onChange
   const handleChange = (name) => (e) => {
     const value = e.target.value;
     setFields((prev) => ({ ...prev, [name]: value }));
   };
 
-  // validate onBlur only
   const handleBlur = (field) => (e) => {
     let validate = validateField(field, e.target.value);
 

@@ -1,5 +1,5 @@
 export const excludeRoutes = [
-  "/auth/login","/auth/signup","/forgotpassword"
+  "/auth/login", "/auth/signup", "/forgotpassword"
 ];
 
 export const generalRoutes = [
@@ -11,6 +11,8 @@ export const generalRoutes = [
   "/pricing",
   "/help"
 ]
+
+export const errorRoutes = ["/error/404", "/error/403", "/error/401"]
 
 const generalConfig = {
   header: {

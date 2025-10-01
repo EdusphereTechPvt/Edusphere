@@ -93,13 +93,13 @@ export const authconfig = {
     options: {
       admin: [
         {
-          name: "fullName",
+          name: "name",
           label: "Full Name",
           type: "text",
           required: true,
         },
         {
-          name: "dob",
+          name: "dateOfBirth",
           label: "Date of Birth",
           type: "date",
           required: true,

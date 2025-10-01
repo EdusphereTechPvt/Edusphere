@@ -2,7 +2,7 @@ import { showToast } from "./Toast";
 
 export const validateField = (field,value) => {
     let error;
-    if (field.required && !value) {
+    if (field.required && (!value || value.length === 0)) {
         error = `${field.label} is required`;
     } else if (field.minLength && value.length < field.minLength) {
         error = `${field.label} must be at least ${field.minLength} characters`;
