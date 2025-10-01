@@ -10,6 +10,7 @@ const authRoutes = require('./routes/AuthRoutes');
 const requestdemoRoutes = require("./routes/RequestDemoRoutes");
 const studentprofileRoutes = require("./routes/StudentProfileRoutes");
 const teacherprofileRoutes = require("./routes/TeacherProfileRoutes");
+const qrSessionRoutes = require("./routes/QrSessionRoutes")
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/auth', authRoutes);
 app.use('/requestdemo', requestdemoRoutes);
 app.use("/student", studentprofileRoutes);
 app.use("/teacher", teacherprofileRoutes);
+app.use("/qr", qrSessionRoutes)
 
 mongoose.connect(process.env.MONGO_URL, {
 }).then(() => {

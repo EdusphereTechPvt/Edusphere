@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
 import {
   FormControl,
@@ -9,7 +9,13 @@ import {
   OutlinedInput,
 } from "@mui/material";
 
-const Dropdown = ({ data, resetFlag, style = {}, onSelect }) => {
+const Dropdown = ({
+  data,
+  resetFlag,
+  style = {},
+  onSelect,
+  disabled = false,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");
 
@@ -19,14 +25,16 @@ const Dropdown = ({ data, resetFlag, style = {}, onSelect }) => {
     onSelect?.(value);
   };
 
-  useEffect(()=>{
-    setSelectedValue("")
-  },[resetFlag])
+  useEffect(() => {
+    setSelectedValue("");
+  }, [resetFlag]);
 
   return (
     <Box className={`${style.className}`} sx={{ ...style.inlineStyle }}>
       {data.label && (
-        <Box className="text-sm font-medium mb-[0.33rem] text-gray-700">{data.label}</Box>
+        <Box className="text-sm font-medium mb-[0.33rem] text-gray-700">
+          {data.label}
+        </Box>
       )}
 
       <FormControl
@@ -45,8 +53,8 @@ const Dropdown = ({ data, resetFlag, style = {}, onSelect }) => {
           onOpen={() => setIsOpen(true)}
           open={isOpen}
           label={data.placeholder}
-                
-          sx={{ borderRadius: "0.35rem", ...style,}}
+          disabled={disabled}
+          sx={{ borderRadius: "0.35rem", ...style }}
           MenuProps={{
             PaperProps: {
               sx: {
