@@ -9,8 +9,7 @@ import {
   OutlinedInput,
 } from "@mui/material";
 
-const Dropdown = ({ data, resetFlag, style = {}, onSelect }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const Dropdown = ({value, data, resetFlag, style = {}, onSelect, onBlur }) => {
   const [selectedValue, setSelectedValue] = useState("");
 
   const handleChange = (e) => {
@@ -22,11 +21,10 @@ const Dropdown = ({ data, resetFlag, style = {}, onSelect }) => {
   useEffect(()=>{
     setSelectedValue("")
   },[resetFlag])
-
   return (
     <Box className={`${style.className}`} sx={{ ...style.inlineStyle }}>
       {data.label && (
-        <Box className="text-sm font-medium mb-[0.33rem] text-gray-700">{data.label}</Box>
+        <Box className="text-sm font-medium mb-[0.33rem] text-gray-700">{data.label} {data.required && "*"}</Box>
       )}
 
       <FormControl
@@ -39,11 +37,9 @@ const Dropdown = ({ data, resetFlag, style = {}, onSelect }) => {
 
         <Select
           labelId="dropdown-label"
-          value={selectedValue || ""}
+          value={selectedValue || value || ""}
           onChange={handleChange}
-          onClose={() => setIsOpen(false)}
-          onOpen={() => setIsOpen(true)}
-          open={isOpen}
+          onBlur={() => onBlur?.(selectedValue)}
           label={data.placeholder}
                 
           sx={{ borderRadius: "0.35rem", ...style,}}
@@ -57,14 +53,9 @@ const Dropdown = ({ data, resetFlag, style = {}, onSelect }) => {
             },
           }}
         >
-          {data?.items?.map((item, index) => {
-            const itemValue = item.value || item;
-            const itemLabel = item.label || item;
-            return (
-              <MenuItem
-                key={index}
-                value={itemValue}
-                sx={{
+          {data?.items?.map((item) => (
+            <MenuItem key={item.id} value={item.id}
+            sx={{
                   "&:hover": {
                     backgroundColor: "var(--color-secondary)",
                   },
@@ -77,12 +68,10 @@ const Dropdown = ({ data, resetFlag, style = {}, onSelect }) => {
                   },
                   borderRadius: "0.45rem",
                   mx: "0.25rem",
-                }}
-              >
-                {itemLabel}
-              </MenuItem>
-            );
-          })}
+                }}>
+              {item.value}
+            </MenuItem>
+          ))}
         </Select>
       </FormControl>
     </Box>
