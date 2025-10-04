@@ -9,7 +9,7 @@ import {
   OutlinedInput,
 } from "@mui/material";
 
-const Dropdown = ({value, data, resetFlag, style = {}, onSelect, onBlur }) => {
+const Dropdown = ({value, data, resetFlag, style = {}, onSelect, onBlur, disabled }) => {
   const [selectedValue, setSelectedValue] = useState("");
 
   const handleChange = (e) => {

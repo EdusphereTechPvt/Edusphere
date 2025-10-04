@@ -1,3 +1,4 @@
+"use client";
 import QRCodeManagement from "@/app/(pages)/qrCode/QRCodeManagement";
 import SystemOverview from "@/app/(pages)/qrCode/systemoverview";
 import SecurityFeature from "@/app/(pages)/qrCode/securityfeature";
@@ -5,15 +6,51 @@ import ConfigurationPanel from "@/app/(pages)/qrCode/configuration";
 import ActiveQR from "@/app/(pages)/qrCode/active_qr_codes";
 import CheckinHistory from "@/app/(pages)/qrCode/checkinhistory";
 import { Box, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import {
+  addOrUpdate,
+  fetchData,
+  fetchSessions,
+} from "@/app/services/QrService";
 
 export default function Page() {
-  // Sample data
-  const sessions = [
-    { name: "Math 101 - Section A", location: "Auditorium 1", active: true },
-    { name: "Physics 202 - Lab", location: "Science Lab 3", active: true },
-    { name: "History 301", location: "Room 204", active: false },
-    { name: "Chemistry 201", location: "Lab 5", active: false },
-  ];
+  const [sessions, setSessions] = useState([]);
+  const [result, setResult] = useState(null);
+  const [data, setData] = useState({});
+  const [currentType, setCurrentType] = useState("");
+
+  const handleGenerate = async (payload) => {
+    try {
+      const res = await addOrUpdate(payload);
+      setCurrentType(payload.sessionType || "event");
+      setResult(res);
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
+
+  useEffect(() => {
+    const fetchResponse = async () => {
+      try {
+        const qrSessions = await fetchData("qr/search", {});
+        setData((prev) => ({
+          ...prev,
+          session: qrSessions,
+        }));
+
+        if (currentType) {
+          const res = await fetchData(`${currentType.toLowerCase()}/getAll`);
+          setData((prev) => ({
+            ...prev,
+            [currentType.toLowerCase()]: res,
+          }));
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+    fetchResponse();
+  }, [result, currentType]);
 
   const logs = [
     { user: "John Doe", type: "in", session: "Math 101", time: "08:02 AM" },
@@ -47,7 +84,6 @@ export default function Page() {
   return (
     <div className="py-8 px-4 lg:px-8 space-y-8 bg-gray-50 min-h-screen">
       {/* Header */}
-
       <Box
         sx={{
           display: "flex",
@@ -102,23 +138,31 @@ export default function Page() {
       </Box>
 
       {/* Main Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="flex flex-col lg:flex-row w-full h-full gap-6">
         {/* Left Section */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:w-[75%]">
           <SystemOverview />
-          <QRCodeManagement />
+          <QRCodeManagement
+            onGenerate={handleGenerate}
+            result={result}
+            data={data}
+          />
         </div>
 
         {/* Right Section */}
-        <div className="space-y-6">
-          <SecurityFeature />
-          {/* <ConfigurationPanel /> */}
+        <div className="space-y-6 flex flex-col lg:flex-col md:flex-row  justify-center lg:gap-0 gap-4 w-full lg:w-[25%]">
+          <div className="w-full">
+            <SecurityFeature />
+          </div>
+          <div className="w-full">
+            <ConfigurationPanel />
+          </div>
         </div>
       </div>
 
       {/* Bottom Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ActiveQR sessions={sessions} />
+        <ActiveQR sessions={data?.session} />
         <CheckinHistory logs={logs} />
       </div>
     </div>

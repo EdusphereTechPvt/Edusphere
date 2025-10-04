@@ -8,9 +8,6 @@ const mongoose = require("mongoose");
 const elementRoutes = require("./routes/ElementRoutes");
 const authRoutes = require("./routes/AuthRoutes");
 const requestdemoRoutes = require("./routes/RequestDemoRoutes");
-const studentprofileRoutes = require("./routes/StudentProfileRoutes");
-const teacherprofileRoutes = require("./routes/TeacherProfileRoutes");
-const qrSessionRoutes = require("./routes/QrSessionRoutes")
 const studentRoutes = require("./routes/StudentRoutes");
 const teacherRoutes = require("./routes/TeacherRoutes");
 const helpcenterroutes = require("./routes/HelpCenterRoutes");
@@ -21,6 +18,7 @@ const AuthGuard = require("./middleware/AuthGuard");
 const RoleGuard = require("./middleware/RoleGuard");
 const { ping } = require("./controllers/AuthController");
 const utilsRoute = require("./routes/UtilsRoutes")
+const qrSessionRoutes = require("./routes/QrSessionRoutes")
 
 const app = express();
 
@@ -42,19 +40,12 @@ app.use("/teacher", teacherRoutes);
 app.use("/class", classRoutes);
 app.use("/subject", subjectRoutes);
 app.use("/section", sectionRoutes)
+app.use("/qr", qrSessionRoutes)
+
 
 mongoose
   .connect(process.env.MONGO_URL, {})
   .then(() => {
-app.use('/permission', elementRoutes)
-app.use('/auth', authRoutes);
-app.use('/requestdemo', requestdemoRoutes);
-app.use("/student", studentprofileRoutes);
-app.use("/teacher", teacherprofileRoutes);
-app.use("/qr", qrSessionRoutes)
-
-mongoose.connect(process.env.MONGO_URL, {
-}).then(() => {
     console.log("Connected to MongoDB");
   })
   .catch((err) => {

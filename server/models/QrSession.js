@@ -1,11 +1,6 @@
 const mongoose = require("mongoose");
 
 const QrSessionSchema = new mongoose.Schema({
-    sessionId: {
-        type: String,
-        required: true,
-        unique: true
-    },
     sessionName: {
         type: String,
         required: true
