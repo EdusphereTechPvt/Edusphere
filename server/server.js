@@ -11,6 +11,7 @@ const requestdemoRoutes = require("./routes/RequestDemoRoutes");
 const studentRoutes = require("./routes/StudentRoutes");
 const teacherRoutes = require("./routes/TeacherRoutes");
 const helpcenterroutes = require("./routes/HelpCenterRoutes");
+const eventRoutes = require("./routes/EventRoutes");
 const classRoutes = require("./routes/ClassRoutes")
 const subjectRoutes = require("./routes/SubjectRoutes");
 const sectionRoutes = require("./routes/SectionRoute")
@@ -33,6 +34,7 @@ app.use("/api", utilsRoute)
 app.use("/permission", elementRoutes);
 app.use("/auth", authRoutes);
 app.use("/helpcenter", helpcenterroutes);
+app.use("/event", eventRoutes);
 app.use("/requestdemo", requestdemoRoutes);
 app.use("/student", studentRoutes);
 app.use("/teacher", teacherRoutes);
@@ -40,8 +42,7 @@ app.use("/class", classRoutes);
 app.use("/subject", subjectRoutes);
 app.use("/section", sectionRoutes)
 
-mongoose
-  .connect(process.env.MONGO_URL, {})
+mongoose.connect(process.env.MONGO_URL, {})
   .then(() => {
     console.log("Connected to MongoDB");
   })
