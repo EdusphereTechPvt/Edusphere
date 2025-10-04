@@ -164,7 +164,7 @@ export const TableComponent = ({
         className="border border-gray-200 rounded-4xl"
         sx={{ borderRadius: "0.3rem", overflow: "hidden", ...styles }}
       >
-        <Table sx={{ fontSize: { xs: "0.75rem", lg: "1rem" } }}>
+        <Table sx={{ fontSize: { xs: "0.75rem", lg: "1rem" }, }}>
           {/* Top Header */}
           {topHeader?.length > 0 && (
             <TableHead>

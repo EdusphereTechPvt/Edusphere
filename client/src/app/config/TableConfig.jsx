@@ -20,14 +20,20 @@ export const statusConfig = {
   Paid: green,
   Completed: green,
   Active: green,
+  Success: green,
 
   Unpaid: red,
   Overdue: red,
   Inactive: red,
+  Failed: red,
 
   "Partially Paid": yellow,
   "On Hold": yellow,
   Upcoming: yellow,
+  Due: yellow,
+
+
+  
 
   default: {
     bg: "#ffffff", // default white
