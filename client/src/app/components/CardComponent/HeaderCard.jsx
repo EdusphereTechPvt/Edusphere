@@ -28,7 +28,7 @@ const HeaderCard = ({ title, items = [], buttons = [], styles = {} }) => (
         <React.Fragment key={idx}>
           <Box mb={1.5}>
             {item.percentage ? (
-              <ProgressBar label={item.label} percentage={item.percentage} />
+              <ProgressBar label={item.label} percentage={item.percentage} color={item.label.toLowerCase()} />
             ) : (
               <Stack direction="row" spacing={2} alignItems="center">
                 {item.icon && (

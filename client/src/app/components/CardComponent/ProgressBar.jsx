@@ -2,8 +2,9 @@
 import React from "react";
 import { Stack, Box, Typography } from "@mui/material";
 // import { getGrade, subjectColors } from "../../utils/subjectData";
+import colorConfig from "@/app/config/ColorConfig";
 
-const ProgressBar = ({ label, percentage }) => (
+const ProgressBar = ({ label, percentage ,color }) => (
   <Stack direction="row" spacing={2} alignItems="center">
     <Box sx={{ flexGrow: 1 }}>
       <Typography variant="body2" sx={{ mb: 0.5 }}>
@@ -22,7 +23,7 @@ const ProgressBar = ({ label, percentage }) => (
           sx={{
             width: `${percentage}%`,
             // backgroundColor: subjectColors[label.toLowerCase()] || "#3f51b5",
-            backgroundColor: "#3f51b5",
+            backgroundColor: colorConfig[color] || "#3f51b5",
             height: "100%",
             borderRadius: "5px",
             transition: "width 0.3s ease",
