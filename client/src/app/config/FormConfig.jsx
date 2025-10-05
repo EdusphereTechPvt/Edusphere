@@ -1007,6 +1007,220 @@ const formConfig = {
       },
     ],
   },
+  feemanagement: {
+    api: {
+      fetch: "/fee/search",
+      submit: "/fee/save",
+      page: {
+        mode: {
+          add: "/form/fee/add",
+          edit: "/form/fee/edit"
+        }
+      }
+    },
+    sections: [
+      {
+        title: "Fee Structure Management",
+        fields: [
+          {
+            type: "text",
+            name: "feestructurename",
+            label: "Fee Structure Name",
+            placeholder: "e.g., Standard Fee Structure",
+            required: true,
+          },
+          {
+            type: "dropdown",
+            name: "academicsession",
+            label: "Select Academic Session",
+            placeholder: "e.g., 2023-2024",
+            required: true,
+            items: []
+          },
+          {
+            type: "multiselect",
+            name: "Applicablegrades",
+            label: "Applicable Grade(s)",
+            placeholder: "e.g., class 10, class 11",
+            required: true,
+            isDistinct: true,
+            items: []
+          },
+        ]
+      },
+      {
+        title: "Fee Categories & Amounts",
+        fields: [
+          {
+            type: "multifield",
+            name: "feeDetails",
+            label: "",
+            btnText: "Add More Fee Categories",
+            DropdownData: {
+              placeholder: "Select Fee Type",
+              items: [
+                { id: "tuition", value: "Tuition" },
+                { id: "library", value: "Library" },
+                { id: "event", value: "Event" },
+              ],
+            },
+            inputData: {
+              label: "Amount",
+              placeholder: "Enter amount",
+            },
+            required: true,
+            styles: {
+              containerStyle: {
+                inlineStyle: { width: { xs: "100%", sm: "90%", md: "75%", lg: "100%" } }
+              },
+              labelStyle: {
+                color: "#333",
+                fontWeight: "600",
+                fontSize: "1rem",
+              },
+              buttonStyle: {
+                color: "#1976d2",
+                fontWeight: "600",
+              },
+            }
+          },
+        ],
+      },
+      {
+        title: "Late Payment Penalties",
+        fields: [
+          {
+            type: "dropdown",
+            name: "latepaypercentage",
+            label: "Late Payment Percentage",
+            required: true,
+            items: []
+          },
+          {
+            type: "text",
+            name: "percentage",
+            label: "Percentage",
+            required: true,
+          }
+        ]
+      },
+      {
+        title: "Installment Plan",
+        fields: [
+          {
+            type: "text",
+            name: "numberofinstallment",
+            label: "Number of Installments",
+            placeholder: "e.g., 3",
+            required: true,
+          },
+        ]
+      },
+      {
+        title: "",
+        fields: [
+          {
+            type: "card",
+            name: "installments",
+            data: [
+              {
+                title: "Installment 1",
+                desc: "$500",
+                additionalInfo: [{ "Due": "2023-08-15" }]
+              },
+              {
+                title: "Installment 1",
+                desc: "$500",
+                additionalInfo: [{ "Due": "2023-08-15" }]
+              },
+              {
+                title: "Installment 1",
+                desc: "$500",
+                additionalInfo: [{ "Due": "2023-08-15" }]
+              },
+              {
+                title: "Installment 1",
+                desc: "$500",
+                additionalInfo: [{ "Due": "2023-08-15" }]
+              },
+            ],
+            styles: {
+              containerStyle: {
+                inlineStyle: {
+                  display: "flex",
+                  flexWrap: "nowrap",
+                  gap: 1,
+                  overflowX: "auto",
+                  py: 1,
+                }
+              },
+              cardStyle: {
+                inlineStyle: {
+                  width: {
+                    xs: 'calc(100% - 8px)',
+                    sm: 'calc(50% - 16px)',
+                    md: 'calc(33.333% - 12px)',
+                  },
+                  minWidth: { xs: 150, sm: 140, md: 160 },
+                  minHeight: { xs: 140, sm: 160, md: 110 },
+                  borderRadius: 2,
+                  boxShadow: 2,
+                  textAlign: 'left',        
+                  display: 'flex',          
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
+                }
+              },
+              textContainerStyle: {
+                titleStyle: {
+                  inlineStyle: {
+                    fontSize: { xs: '0.9rem', sm: '1rem', md: '0.8rem' },
+                    fontWeight: 200,
+                    textTransform: 'uppercase',
+                    // letterSpacing: '0.5px',
+                    color: 'text.secondary'
+                  }
+                },
+                descStyle: {
+                  inlineStyle: {
+                    fontSize: { xs: '1.2rem', sm: '1.4rem', md: '1.5rem' },
+                    fontWeight: 700,
+                    color: 'text.primary',
+                    // display: 'block'
+                  }
+                },
+                additionalInfoStyle: {
+                  inlineStyle: {
+                    fontSize: { xs: '0.75rem', sm: '0.8rem' },
+                    color: 'text.secondary',
+                    fontWeight: 500,
+                    display: 'block',
+                  },
+                },
+              }
+            }
+          }
+        ]
+      },
+      {
+        title: "Actions",
+        fields: [
+          {
+            type: "button",
+            action: "cancel",
+            variant: "outlined",
+            text: "Cancel"
+          },
+          {
+            type: "button",
+            action: "submit",
+            variant: "contained",
+            text: "Save structure"
+          }
+        ]
+      }
+    ]
+  },
 };
 
 export default formConfig;

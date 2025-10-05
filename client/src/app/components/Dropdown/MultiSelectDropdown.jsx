@@ -111,7 +111,7 @@ console.log("Multiselect value" ,data)
         <InputLabel 
           id="dropdown-label" 
           shrink={shouldLabelShrink}    
-          sx={{ padding: '0.5rem 0'}}
+          // sx={{ padding: '0r 0'}}
           color={!shouldLabelShrink && 'default'}
         >
           {data.placeholder}

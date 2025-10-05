@@ -10,6 +10,8 @@ import { getFormData, handleFormAction } from "@/app/services/FormService";
 import { fetchDistinctValues } from "@/app/services/UtilityService";
 import { validateField } from "@/app/utils/Validator";
 import { updateConfig } from "@/app/utils/FormatConfig";
+import GenericCard from "@/app/components/CardComponent/GenericCard";
+import MultiFiled from "../Multifield/Multifield";
 
 export default function Form({ type, mode, id }) {
   const router = useRouter();
@@ -300,6 +302,39 @@ export default function Form({ type, mode, id }) {
                           onBlur={handleBlur(field)}
                         />
                       </div>
+                    );
+                  case "card":
+                    return (
+                      <Box key={i} className="col-span-1 sm:col-span-2"
+                        sx={field.styles?.containerStyle?.inlineStyle || {}}>
+                        {field.data.map((item, index) => (
+                          <GenericCard
+                            key={index}
+                            title={item.title}
+                            desc={item.desc}
+                            additionalInfo={item.additionalInfo}
+                            styles={field.styles}
+                          />
+                        ))}
+                      </Box>
+                    );
+                  case "multifield":
+                    return (
+                      <Box
+                        key={i}
+                        className="col-span-1 sm:col-span-2"
+                        sx={field.styles?.containerStyle?.inlineStyle || {}}
+                      >
+                        <MultiFiled
+                          label={field.label || ""}
+                          btnText={field.btnText || ""}
+                          DropdownData={field.DropdownData || {
+                            placeholder: "Select Category",
+                            items: field.DropdownData?.items || [],
+                          }}
+                          onChange={(value) => handleChange(field.name, value)}
+                        />
+                      </Box>
                     );
                   default:
                     return null;

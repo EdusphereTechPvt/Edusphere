@@ -7,25 +7,21 @@ import DateTimePicker from "../DateTimePicker/DateTimePicker";
 import { Add, Delete } from "@mui/icons-material";
 
 const MultiFiled = ({
-  label = "Fee Categories & Amounts",
-  btnText = "Add Fee Categories",
+  label = "",
+  btnText = "",
   DropdownData = {
-    placeholder: "New Category Name",
-    items: [
-      { id: "Event", value: "Event" },
-      { id: "Class", value: "Class" },
-      { id: "Class", value: "Class" },
-    ],
+    placeholder: "",
+    items: [],
   },
   inputData = {
-    label: "Amout",
+    label: "Amount",
     placeholder: "1000",
   },
   onChange,
 }) => {
   const [fields, setFields] = useState([
-    { category: "", amount: "", date: null },
-    { category: "", amount: "", date: null },
+    { category: DropdownData.items[0]?.id || "", amount: "", date: null },
+    { category: DropdownData.items[1]?.id || "", amount: "", date: null },
   ]);
 
   const maxFields = DropdownData.items.length;
@@ -70,14 +66,14 @@ const MultiFiled = ({
           {label}
         </Typography>
       )}
-      <div className="space-y-2">
+      <div className="space-y-2 w-full">
         {fields.map((field, idx) => (
           <Box
             key={idx}
-            sx={{ display: "flex", gap: 1, alignItems: "center", width: "80%" }}
+            sx={{ display: "flex", gap: 1, alignItems: "center", width: "100%" }}
           >
             {/* Dropdown */}
-            <Box sx={{ width: { xs: "100%", sm: "35%" } }}>
+            <Box sx={{ width: { xs: "100%", sm: "45%" } }}>
               <Dropdown
                 data={DropdownData}
                 style={{ inlineStyle: { mt: 0, mb: 0 } }}
