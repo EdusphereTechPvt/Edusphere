@@ -152,7 +152,8 @@ export const PricingConfig = {
     styles: {
       titleStyle: {
         inlineStyle: {
-          fontSize: { xs: "1rem", sm: "1.1rem", md: "1.2rem", lg: "1.3rem" },
+          fontSize: {
+          },
           fontWeight: "bold",
         },
       },
