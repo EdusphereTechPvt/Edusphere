@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { authconfig } from "@/app/config/Authconfig";
+import { authconfig } from "@/app/config/AuthConfig";
 import { isUserAvailable, updatePassword } from "@/app/services/AuthService";
 import { matchPassword, validateField } from "@/app/utils/Validator";
 import { Lock, Visibility, VisibilityOff } from "@mui/icons-material";
