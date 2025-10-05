@@ -3,7 +3,6 @@ import React from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker as MuiDateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import TextField from "@mui/material/TextField";
 
 const DateTimePicker = ({
   label,
@@ -12,6 +11,7 @@ const DateTimePicker = ({
   minDateTime = null,
   disabled = false,
   styles = {},
+  sx = {},
 }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -21,14 +21,24 @@ const DateTimePicker = ({
         onChange={(newValue) => onChange(newValue)}
         minDateTime={minDateTime}
         disabled={disabled}
+        sx={{
+          width: styles.width || "100%",
+          ...sx,
+        }}
         slotProps={{
           textField: {
-            fullWidth: true,
-            margin: "normal",
+            size: "small",
             sx: {
-              
+              "& .MuiInputBase-root": {
+                paddingTop: "4px",
+                paddingBottom: "4px",
+                height: "40px",
+              },
+              "& .MuiInputLabel-shrink": {
+                top: "0px",
+              },
+              ...styles.textField,
             },
-            ...styles.textField,
           },
         }}
       />
