@@ -1071,7 +1071,7 @@ const formConfig = {
             required: true,
             styles: {
               containerStyle: {
-                inlineStyle: { width: { xs: "100%", sm: "90%", md: "75%", lg: "100%" } }
+                inlineStyle: {}
               },
               labelStyle: {
                 color: "#333",

@@ -12,6 +12,7 @@ const DateTimePicker = ({
   disabled = false,
   styles = {},
   sx = {},
+  fullWidth = true,
 }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -22,11 +23,12 @@ const DateTimePicker = ({
         minDateTime={minDateTime}
         disabled={disabled}
         sx={{
-          width: styles.width || "100%",
+          width: "100%",
           ...sx,
         }}
         slotProps={{
           textField: {
+            fullWidth,
             size: "small",
             sx: {
               "& .MuiInputBase-root": {

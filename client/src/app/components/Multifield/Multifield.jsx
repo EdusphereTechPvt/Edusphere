@@ -21,7 +21,6 @@ const MultiFiled = ({
 }) => {
   const [fields, setFields] = useState([
     { category: DropdownData.items[0]?.id || "", amount: "", date: null },
-    { category: DropdownData.items[1]?.id || "", amount: "", date: null },
   ]);
 
   const maxFields = DropdownData.items.length;
@@ -66,14 +65,23 @@ const MultiFiled = ({
           {label}
         </Typography>
       )}
-      <div className="space-y-2 w-full">
+      <Box
+        sx={{ display: "flex", flexDirection: "column", gap: 2, width: "100%" }}
+      >
         {fields.map((field, idx) => (
           <Box
             key={idx}
-            sx={{ display: "flex", gap: 1, alignItems: "center", width: "100%" }}
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              gap: 1,
+              alignItems: { xs: "", sm: "center" },
+              justifyContent: "center",
+              // maxWidth: "100%",
+            }}
           >
             {/* Dropdown */}
-            <Box sx={{ width: { xs: "100%", sm: "45%" } }}>
+            <Box sx={{ minWidth: "40%", width: "100%" }}>
               <Dropdown
                 data={DropdownData}
                 style={{ inlineStyle: { mt: 0, mb: 0 } }}
@@ -83,7 +91,7 @@ const MultiFiled = ({
             </Box>
 
             {/* input */}
-            <Box sx={{ width: { xs: "100%", sm: "25%" } }}>
+            <Box sx={{ minWidth: "30%" }}>
               <TextField
                 label={inputData.label}
                 placeholder={inputData.placeholder}
@@ -98,24 +106,52 @@ const MultiFiled = ({
             </Box>
 
             {/* datePicker */}
-            <Box sx={{ width: { xs: "100%", sm: "28%" } }}>
-              <DateTimePicker
-                label="Time"
-                value={field.date}
-                onChange={(value) => handleFieldChange(idx, "date", value)}
-                sx={{ width: "100%" }}
-              />
-            </Box>
 
+            <DateTimePicker
+              label="Time"
+              value={field.date}
+              onChange={(value) => handleFieldChange(idx, "date", value)}
+              sx={{ width: "100%", minWidth: "30%", pl: 1 }}
+            />
             {/* btn */}
-            {idx > 1 && (
-              <IconButton onClick={() => handleDeleteField(idx)}>
-                <Delete sx={{ fontSize: "1.7rem", color: "grey.500" }} />
-              </IconButton>
-            )}
+            <Button
+              disabled={idx === 0}
+              variant="outlined"
+              sx={{
+                ml: 0.1,
+                mr: -1,
+                p: "7px",
+                borderRadius: "5px",
+                width: { xs: "100%", sm: "0%" },
+                bgcolor: "error.main",
+                color: "white",
+                border: "none",
+                justifyContent: "center",
+                transition: "all 0.3s ease",
+
+                "&:hover": {
+                  bgcolor: "error.dark",
+                  transform: "scale(1.05)",
+                  boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+                },
+
+                "&.Mui-disabled": {
+                  bgcolor:'grey.500',
+                  color: "white",
+                  opacity: 0.6,
+                },
+              }}
+              onClick={() => handleDeleteField(idx)}
+            >
+              <Delete
+                sx={{
+                  fontSize: "1.5rem",
+                }}
+              />
+            </Button>
           </Box>
         ))}
-      </div>
+      </Box>
 
       {btnText && (
         <Button

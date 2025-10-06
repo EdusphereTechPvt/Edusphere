@@ -7,9 +7,9 @@ import { Box, Button, Typography } from "@mui/material";
 
 const page = () =>{
     return(
-        <box>
+        <Box>
             <Form type ='feemanagement'/>
-        </box>
+        </Box>
     )
 }
 
