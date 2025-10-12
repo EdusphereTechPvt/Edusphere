@@ -83,6 +83,32 @@ export const updatePassword = async(email, password) => {
   }
 }
 
+export const logout = async() => {
+  try{
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/auth/logout`,{
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+
+    const data = await response.json();
+
+    if(!data.status){
+      showToast(data.message, "error")
+      return false;
+    }
+
+    showToast(data.message, "success");
+    return data.status
+  }
+  catch(err){
+    showToast("Error Updating Password", "error")
+    return false;
+  }
+}
+
 export const ping = async (page) => {
   try {
     const response = await api.post(
