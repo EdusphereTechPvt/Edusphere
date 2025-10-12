@@ -6,9 +6,11 @@ import {
   AccordionSummary,
   AccordionDetails,
   Button,
+  TableCell,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Link from "next/link";
+import Dropdown from "../components/Dropdown/Dropdown";
 
 export const DynamicRenderer = ({
   config,
@@ -205,4 +207,102 @@ export const DynamicRenderer = ({
     default:
       return null;
   }
+};
+
+//topHeaderRenderer
+export const renderTopHeader = (items) => {
+  return items?.map(
+    (
+      {
+        id,
+        label,
+        action,
+        actionValue,
+        actionUse,
+        type,
+        path,
+        onClick,
+        Icon,
+        variant,
+        options = [],
+        placeholder,
+        required,
+        styles,
+      },
+      idx
+    ) => {
+      switch (type) {
+        case "text":
+          return (
+            <Typography
+              key={idx}
+              sx={{ fontWeight: "bold", fontSize: "0.9rem", ...styles }}
+            >
+              {label}
+            </Typography>
+          );
+
+        case "link":
+          return (
+            <a
+              href={path}
+              key={idx}
+              className="flex items-center gap-2 px-2 py-1 text-sm sm:text-base font-medium transition relative"
+              style={styles}
+            >
+              {Icon && <span className="text-lg">{Icon}</span>}
+              <span>{label}</span>
+            </a>
+          );
+
+        case "dropdown":
+          return (
+            <Dropdown
+              key={idx}
+              data={items}
+              onSelect={(value) => console.log("from dropdown", value)}
+              styles={styles}
+            />
+          );
+        case "search":
+          return (
+            <input
+              key={idx}
+              type="text"
+              className="w-full rounded-4xl p-2 border border-gray-200"
+              placeholder={placeholder}
+              required={required}
+              styles={styles}
+            />
+          );
+        case "button":
+          return (
+            <Button
+              key={idx}
+              variant={variant || "contained"}
+              onClick={() => handleAction(action, actionValue, actionUse)}
+              sx={{
+                borderRadius: "1.5rem",
+                flexWrap: "nowrap",
+                alignItems: "center",
+                px: 2,
+                py: 1,
+                textTransform: "none",
+                fontSize: "0.2rem",
+                ":hover": {
+                  filter: "brightness(95%)",
+                },
+                ...styles.elementStyles,
+              }}
+            >
+              {Icon && <Icon sx={{ ...styles?.iconStyles }} />}
+              <div style={{ ...styles?.labelStyles }}>{label}</div>
+            </Button>
+          );
+
+        default:
+          return <TableCell key={idx}>{text}</TableCell>;
+      }
+    }
+  );
 };

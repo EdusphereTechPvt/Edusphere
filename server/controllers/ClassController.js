@@ -50,7 +50,7 @@ const addOrUpdateClass = async (req, res) => {
       // Create new class
       classData = new Class({
         classId: classId || `CLASS-${Date.now()}`,
-        name,
+        name: `Class ${name}`,
         gradeLevel,
         sections: Array.isArray(sections) ? sections : [],
         subjects: Array.isArray(subjects) ? subjects : [],

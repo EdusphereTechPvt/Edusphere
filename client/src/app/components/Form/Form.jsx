@@ -1,6 +1,13 @@
-"use client"
+"use client";
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { Box, Button, Checkbox, Divider, FormControlLabel, FormGroup } from "@mui/material";
+import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  FormControlLabel,
+  FormGroup,
+} from "@mui/material";
 import { Cancel, CloudUpload, Person, QrCode } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import Dropdown from "../Dropdown/Dropdown";
@@ -10,6 +17,8 @@ import { getFormData, handleFormAction } from "@/app/services/FormService";
 import { fetchDistinctValues } from "@/app/services/UtilityService";
 import { validateField } from "@/app/utils/Validator";
 import { updateConfig } from "@/app/utils/FormatConfig";
+import { showToast } from "@/app/utils/Toast";
+import { formatLabel } from "@/app/utils/Format";
 
 export default function Form({ type, mode, id }) {
   const router = useRouter();
@@ -21,15 +30,17 @@ export default function Form({ type, mode, id }) {
 
   const { sections, info } = config || {};
 
-  const requiredFieldNames = useMemo(() => (
-    sections?.flatMap(section =>
-      section.fields.filter(f => f.required).map(f => f.name)
-    ) || []
-  ), [sections]);
+  const requiredFieldNames = useMemo(
+    () =>
+      sections?.flatMap((section) =>
+        section.fields.filter((f) => f.required).map((f) => f.name)
+      ) || [],
+    [sections]
+  );
 
   useEffect(() => {
-    const hasErrors = Object.values(error).some(e => e);
-    const allRequiredFilled = requiredFieldNames.every(name => {
+    const hasErrors = Object.values(error).some((e) => e);
+    const allRequiredFilled = requiredFieldNames.every((name) => {
       const val = formData[name];
       if (val == null) return false;
       if (typeof val === "string") return val.trim() !== "";
@@ -46,14 +57,21 @@ export default function Form({ type, mode, id }) {
       for (const section of sections || []) {
         for (const field of section.fields) {
           if (field.isDistinct) {
-            const depsSatisfied = !field.dependancy || field.dependancy.every(dep => formData[dep]?.length > 0);
+            const depsSatisfied =
+              !field.dependancy ||
+              field.dependancy.every((dep) => formData[dep]?.length > 0);
             if (depsSatisfied) {
-              const options = await fetchDistinctValues(field, formData, config?.api?.page?.mode?.[mode]);
+              const options = await fetchDistinctValues(
+                field,
+                formData,
+                config?.api?.page?.mode?.[mode]
+              );
+
               updateConfig(config, {
                 fieldName: "items",
                 matchKey: "name",
                 matchValue: field.name,
-                newData: options.distinctValues || []
+                newData: options.distinctValues || [],
               });
               setConfig({ ...config });
             }
@@ -67,7 +85,11 @@ export default function Form({ type, mode, id }) {
   useEffect(() => {
     const getInitialData = async () => {
       if (mode === "edit") {
-        const data = await getFormData(config.api.fetch, config?.api?.page?.mode?.[mode], id);
+        const data = await getFormData(
+          config.api.fetch,
+          config?.api?.page?.mode?.[mode],
+          id
+        );
         setFormData(data.data);
       }
     };
@@ -75,38 +97,53 @@ export default function Form({ type, mode, id }) {
   }, []);
 
   const handleChange = useCallback((name, value) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleButtonAction = useCallback(async (action) => {
-    if (action === "cancel") {
-      setFormData({});
-      setResetFlag(f => !f);
-      setDisabled(true);
-    } else if (action === "submit") {
-      const result = await handleFormAction(formData, config.api[action], config?.api?.page?.mode?.[mode]);
-      if (result.status) {
+  const handleButtonAction = useCallback(
+    async (action) => {
+      if (action === "cancel") {
         setFormData({});
-        setResetFlag(f => !f);
+        setResetFlag((f) => !f);
         setDisabled(true);
-        router.back();
+      } else if (action === "submit") {
+        const result = await handleFormAction(
+          formData,
+          config.api[action],
+          config?.api?.page?.mode?.[mode]
+        );
+        if (result.status) {
+          setFormData({});
+          setResetFlag((f) => !f);
+          setDisabled(true);
+        }
       }
-    }
-  }, [formData, config, mode, router]);
+    },
+    [formData, config, mode, router]
+  );
 
-  const handleBlur = useCallback((field) => () => {
-    const validate = validateField(field, formData[field.name]);
-    setError(prev => ({ ...prev, [field.name]: !validate }));
-  }, [formData]);
+  const handleBlur = useCallback(
+    (field) => () => {
+      const validate = validateField(field, formData[field.name]);
+      setError((prev) => ({ ...prev, [field.name]: !validate }));
+    },
+    [formData]
+  );
 
   const photoUploader = ({ name, label, placeholder }, i) => (
     <div key={i} className="col-span-1 sm:col-span-2">
-      <label className="block mb-2 text-sm font-medium text-gray-700">{label}</label>
+      <label className="block mb-2 text-sm font-medium text-gray-700">
+        {label}
+      </label>
       <div className="flex items-center gap-4">
         <div className="flex flex-col items-center">
           <div className="lg:w-40 lg:h-40 w-28 h-28 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
             {formData[name] ? (
-              <img src={URL.createObjectURL(formData[name])} alt="Uploaded" className="w-full h-full object-cover" />
+              <img
+                src={URL.createObjectURL(formData[name])}
+                alt="Uploaded"
+                className="w-full h-full object-cover"
+              />
             ) : (
               <Person sx={{ fontSize: { xs: 95, lg: 140 }, color: "gray" }} />
             )}
@@ -114,13 +151,21 @@ export default function Form({ type, mode, id }) {
           {formData[name] && (
             <span className="text-xs mt-1 flex items-center text-gray-700">
               {formData[name].name}
-              <Cancel onClick={() => handleChange(name, null)} className="ml-1 cursor-pointer text-red-500" />
+              <Cancel
+                onClick={() => handleChange(name, null)}
+                className="ml-1 cursor-pointer text-red-500"
+              />
             </span>
           )}
         </div>
         <label className="cursor-pointer px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-sm font-medium">
           {placeholder || "Upload"}
-          <input type="file" accept="image/*" className="hidden" onChange={(e) => handleChange(name, e.target.files[0])} />
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => handleChange(name, e.target.files[0])}
+          />
         </label>
       </div>
     </div>
@@ -145,16 +190,26 @@ export default function Form({ type, mode, id }) {
           className="hidden"
           onChange={(e) => handleChange(name, e.target.files[0])}
         />
-        <label htmlFor={`file-upload-${i}`} className="flex flex-col items-center">
+        <label
+          htmlFor={`file-upload-${i}`}
+          className="flex flex-col items-center"
+        >
           <CloudUpload className="text-gray-500" fontSize="large" />
-          <span className="text-gray-600 mt-2">Upload a file or drag and drop</span>
-          <span className="text-xs text-gray-500">PDF, DOCX, PNG, JPG (max 10MB)</span>
+          <span className="text-gray-600 mt-2">
+            Upload a file or drag and drop
+          </span>
+          <span className="text-xs text-gray-500">
+            PDF, DOCX, PNG, JPG (max 10MB)
+          </span>
         </label>
       </div>
       {formData[name] && (
         <p className="mt-2 text-sm flex items-center text-gray-700">
           Selected: <strong>{formData[name].name}</strong>
-          <Cancel onClick={() => handleChange(name, null)} className="ml-1 cursor-pointer text-red-500" />
+          <Cancel
+            onClick={() => handleChange(name, null)}
+            className="ml-1 cursor-pointer text-red-500"
+          />
         </p>
       )}
     </div>
@@ -167,7 +222,11 @@ export default function Form({ type, mode, id }) {
       {info && (
         <div className="mb-2">
           {info.map((item, idx) => (
-            <item.tag key={idx} className={item.styles?.className} style={item.styles?.inlineStyle}>
+            <item.tag
+              key={idx}
+              className={item.styles?.className}
+              style={item.styles?.inlineStyle}
+            >
               {item.mode?.[mode]?.value || item.value}
             </item.tag>
           ))}
@@ -181,31 +240,119 @@ export default function Form({ type, mode, id }) {
                 {section.title}
               </h1>
             )}
-            <div className={section.title === "Actions" ? "flex justify-end flex-wrap gap-4" : "grid grid-cols-1 sm:grid-cols-2 gap-4"}>
-              {section.title === "Actions" && <Divider sx={{ width: "100%" }} />}
+            <div
+              className={
+                section.title === "Actions"
+                  ? "flex justify-end flex-wrap gap-4"
+                  : "grid grid-cols-1 sm:grid-cols-2 gap-4"
+              }
+            >
+              {section.title === "Actions" && (
+                <Divider sx={{ width: "100%" }} />
+              )}
               {section.fields.map((field, i) => {
-                const { type, name, label, placeholder, variant, text, values, required } = field;
+                const {
+                  type,
+                  name,
+                  label,
+                  placeholder,
+                  variant,
+                  text,
+                  values,
+                  required,
+                } = field;
                 switch (type) {
                   case "text":
                   case "email":
                   case "date":
+                  case "number":
                     return (
-                      <div key={i} className={`flex flex-col w-full ${i === section.fields.length - 1 && i % 2 === 0 ? "sm:col-span-2" : ""}`}>
-                        <label className="mb-1 text-sm font-medium text-gray-700">{label} {required && "*"}</label>
-                        <input
-                          type={type}
-                          name={name}
-                          placeholder={placeholder}
-                          value={formData[name] || (formData[name] && formData[name].split("T")[0]) || ""}
-                          onChange={(e) => handleChange(name, e.target.value)}
-                          onBlur={handleBlur(field)}
-                          className="w-full border border-gray-300 rounded-[5px] px-4 py-2 focus:ring-1 focus:ring-blue-600 focus:outline-none hover:border-black"
-                        />
+                      <div
+                        key={i}
+                        className={`flex flex-col w-full ${
+                          i === section.fields.length - 1 && i % 2 === 0
+                            ? "sm:col-span-2"
+                            : ""
+                        }`}
+                      >
+                        <label className="mb-1 text-sm font-medium text-gray-700">
+                          {label} {required && "*"}
+                        </label>
+                        <>
+                          <style jsx>{`
+                            input::-webkit-inner-spin-button,
+                            input::-webkit-outer-spin-button {
+                              -webkit-appearance: none;
+                            }
+                            input[type="number"] {
+                              -moz-appearance: textfield;
+                            }
+                          `}</style>
+
+                          <input
+                            type={type}
+                            name={name}
+                            placeholder={placeholder}
+                            value={
+                              formData[name] ||
+                              (formData[name] &&
+                                formData[name].split("T")[0]) ||
+                              ""
+                            }
+                            onChange={(e) => {
+                              let value = e.target.value;
+
+                              // type TExt
+                              if (type === "text") {
+                                const pattern =
+                                  field?.pattern && new RegExp(field.pattern);
+                                if (pattern && !pattern.test(value)) return;
+                                if (field?.maxLength) {
+                                  value = formatLabel(
+                                    value.slice(0, field.maxLength)
+                                  ).trim();
+                                }
+                                value = value.replace(/^\s+/, "");
+                              }
+
+                              // type number
+                              if (type === "number") {
+                                if (
+                                  field?.maxLength &&
+                                  value.length > field.maxLength
+                                )
+                                  return;
+                                if (value !== "") value = Number(value);
+                              }
+                              if (
+                                field?.max !== undefined &&
+                                value > field.max
+                              ) {
+                                value = field.max;
+                                showToast(
+                                  `${label} shouldn't be more than ${field.max}`,
+                                  "warning"
+                                );
+                              }
+
+                              handleChange(name, value);
+                            }}
+                            onBlur={() => handleBlur(field)}
+                            className="w-full border border-gray-300 rounded-[5px] px-4 py-2 focus:ring-1 focus:ring-blue-600 focus:outline-none hover:border-black"
+                          />
+                        </>
                       </div>
                     );
                   case "dropdown":
                     return (
-                      <div key={i} className={`flex w-full flex-col ${i === section.fields.length - 1 && i % 2 === 0 ? "sm:col-span-2" : ""}`}>
+                      <div
+                        key={i}
+                        className={`flex w-full flex-col ${
+                          i === section.fields.length - 1 && i % 2 === 0
+                            ? "sm:col-span-2"
+                            : ""
+                        }`}
+                      >
                         <Dropdown
                           value={formData[name]}
                           data={field || {}}
@@ -222,7 +369,9 @@ export default function Form({ type, mode, id }) {
                   case "textArea":
                     return (
                       <div key={i} className="col-span-1 sm:col-span-2">
-                        <label className="block mb-1 font-medium text-gray-700">{label}</label>
+                        <label className="block mb-1 font-medium text-gray-700">
+                          {label}
+                        </label>
                         <textarea
                           name={name}
                           placeholder={placeholder}
@@ -239,7 +388,9 @@ export default function Form({ type, mode, id }) {
                       <div key={i} className="col-span-1 sm:col-span-2">
                         <div className="flex w-40 items-center gap-2 bg-gray-100 px-4 py-3 rounded-lg cursor-pointer hover:bg-gray-200">
                           <QrCode size={20} className="text-gray-600" />
-                          <span className="text-gray-700 text-sm font-medium">{label || "Generate QR ID"}</span>
+                          <span className="text-gray-700 text-sm font-medium">
+                            {label || "Generate QR ID"}
+                          </span>
                         </div>
                       </div>
                     );
@@ -248,9 +399,14 @@ export default function Form({ type, mode, id }) {
                       <Button
                         key={i}
                         type="button"
-                        disabled={disabled && (field.action === "submit" || field.action === "save")}
+                        disabled={
+                          disabled &&
+                          (field.action === "submit" || field.action === "save")
+                        }
                         onClick={() => handleButtonAction(field.action)}
-                        variant={variant === "contained" ? "contained" : "outlined"}
+                        variant={
+                          variant === "contained" ? "contained" : "outlined"
+                        }
                         color={variant === "contained" ? "primary" : "inherit"}
                         sx={{
                           px: { xs: 3, sm: 6, lg: 3 },
@@ -260,7 +416,7 @@ export default function Form({ type, mode, id }) {
                           fontWeight: 500,
                           textTransform: "none",
                           boxShadow: "none",
-                          minWidth: { xs: "auto", sm: "120px", lg: "140px" }
+                          minWidth: { xs: "auto", sm: "120px", lg: "140px" },
                         }}
                       >
                         {field?.mode?.[mode]?.text || text}
@@ -269,7 +425,9 @@ export default function Form({ type, mode, id }) {
                   case "checkBox":
                     return (
                       <Box key={i}>
-                        <label className="font-medium text-gray-700">{label}</label>
+                        <label className="font-medium text-gray-700">
+                          {label}
+                        </label>
                         <div className="mt-1.5">
                           {values.map((value, idx) => (
                             <div key={idx} className="flex gap-3">
@@ -277,7 +435,9 @@ export default function Form({ type, mode, id }) {
                                 control={
                                   <Checkbox
                                     checked={formData[value.name] || false}
-                                    onChange={(e) => handleChange(value.name, e.target.checked)}
+                                    onChange={(e) =>
+                                      handleChange(value.name, e.target.checked)
+                                    }
                                     onBlur={handleBlur(field)}
                                   />
                                 }
@@ -290,7 +450,14 @@ export default function Form({ type, mode, id }) {
                     );
                   case "multiselect":
                     return (
-                      <div key={i} className={`flex w-full flex-col ${i === section.fields.length - 1 && i % 2 === 0 ? "sm:col-span-2" : ""}`}>
+                      <div
+                        key={i}
+                        className={`flex w-full flex-col ${
+                          i === section.fields.length - 1 && i % 2 === 0
+                            ? "sm:col-span-2"
+                            : ""
+                        }`}
+                      >
                         <MultiSelectDropdown
                           value={formData[name]}
                           data={field || {}}

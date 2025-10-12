@@ -93,7 +93,7 @@ const MultiSelectDropdown = ({value, data, resetFlag, style = {}, onSelect ,onBl
   useEffect(() => {
     setSelectedValue([]);
   }, [resetFlag]);
-console.log("Multiselect value" ,data)
+
   return (
     <Box className={`${style.className}`} sx={{ ...style.inlineStyle }}>
       {data.label && (
@@ -111,7 +111,7 @@ console.log("Multiselect value" ,data)
         <InputLabel 
           id="dropdown-label" 
           shrink={shouldLabelShrink}    
-          sx={{ padding: '0.5rem 0'}}
+          // sx={{ padding: '0.5rem 0'}}
           color={!shouldLabelShrink && 'default'}
         >
           {data.placeholder}

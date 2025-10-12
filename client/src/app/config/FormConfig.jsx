@@ -6,9 +6,9 @@ const formConfig = {
       page: {
         mode: {
           add: "/form/teacher/add",
-          edit: "/form/teacher/edit"
-        }
-      }
+          edit: "/form/teacher/edit",
+        },
+      },
     },
     info: [
       {
@@ -22,12 +22,12 @@ const formConfig = {
         },
         mode: {
           add: {
-            value: "Add New Teacher"
+            value: "Add New Teacher",
           },
           edit: {
-            value: "Edit Teacher"
-          }
-        }
+            value: "Edit Teacher",
+          },
+        },
       },
       {
         type: "desc",
@@ -39,12 +39,12 @@ const formConfig = {
         },
         mode: {
           add: {
-            value: "Fill in the details below to add new teacher."
+            value: "Fill in the details below to add new teacher.",
           },
           edit: {
-            value: "Fill in the details below to edit teacher."
-          }
-        }
+            value: "Fill in the details below to edit teacher.",
+          },
+        },
       },
     ],
     sections: [
@@ -56,14 +56,15 @@ const formConfig = {
             name: "name",
             label: "Full Name",
             placeholder: "Enter full name",
-            required: true
+            required: true,
+            pattern: "^[A-Za-z\\s]*$",
           },
           {
             type: "date",
             name: "dateOfBirth",
             label: "Date of Birth",
             placeholder: "Enter Date of Birth",
-            required: true
+            required: true,
           },
           {
             type: "dropdown",
@@ -72,10 +73,10 @@ const formConfig = {
             placeholder: "Gender",
             required: true,
             items: [
-              { id: "Male", value: 'Male' },
-              { id: "Female", value: 'Female' },
-              { id: "Others", value: 'Others' }
-            ]
+              { id: "Male", value: "Male" },
+              { id: "Female", value: "Female" },
+              { id: "Others", value: "Others" },
+            ],
           },
         ],
       },
@@ -83,27 +84,27 @@ const formConfig = {
         title: "Contact Information",
         fields: [
           {
-            type: "text",
+            type: "number",
             name: "phone",
             label: "Contact Number",
             placeholder: "Enter contact number",
             required: true,
-            minLenght: 10
+            maxLength: 10,
           },
           {
             type: "email",
             name: "email",
             label: "Email Address",
             placeholder: "Enter email address",
-            required: true
+            required: true,
           },
           {
             type: "textArea",
             name: "address",
             label: "Address",
-            placeholder: "Address"
+            placeholder: "Address",
           },
-        ]
+        ],
       },
       {
         title: "Academic Information",
@@ -129,7 +130,7 @@ const formConfig = {
             placeholder: "Select Date of Joining",
             required: true,
           },
-        ]
+        ],
       },
       {
         title: "Assignment Details",
@@ -143,9 +144,9 @@ const formConfig = {
             isDistinct: true,
             styles: {
               selectStyle: {
-                height: "3.5rem"
-              }
-            }
+                minHeight: "2.5rem",
+              },
+            },
           },
           {
             type: "multiselect",
@@ -157,9 +158,9 @@ const formConfig = {
             items: [],
             styles: {
               selectStyle: {
-                height: "3.5rem"
-              }
-            }
+                minHeight: "2.5rem",
+              },
+            },
           },
           {
             type: "multiselect",
@@ -171,9 +172,9 @@ const formConfig = {
             items: [],
             styles: {
               selectStyle: {
-                height: "3.5rem"
-              }
-            }
+                minHeight: "2.5rem",
+              },
+            },
           },
         ],
       },
@@ -186,6 +187,7 @@ const formConfig = {
             label: "Contact Name",
             placeholder: "Emergency Contact Name",
             required: false,
+            pattern: "^[A-Za-z\\s]*$",
           },
           {
             type: "text",
@@ -193,13 +195,15 @@ const formConfig = {
             label: "Relation To Teacher",
             placeholder: "Enter the relation to teacher",
             required: false,
+            pattern: "^[A-Za-z\\s]*$",
           },
           {
-            type: "text",
+            type: "number",
             name: "emergencyContactPhone",
             label: "Contact Phone",
             placeholder: "Emergency Contact Phone",
             required: false,
+            maxLength: 10,
           },
         ],
       },
@@ -208,14 +212,12 @@ const formConfig = {
           {
             type: "checkBox",
             name: "isActive",
-            values: [
-              { name: "isActive", text: "Active" }
-            ],
+            values: [{ name: "isActive", text: "Active" }],
             styles: {
-              className: "font-bold text-black"
-            }
+              className: "font-bold text-black",
+            },
           },
-        ]
+        ],
       },
       {
         title: "Actions",
@@ -234,12 +236,12 @@ const formConfig = {
             action: "submit",
             mode: {
               add: {
-                text: "Save Teacher"
+                text: "Save Teacher",
               },
               edit: {
-                text: "Update Teacher"
-              }
-            }
+                text: "Update Teacher",
+              },
+            },
           },
         ],
       },
@@ -281,6 +283,7 @@ const formConfig = {
             name: "studentName",
             label: "Student Name",
             placeholder: "Enter student's full name",
+            pattern: "^[A-Za-z\\s]*$",
           },
           { type: "date", name: "dateOfBirth", label: "Date of Birth" },
           {
@@ -289,7 +292,11 @@ const formConfig = {
             label: "Gender",
             placeholder: "Select gender",
             required: true,
-            items: [],
+            items: [
+              { id: "male", value: "Male" },
+              { id: "female", value: "Female" },
+              { id: "other", value: "Other" },
+            ],
           },
           {
             type: "dropdown",
@@ -305,10 +312,11 @@ const formConfig = {
         title: "Contact Information",
         fields: [
           {
-            type: "text",
+            type: "number",
             name: "contactNumber",
             label: "Parent/Guardian Contact Number",
             placeholder: "Enter contact number",
+            maxLength: 10,
           },
           {
             type: "text",
@@ -416,7 +424,7 @@ const formConfig = {
   },
   demo: {
     api: {
-      submit: "/requestdemo/add"
+      submit: "/requestdemo/add",
     },
     sections: [
       {
@@ -427,6 +435,7 @@ const formConfig = {
             name: "name",
             label: "Full Name",
             placeholder: "Enter full name",
+            pattern: "^[A-Za-z\\s]*$",
           },
           {
             type: "text",
@@ -441,10 +450,11 @@ const formConfig = {
             placeholder: "Enter email address",
           },
           {
-            type: "text",
+            type: "number",
             name: "phone",
             label: "Phone Number",
             placeholder: "Enter Your Phone Number",
+            maxLength: 10,
           },
         ],
       },
@@ -458,10 +468,10 @@ const formConfig = {
             placeholder: "Select Size",
             required: true,
             items: [
-              { value: "Less than 100", "label": "Less than 100" },
-              { value: "Between 100 and 250", "label": "Between 100 and 250" },
-              { value: "Between 250 and 500", "label": "Between 250 and 500" },
-              { value: "More than 500", "label": "More than 500" },
+              { value: "Less than 100", label: "Less than 100" },
+              { value: "Between 100 and 250", label: "Between 100 and 250" },
+              { value: "Between 250 and 500", label: "Between 250 and 500" },
+              { value: "More than 500", label: "More than 500" },
             ],
           },
           {
@@ -498,10 +508,10 @@ const formConfig = {
             placeholder: "Select an option",
             required: true,
             items: [
-              { value: "Facebook", "label": "Facebook" },
-              { value: "Google", "label": "Google" },
-              { value: "News Paper", "label": "New Paper" },
-              { value: "Instagram", "label": "Instagram" },
+              { value: "Facebook", label: "Facebook" },
+              { value: "Google", label: "Google" },
+              { value: "News Paper", label: "New Paper" },
+              { value: "Instagram", label: "Instagram" },
             ],
           },
         ],
@@ -513,7 +523,8 @@ const formConfig = {
             type: "textArea",
             name: "message",
             label: "Message/Questions",
-            placeholder: "Any specific questions or areas you'd like us to focus on during the demo?",
+            placeholder:
+              "Any specific questions or areas you'd like us to focus on during the demo?",
           },
         ],
       },
@@ -544,9 +555,9 @@ const formConfig = {
       page: {
         mode: {
           add: "/form/subject/add",
-          edit: "/form/subject/edit"
-        }
-      }
+          edit: "/form/subject/edit",
+        },
+      },
     },
     info: [
       {
@@ -560,12 +571,12 @@ const formConfig = {
         },
         mode: {
           add: {
-            value: "Add New Subject"
+            value: "Add New Subject",
           },
           edit: {
-            value: "Edit Subject"
-          }
-        }
+            value: "Edit Subject",
+          },
+        },
       },
       {
         type: "desc",
@@ -577,12 +588,12 @@ const formConfig = {
         },
         mode: {
           add: {
-            value: "Fill in the details below to add new subject."
+            value: "Fill in the details below to add new subject.",
           },
           edit: {
-            value: "Fill in the details below to edit subject."
-          }
-        }
+            value: "Fill in the details below to edit subject.",
+          },
+        },
       },
     ],
     sections: [
@@ -595,6 +606,7 @@ const formConfig = {
             label: "Subject Name",
             placeholder: "e.g., Math",
             required: true,
+            pattern: "^[A-Za-z\\s]*$",
           },
           {
             type: "text",
@@ -608,10 +620,11 @@ const formConfig = {
             name: "subjectCode",
             label: "Subject Code (Optional)",
             placeholder: "e.g., MATH101",
+            pattern: "/^[A-Za-z0-9\s]*$/",
             required: false,
           },
           {
-            type: "text",
+            type: "number",
             name: "credits",
             label: "Credit (Optional)",
             placeholder: "e.g., 10",
@@ -627,9 +640,9 @@ const formConfig = {
             items: [],
             styles: {
               selectStyle: {
-                height: "3.5rem",
-              }
-            }
+                minHeight: "2.5rem",
+              },
+            },
           },
           {
             type: "multiselect",
@@ -641,19 +654,17 @@ const formConfig = {
             items: [],
             styles: {
               selectStyle: {
-                height: "3.5rem"
-              }
-            }
+                minHeight: "2.5rem",
+              },
+            },
           },
           {
             type: "checkBox",
             name: "isActive",
-            values: [
-              { name: "isActive", text: "Active" }
-            ],
+            values: [{ name: "isActive", text: "Active" }],
             styles: {
-              className: "font-bold text-black"
-            }
+              className: "font-bold text-black",
+            },
           },
         ],
       },
@@ -673,12 +684,12 @@ const formConfig = {
             action: "submit",
             mode: {
               add: {
-                text: "Save Subject"
+                text: "Save Subject",
               },
               edit: {
-                text: "Update Subject"
-              }
-            }
+                text: "Update Subject",
+              },
+            },
           },
         ],
       },
@@ -691,9 +702,9 @@ const formConfig = {
       page: {
         mode: {
           add: "/form/class/add",
-          edit: "/form/class/edit"
-        }
-      }
+          edit: "/form/class/edit",
+        },
+      },
     },
     info: [
       {
@@ -707,12 +718,12 @@ const formConfig = {
         },
         mode: {
           add: {
-            value: "Add New Class"
+            value: "Add New Class",
           },
           edit: {
-            value: "Edit Class"
-          }
-        }
+            value: "Edit Class",
+          },
+        },
       },
       {
         type: "desc",
@@ -724,12 +735,12 @@ const formConfig = {
         },
         mode: {
           add: {
-            value: "Fill in the details below to add new class."
+            value: "Fill in the details below to add new class.",
           },
           edit: {
-            value: "Fill in the details below to edit class."
-          }
-        }
+            value: "Fill in the details below to edit class.",
+          },
+        },
       },
     ],
     sections: [
@@ -737,14 +748,15 @@ const formConfig = {
         title: "Class Information",
         fields: [
           {
-            type: "text",
+            type: "number",
             name: "name",
-            label: "Class Name",
-            placeholder: "e.g., 10th",
+            label: "Class No.",
+            placeholder: "e.g., 10",
+            max: "12",
             required: true,
           },
           {
-            type: "text",
+            type: "number",
             name: "gradeLevel",
             label: "Grade (in number)",
             placeholder: "e.g., 10",
@@ -756,6 +768,7 @@ const formConfig = {
             label: "Academic Year",
             placeholder: "e.g., 2025-2026",
             required: false,
+            pattern: "^[A-Za-z\\s-]*$",
           },
           {
             type: "multiselect",
@@ -767,9 +780,9 @@ const formConfig = {
             isDistinct: true,
             styles: {
               selectStyle: {
-                height: "3.5rem",
-              }
-            }
+                minHeight: "2.5rem",
+              },
+            },
           },
           {
             type: "multiselect",
@@ -781,9 +794,9 @@ const formConfig = {
             isDistinct: true,
             styles: {
               selectStyle: {
-                height: "3.5rem"
-              }
-            }
+                minHeight: "2.5rem",
+              },
+            },
           },
           {
             type: "text",
@@ -797,17 +810,14 @@ const formConfig = {
       {
         fields: [
           {
-
             type: "checkBox",
             name: "isActive",
-            values: [
-              { name: "isActive", text: "Active" }
-            ],
+            values: [{ name: "isActive", text: "Active" }],
             styles: {
-              className: "font-bold text-black"
-            }
-          }
-        ]
+              className: "font-bold text-black",
+            },
+          },
+        ],
       },
       {
         title: "Actions",
@@ -825,12 +835,12 @@ const formConfig = {
             action: "submit",
             mode: {
               add: {
-                text: "Save Class"
+                text: "Save Class",
               },
               edit: {
-                text: "Update Class"
-              }
-            }
+                text: "Update Class",
+              },
+            },
           },
         ],
       },
@@ -843,9 +853,9 @@ const formConfig = {
       page: {
         mode: {
           add: "/form/section/add",
-          edit: "/form/section/edit"
-        }
-      }
+          edit: "/form/section/edit",
+        },
+      },
     },
     info: [
       {
@@ -859,12 +869,12 @@ const formConfig = {
         },
         mode: {
           add: {
-            value: "Add New Section"
+            value: "Add New Section",
           },
           edit: {
-            value: "Edit Section"
-          }
-        }
+            value: "Edit Section",
+          },
+        },
       },
       {
         type: "desc",
@@ -876,12 +886,12 @@ const formConfig = {
         },
         mode: {
           add: {
-            value: "Fill in the details below to add new section."
+            value: "Fill in the details below to add new section.",
           },
           edit: {
-            value: "Fill in the details below to edit section."
-          }
-        }
+            value: "Fill in the details below to edit section.",
+          },
+        },
       },
     ],
     sections: [
@@ -894,9 +904,11 @@ const formConfig = {
             label: "Section Name",
             placeholder: "e.g., A",
             required: true,
+            maxLength: 1,
+            pattern: "^[A-Za-z\\s]*$",
           },
           {
-            type: "text",
+            type: "number",
             name: "capacity",
             label: "Capacity (in number)",
             placeholder: "e.g., 50",
@@ -909,10 +921,10 @@ const formConfig = {
             placeholder: "e.g., Class 10",
             required: true,
             items: [],
-            isDistinct: true
+            isDistinct: true,
           },
           {
-            type: "text",
+            type: "number",
             name: "roomNumber",
             label: "Room Number",
             placeholder: "e.g., 2025-2026",
@@ -938,9 +950,9 @@ const formConfig = {
             dependancy: ["classId"],
             styles: {
               selectStyle: {
-                height: "3.5rem",
-              }
-            }
+                minHeight: "2.5rem",
+              },
+            },
           },
           {
             type: "multiselect",
@@ -952,9 +964,9 @@ const formConfig = {
             isDistinct: true,
             styles: {
               selectStyle: {
-                height: "3.5rem"
-              }
-            }
+                minHeight: "2.5rem",
+              },
+            },
           },
           {
             type: "text",
@@ -968,17 +980,14 @@ const formConfig = {
       {
         fields: [
           {
-
             type: "checkBox",
             name: "isActive",
-            values: [
-              { name: "isActive", text: "Active" }
-            ],
+            values: [{ name: "isActive", text: "Active" }],
             styles: {
-              className: "font-bold text-black"
-            }
-          }
-        ]
+              className: "font-bold text-black",
+            },
+          },
+        ],
       },
       {
         title: "Actions",
@@ -996,12 +1005,12 @@ const formConfig = {
             action: "submit",
             mode: {
               add: {
-                text: "Save Subject"
+                text: "Save Subject",
               },
               edit: {
-                text: "Update Subject"
-              }
-            }
+                text: "Update Subject",
+              },
+            },
           },
         ],
       },
