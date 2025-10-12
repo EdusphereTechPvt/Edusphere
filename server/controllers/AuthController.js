@@ -402,8 +402,6 @@ const logout = async (req, res) => {
 
 const revokeAll = async (req, res) => {
   try {
-    // require auth: you can call authGuard first or check refresh token user
-    // for brevity assume userId in body and validation done
     const { userId } = req.body;
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -556,6 +554,10 @@ const ping = async(req,res) => {
     res.status(200).json({
       status: true,
       authorized: true,
+      user: {
+        name: req.user.name,
+        role: req.user.role
+      },
       message: "User is online & authorized",
     });
   } catch (err) {

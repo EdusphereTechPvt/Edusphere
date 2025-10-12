@@ -6,39 +6,68 @@ import {
   Drawer,
   IconButton,
   Typography,
+  Avatar,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
-import generalConfig, { generalRoutes } from "../../config/GeneralConfig";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Close } from "@mui/icons-material";
-import { getElements } from "@/app/services/ElementAccessService";
+import { Close, Person, Settings, Logout } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
-import { updateConfig } from "@/app/utils/FormatConfig";
+import generalConfig, { generalRoutes, navItems, userMenuItems } from "../../config/GeneralConfig";
+import { staticUpdateConfig } from "@/app/utils/FormatConfig";
 import { DynamicRenderer } from "@/app/utils/DynamicRender";
+import { logout } from "@/app/services/AuthService";
 
-const Header = ({ path }) => {
+const Header = ({ path, userData }) => {
   const [header, setHeader] = useState(generalConfig.header);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
 
-  const toggleDrawer = (open) => () => setDrawerOpen(open);
   const router = useRouter();
+  const toggleDrawer = (open) => () => setDrawerOpen(open);
 
   useEffect(() => {
-    const fetchNavItems = async () => {
-      try {
-        const result = await getElements(generalRoutes.includes(path) ? "navbar" : "navbarApp");
-        updateConfig(generalConfig.header, {
-          fieldName: "navItems",
-          matchKey: "type",
-          matchValue: "navigate",
-          newData: result
-        });
-        setHeader({ ...generalConfig.header });
-      } catch (err) {
-        console.error("Error fetching navbar items:", err);
+    try {
+      const result = generalRoutes.includes(path)
+        ? navItems.default
+        : navItems[userData?.role];
+
+      staticUpdateConfig(generalConfig, [
+        { key: "header", childType: "object" },
+        { key: "sections", childType: "array" },
+        { matchKey: "type", matchValue: "navigate" },
+        { dataKey: "navItems", data: result },
+      ]);
+
+      setHeader({ ...generalConfig.header });
+      setUserLoggedIn(!!userData);
+    } catch (err) {
+      console.error("Error fetching navbar items:", err);
+    }
+  }, [userData, path]);
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = async (item = null) => {
+    setAnchorEl(null);
+    if (!item) return;
+
+    if (item.action === "navigate") {
+      router.push(item.actionValue);
+    } else if (item.action === "logout") {
+      const response = await logout();
+      if (response) {
+        setUserLoggedIn(false);
+        router.push(item.actionValue);
       }
-    };
-    fetchNavItems();
-  }, []);
+    }
+  };
 
   return (
     <Box
@@ -46,7 +75,6 @@ const Header = ({ path }) => {
       className={header.styles?.className}
       sx={header.styles?.inlineStyle}
     >
-      {/* hemburger Icon from smller screen */}
       <IconButton
         color="black"
         sx={{ display: { lg: "none" } }}
@@ -55,34 +83,80 @@ const Header = ({ path }) => {
         <MenuIcon />
       </IconButton>
 
-      {/* //always visible */}
       {header.sections.map(
         (section, index) =>
           section.type === "logo" && (
-            <DynamicRenderer key={index} config={section} index={index} onClick={() => router.push("/")} />
+            <DynamicRenderer
+              key={index}
+              config={section}
+              index={index}
+              onClick={() => router.push("/")}
+            />
           )
       )}
 
-      {/* conditional render based on screen width */}
       <Box display={{ xs: "none", lg: "flex" }} alignItems="center">
         {header.sections.map(
           (section, index) =>
             section.type === "navigate" && (
-              <DynamicRenderer key={index} config={section} index={index} path={path} />
+              <DynamicRenderer
+                key={index}
+                config={section}
+                index={index}
+                path={path}
+              />
             )
         )}
       </Box>
 
       <Box display={{ xs: "none", lg: "flex" }} alignItems="center">
-        {header.sections.map(
-          (section, index) =>
-            section.type === "action" && (
-              <DynamicRenderer key={index} config={section} index={index} />
-            )
+        {!userLoggedIn ? (
+          <>
+            {header.sections.map(
+              (section, index) =>
+                section.type === "action" && (
+                  <DynamicRenderer key={index} config={section} index={index} />
+                )
+            )}
+          </>
+        ) : (
+          <>
+            <IconButton onClick={handleMenuClick} sx={{ ml: 1 }}>
+              <Avatar
+                alt={userData?.name || "User"}
+                src={userData?.avatar || "/default-avatar.png"}
+                sx={{ width: 36, height: 36 }}
+              />
+            </IconButton>
+
+            <Menu
+              anchorEl={anchorEl}
+              open={open}
+              onClose={() => handleMenuClose()}
+              PaperProps={{
+                elevation: 3,
+                sx: { mt: 1.5, borderRadius: "12px", minWidth: 160 },
+              }}
+              transformOrigin={{ horizontal: "right", vertical: "top" }}
+              anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+            >
+              {userMenuItems.map((item, index) => (
+                <MenuItem key={index} onClick={() => handleMenuClose(item)}>
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText>{item.label}</ListItemText>
+                </MenuItem>
+              ))}
+            </Menu>
+          </>
         )}
       </Box>
 
-      <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)} sx={{ display: { xs: "block", lg: "none" } }}>
+      <Drawer
+        anchor="left"
+        open={drawerOpen}
+        onClose={toggleDrawer(false)}
+        sx={{ display: { xs: "block", lg: "none" } }}
+      >
         <Box
           sx={header.styles.drawerStyle?.inlineStyle}
           className={header.styles.drawerStyle?.className}
@@ -96,10 +170,7 @@ const Header = ({ path }) => {
               px: "0.9rem",
             }}
           >
-            <Typography
-              variant="h6"
-              sx={{ textAlign: "left", fontWeight: "bold" }}
-            >
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
               Menu
             </Typography>
             <Close onClick={toggleDrawer(false)} />

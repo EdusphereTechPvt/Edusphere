@@ -1,4 +1,4 @@
-export const updateConfig = (config, options) => {
+export const dynamicUpdateConfig = (config, options) => {
   const { fieldName, matchKey, matchValue, newData } = options;
 
   const traverse = (node) => {
@@ -7,7 +7,6 @@ export const updateConfig = (config, options) => {
     if (Array.isArray(node)) {
       node.forEach(traverse);
     } else if (typeof node === "object") {
-      // If matchKey/matchValue are provided, only update if it matches
       const matches = !matchKey || node[matchKey] === matchValue;
 
       if (matches && node[fieldName] !== undefined) {
@@ -23,7 +22,7 @@ export const updateConfig = (config, options) => {
 };
 
 
-export const formatConfig = (config, location) => {
+export const staticUpdateConfig = (config, location) => {
   if (!config || !location || !Array.isArray(location)) return config;
 
   const traverse = (obj, locIndex) => {

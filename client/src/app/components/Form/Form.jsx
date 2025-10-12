@@ -16,9 +16,9 @@ import formConfig from "../../config/FormConfig";
 import { getFormData, handleFormAction } from "@/app/services/FormService";
 import { fetchDistinctValues } from "@/app/services/UtilityService";
 import { validateField } from "@/app/utils/Validator";
-import { updateConfig } from "@/app/utils/FormatConfig";
 import { showToast } from "@/app/utils/Toast";
 import { formatLabel } from "@/app/utils/Format";
+import { dynamicUpdateConfig } from "@/app/utils/FormatConfig";
 
 export default function Form({ type, mode, id }) {
   const router = useRouter();
@@ -61,13 +61,8 @@ export default function Form({ type, mode, id }) {
               !field.dependancy ||
               field.dependancy.every((dep) => formData[dep]?.length > 0);
             if (depsSatisfied) {
-              const options = await fetchDistinctValues(
-                field,
-                formData,
-                config?.api?.page?.mode?.[mode]
-              );
-
-              updateConfig(config, {
+              const options = await fetchDistinctValues(field, formData, config?.api?.page?.mode?.[mode]);
+              dynamicUpdateConfig(config, {
                 fieldName: "items",
                 matchKey: "name",
                 matchValue: field.name,
