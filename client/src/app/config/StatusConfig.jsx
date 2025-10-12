@@ -24,6 +24,7 @@ export const statusConfig = {
   Unpaid: red,
   Overdue: red,
   Inactive: red,
+  undefined: red,
 
   "Partially Paid": yellow,
   "On Hold": yellow,

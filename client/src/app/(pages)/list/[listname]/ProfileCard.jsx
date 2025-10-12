@@ -11,11 +11,11 @@ import {
   Button,
   Tooltip,
 } from "@mui/material";
-import { statusConfig } from "@/app/config/TableConfig";
 import { ProfileCardConfig } from "@/app/config/ListConfig";
 import { useHandleAction } from "@/app/utils/HelperFunctions";
 import DeleteModal from "@/app/components/Modal/DeleteModal";
 import { handleDeleteData } from "@/app/services/ListService";
+import LableChip from "@/app/components/LableChip/LableChip";
 
 const ProfileCard = ({ role, data, updateFlag, setUpdateFlag }) => {
   const { header, fields = [], quickLinks = [] } = ProfileCardConfig[role];
@@ -104,14 +104,10 @@ const ProfileCard = ({ role, data, updateFlag, setUpdateFlag }) => {
             >
               {field.label}
             </Typography>
-            <Chip
-              label={`● ${value}`}
-              size="small"
-              sx={{
-                backgroundColor: statusConfig[value]?.chipBg,
-                color: statusConfig[value]?.chipColor,
-                fontWeight: "bold",
-              }}
+            <LableChip
+            value={value}
+            size="small"
+            variant="outlined"
             />
           </Box>
         );

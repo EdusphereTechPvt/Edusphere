@@ -55,7 +55,7 @@ const save = async (req, res) => {
 
     const newSection = new Section({
       sectionId: `SEC-${Date.now()}`,
-      name,
+      name: `Section ${name}`,
       classId,
       teachers,
       students,
