@@ -12,7 +12,7 @@ import ThumbDownRoundedIcon from "@mui/icons-material/ThumbDownRounded";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { getHelpRecordsByType, updateViews, updateLikes, searchHelpRecords } from "@/app/services/HelpCenterService";
-import { updateConfig } from "@/app/utils/FormatConfig";
+import { dynamicUpdateConfig } from "@/app/utils/FormatConfig";
 
 const Page = () => {
   const [config, setConfig] = useState(faqconfig);
@@ -42,7 +42,12 @@ const Page = () => {
     const fetchRecords = async () => {
       try {
         const records = await getHelpRecordsByType(faqconfig.tabs[value].name);
-        updateConfig(faqconfig, "helpcenterrecords", records.data);
+        dynamicUpdateConfig(faqconfig,{
+          fieldName: "items",
+          matchKey: "name",
+          matchValue: faqconfig.tabs[value].name,
+          newData: records.data
+        });
         setConfig({ ...faqconfig });
         
         setTimeout(() => {
