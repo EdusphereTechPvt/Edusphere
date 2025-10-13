@@ -8,7 +8,7 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from "@mui/material";
-import { demoConfig } from "@/app/config/DemoConfig";
+import { demoConfig } from "@/app/config/demoConfig";
 import Form from "@/app/components/Form/Form";
 import { DynamicRenderer } from "@/app/utils/DynamicRender";
 

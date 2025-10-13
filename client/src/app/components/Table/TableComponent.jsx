@@ -67,8 +67,8 @@ export const TableComponent = ({
   const date = new Date();
   const currentDay = date.toLocaleDateString("en-US", { weekday: "long" });
 
-  const handleCellClick = (header, value, rowData) => {
-    if (onClick) onClick(header, value, rowData);
+  const handleCellClick = (header, value, row) => {
+    if (onClick) onClick(header, value, row);
   };
 
   const handleSelect = (row) => {
@@ -108,10 +108,13 @@ export const TableComponent = ({
                   <div className="flex flex-row items-center justify-between gap-4 w-full px-2">
                     {/* left */}
                     <div className="flex items-center justify-start gap-5">
-                      {topHeader.filter((item) =>
-                        ["text", "search", "dropdown"].includes(item.type)
+                      {renderTopHeader(
+                        topHeader.filter((item) =>
+                          ["text", "search", "dropdown"].includes(item.type)
+                        )
                       )}
                     </div>
+
                     {/* right */}
                     <div className="flex items-center justify-end gap-5">
                       {renderTopHeader(
@@ -121,6 +124,7 @@ export const TableComponent = ({
                       )}
                     </div>
                   </div>
+
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -293,8 +297,9 @@ export const TableComponent = ({
                               key={colIndex}
                               onClick={
                                 isClickable
-                                  ? () => handleCellClick(header, cellValue)
+                                  ? () => handleCellClick(header, cellValue,row)
                                   : undefined
+                                
                               }
                               sx={{
                                 cursor: isClickable ? "pointer" : "default",
