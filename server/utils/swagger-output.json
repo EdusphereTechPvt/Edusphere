@@ -25,6 +25,18 @@
       "description": "Teacher profile management"
     },
     {
+      "name": "Class",
+      "description": "Class profile management"
+    },
+    {
+      "name": "Section",
+      "description": "Section profile management"
+    },
+    {
+      "name": "Subject",
+      "description": "Subject profile management"
+    },
+    {
       "name": "Permission",
       "description": "Element access control management"
     },
@@ -1723,7 +1735,10 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "tags": [
+          "Class"
+        ]
       }
     },
     "/class/search": {
@@ -1791,7 +1806,10 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "tags": [
+          "Class"
+        ]
       }
     },
     "/class/getProfileCardData": {
@@ -1826,7 +1844,10 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "tags": [
+          "Class"
+        ]
       }
     },
     "/class/getAll/": {
@@ -1874,7 +1895,10 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "tags": [
+          "Class"
+        ]
       }
     },
     "/class/delete": {
@@ -1925,7 +1949,10 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "tags": [
+          "Class"
+        ]
       }
     },
     "/subject/save": {
@@ -2006,7 +2033,10 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "tags": [
+          "Subject"
+        ]
       }
     },
     "/subject/search": {
@@ -2072,7 +2102,10 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "tags": [
+          "Subject"
+        ]
       }
     },
     "/subject/getAll/": {
@@ -2123,7 +2156,10 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "tags": [
+          "Subject"
+        ]
       }
     },
     "/subject/delete": {
@@ -2177,7 +2213,10 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "tags": [
+          "Subject"
+        ]
       }
     },
     "/section/save": {
@@ -2261,7 +2300,10 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "tags": [
+          "Section"
+        ]
       }
     },
     "/section/search": {
@@ -2324,7 +2366,10 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "tags": [
+          "Section"
+        ]
       }
     },
     "/section/getAll/": {
@@ -2372,7 +2417,10 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "tags": [
+          "Section"
+        ]
       }
     },
     "/section/delete": {
@@ -2426,7 +2474,10 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "tags": [
+          "Section"
+        ]
       }
     }
   }
