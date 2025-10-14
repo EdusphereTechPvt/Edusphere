@@ -34,7 +34,7 @@ export const TableComponent = ({
   styles = {},
   colors = [],
   clickableFields = [],
-  checkBox = true,
+  checkBox = false,
   selectedRow,
   onPaginationChange,
 }) => {

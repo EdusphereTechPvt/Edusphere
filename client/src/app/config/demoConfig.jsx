@@ -41,13 +41,13 @@ export const demoConfig = {
               className: "",
               inlineStyle: {
                 color: "var(--color-primary)",
-                fontSize: { xs: "0.9rem", sm: "1rem", md: "1rem", lg: "1rem" },
+                fontSize: { xs: "0.6rem", sm: "0.6rem", md: "0.6rem", lg: "1rem" },
               },
             },
             titleStyle: {
               className: "",
               inlineStyle: {
-                fontSize: { xs: "0.9rem", sm: "1rem", md: "1rem", lg: "1rem" },
+                fontSize: { xs: "0.5rem", sm: "0.6rem", md: "0.6rem", lg: "1rem" },
                 color: "var(--color-text-secondary)",
               },
             },
@@ -62,13 +62,13 @@ export const demoConfig = {
               className: "",
               inlineStyle: {
                 color: "var(--color-primary)",
-                fontSize: { xs: "0.9rem", sm: "1rem", md: "1rem", lg: "1rem" },
+                fontSize: { xs: "0.5rem", sm: "0.6rem", md: "0.6rem", lg: "1rem" },
               },
             },
             titleStyle: {
               className: "",
               inlineStyle: {
-                fontSize: { xs: "0.9rem", sm: "1rem", md: "1rem", lg: "1rem" },
+                fontSize: { xs: "15rem", sm: "15rem", md: "1rem", lg: "1rem" },
                 color: "var(--color-text-secondary)",
               },
             },
@@ -83,7 +83,7 @@ export const demoConfig = {
               className: "",
               inlineStyle: {
                 color: "var(--color-primary)",
-                fontSize: { xs: "0.9rem", sm: "1rem", md: "1rem", lg: "1rem" },
+                fontSize: { xs: "0.5rem", sm: "0.6rem", md: "0.6rem", lg: "1rem" },
               },
             },
             titleStyle: {

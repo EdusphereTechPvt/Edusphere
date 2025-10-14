@@ -6,6 +6,7 @@ import {
   PeopleOutline,
 } from "@mui/icons-material";
 
+
 export const HomePageConfig = {
   sections: [
     {
@@ -30,16 +31,18 @@ export const HomePageConfig = {
                   // className: "font-bold",
                   inlineStyle: {
                     fontWeight: "bold",
-                    py: { xs: 1, sm: 1.2, md: 1.5 },
+                    py: { xs: 0.4, sm: 1.2, md: 1.5 },
                     // maxWidth: {sm:120, md:140, lg:160},
-                    fontSize: { xs: "0.6rem", sm: "0.8rem", md: "0.9rem" },
+                    fontSize: { xs: "0.4rem", sm: "0.8rem", md: "0.9rem" },
                     textTransform: "none",
+                    
+              
                   },
                 },
               },
               {
                 text: "Sign Up Now",
-                action: "signup",
+                action: "auth/signup",
                 variant: "outlined",
                 styles: {
                   className: "",
@@ -49,9 +52,9 @@ export const HomePageConfig = {
                     fontWeight: "bold",
                     textTransform: "none",
                     border: "none",
-                    py: { xs: 1, sm: 1.2, md: 1.5 },
+                    py: { xs: 0.4, sm: 1.2, md: 1.5 },
                     minWidth: { sm: 120, md: 140, lg: 160 },
-                    fontSize: { xs: "0.6rem", sm: "0.8rem", md: "0.9rem" },
+                    fontSize: { xs: "0.4rem", sm: "0.8rem", md: "0.9rem" },
                   },
                 },
               },
@@ -62,7 +65,7 @@ export const HomePageConfig = {
             inlineStyle: {},
             imgStyle: {
               className:
-                "w-full h-auto object-cover rounded bg-gradient-to-t from-white to-transparent",
+                "w-full h-auto object-cover rounded bg-gradient-to-t from-white to-transparent ",
               inlineStyle: { display: "block" },
             },
             containerStyle: {
@@ -79,7 +82,7 @@ export const HomePageConfig = {
               },
               btnCotainerStyle: {
                 className:
-                  "flex gap-4 mt-6 sm:mt-12 font-bold items-center justify-center",
+                  "flex gap-4 mt-2 sm:mt-12 font-bold items-center justify-center",
                 inlineStyle: {},
               },
             },
@@ -155,7 +158,7 @@ export const HomePageConfig = {
               },
               iconStyles: {
                 inlineStyle: {
-                  color: "var(--color-primary)",
+                  color: "#2279ce",
                   fontSize: {
                     xs: "1.5rem",
                     sm: "1.75rem",
@@ -222,7 +225,7 @@ export const HomePageConfig = {
               },
               iconStyles: {
                 inlineStyle: {
-                  color: "var(--color-primary)",
+                  color: "#2279ce",
                   fontSize: {
                     xs: "1.5rem",
                     sm: "1.75rem",
@@ -290,7 +293,7 @@ export const HomePageConfig = {
               },
               iconStyles: {
                 inlineStyle: {
-                  color: "var(--color-primary)",
+                  color: "#2279ce",
                   fontSize: {
                     xs: "1.5rem",
                     sm: "1.75rem",
@@ -358,7 +361,7 @@ export const HomePageConfig = {
               },
               iconStyles: {
                 inlineStyle: {
-                  color: "var(--color-primary)",
+                  color: "#2279ce",
                   fontSize: {
                     xs: "1.5rem",
                     sm: "1.75rem",
@@ -657,7 +660,7 @@ export const HomePageConfig = {
               },
               iconContainerStyle: {
                 inlineStyle: {
-                  backgroundColor: "var(--color-primary)",
+                  backgroundColor: "#2279ce",
                   borderRadius: "50%",
                   height: { xs: "35px", sm: "40px", md: "45px", lg: "50px" },
                   width: { xs: "35px", sm: "40px", md: "45px", lg: "50px" },
@@ -720,7 +723,7 @@ export const HomePageConfig = {
               },
               iconContainerStyle: {
                 inlineStyle: {
-                  backgroundColor: "var(--color-primary)",
+                  backgroundColor: "#2279ce",
                   borderRadius: "50%",
                   height: { xs: "35px", sm: "40px", md: "45px", lg: "50px" },
                   width: { xs: "35px", sm: "40px", md: "45px", lg: "50px" },
@@ -783,7 +786,7 @@ export const HomePageConfig = {
               },
               iconContainerStyle: {
                 inlineStyle: {
-                  backgroundColor: "var(--color-primary)",
+                  backgroundColor: "#2279ce",
                   borderRadius: "50%",
                   height: { xs: "35px", sm: "40px", md: "45px", lg: "50px" },
                   width: { xs: "35px", sm: "40px", md: "45px", lg: "50px" },
@@ -1088,7 +1091,7 @@ export const HomePageConfig = {
             {
               text: "Sign Up Now",
               variant: "contained",
-              action: "signup",
+              action: "auth/signup",
               styles: {
                 className: "",
                 inlineStyle: {

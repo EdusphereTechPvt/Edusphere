@@ -23,7 +23,7 @@ const page = () => {
         px: {xs:"1.5rem", sm:"2rem", md:"3rem", lg:"4rem"},
         gap: "3rem",
         alignItems: { xs: "center", md: "flex-start" },
-        textAlign: { xs: "center", md: "left" },
+        textAlign: { xs: "left", md: "left" },
       }}
     >
       {/* textContent */}
