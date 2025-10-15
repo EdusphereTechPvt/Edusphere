@@ -13,8 +13,8 @@ const GenericCard = ({
   styles = {},
 }) => (
   <Card
-  onClick={onclick || undefined}
-  sx={{
+    onClick={onclick || undefined}
+    sx={{
       maxWidth: 360,
       p: 2,
       textAlign: "center",
@@ -82,7 +82,11 @@ const GenericCard = ({
         </Typography>
       )}
       {additionalInfo && additionalInfo.map((info, index) => {
-
+        const handleemailclick = () => {
+          if (key == "email") {
+            window.location.href = `mailto:${value}`;
+          }
+        }
         const [key, value] = Object.entries(info)[0];
 
         const baseStyle = styles.textContainerStyle?.additionalInfoStyle?.inlineStyle || {};
@@ -93,8 +97,9 @@ const GenericCard = ({
         return (
           <Typography
             key={index}
-            sx={{ ...baseStyle, ...keyStyle }}
+            sx={{ ...baseStyle, ...keyStyle , cursor: key === "email" ? "pointer" : "default"}}
             className={`${baseClass} ${keyClass}`}
+            onClick={handleemailclick || undefined}
           >
             {value}
           </Typography>
