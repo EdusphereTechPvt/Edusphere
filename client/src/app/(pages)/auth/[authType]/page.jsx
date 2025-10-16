@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { TextField, Typography, Button, Divider, Box } from "@mui/material";
-import { roles, authconfig } from "@/app/config/AuthConfig.jsx";
+import { roles, authconfig } from "@/app/config/authconfig.jsx";
 import { showToast } from "@/app/utils/Toast.jsx";
 import { matchPassword, validateField } from "@/app/utils/Validator.jsx";
 import { authenticateUser } from "@/app/services/AuthService.jsx";
@@ -19,7 +19,7 @@ export default function AuthPage() {
   const fieldsConfig = authconfig[mode]?.options?.[activeRole] || [];
 
   const { authType } = useParams();
-  if (!authType) return <p>Loading...</p>;
+  if(!authType) return <p>Loading...</p>;
 
   useEffect(() => {
     const type = ["login", "signup"].includes(authType) ? authType : null;
@@ -62,16 +62,22 @@ export default function AuthPage() {
   const handleChange = (name) => (e) => {
     const value = e.target.value;
     setFields((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleBlur = (field) => (e) => {
-    let validate = validateField(field, e.target.value);
-
-    if (field.name === "confirmPassword" && validate) {
-      validate = matchPassword(fields.password, fields.confirmPassword);
-    }
-
-    setError((prev) => ({ ...prev, [field.name]: !validate }));
+    
+    clearTimeout(window.validationTimeout);
+    window.validationTimeout = setTimeout(() => {
+      if (value.trim() !== "") {
+        const field = fieldsConfig.find(f => f.name === name);
+        if (field) {
+          let validate = validateField(field, value, true);
+          if (field.name === "confirmPassword" && validate) {
+            validate = matchPassword(fields.password, value);
+          }
+          setError((prev) => ({ ...prev, [name]: !validate }));
+        }
+      } else {
+        setError((prev) => ({ ...prev, [name]: false }));
+      }
+    }, 1000);
   };
 
   const handleCheckboxChange = (e) => {
@@ -190,7 +196,6 @@ export default function AuthPage() {
               type={field.type || "text"}
               value={fields[field.name] || ""}
               onChange={handleChange(field.name)}
-              onBlur={handleBlur(field)}
               error={!!error[field.name]}
               helperText={error[field.name] ? "Invalid value" : ""}
               fullWidth
@@ -267,7 +272,7 @@ export default function AuthPage() {
               fontWeight: 600,
               textTransform: "none",
               py: 1,
-              "&:hover": { backgroundColor: "#f0f0f0" },
+              "&:disabled": { backgroundColor: "#e0e0e0", color: "#9e9e9e" },
             }}
           >
             {mode === "login" ? "Login" : "Sign Up"}
