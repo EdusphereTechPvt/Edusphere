@@ -23,11 +23,9 @@ export default function AuthPage() {
 
   useEffect(() => {
     const type = ["login", "signup"].includes(authType) ? authType : null;
-    if (type)
-      setMode(type)
-    else
-      window.location.href = '/error/404';
-  }, [authType])
+    if (type) setMode(type);
+    else window.location.href = "/error/404";
+  }, [authType]);
 
   useEffect(() => {
     const roleToUse = mode === "signup" ? "admin" : activeRole;
@@ -81,18 +79,19 @@ export default function AuthPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!fields || Object.values(fields).every(val => !val || val.trim() === "")) {
+    if (
+      !fields ||
+      Object.values(fields).every((val) => !val || val.trim() === "")
+    ) {
       console.warn("Skipping API call: empty fields");
       return;
     }
-
 
     try {
       const status = await authenticateUser(mode, activeRole, fields);
       if (status && mode === "signup") {
         setMode("login");
-      }
-      else if (status && mode === "login") {
+      } else if (status && mode === "login") {
         const prev = document.referrer;
         if (prev.includes("/forgotpassword")) {
           router.replace("/dashboard");
@@ -105,7 +104,6 @@ export default function AuthPage() {
       console.error(err);
     }
   };
-
 
   const handleOAuthSubmit = (provider) => {
     console.log("OAuth login with", provider);
@@ -137,18 +135,21 @@ export default function AuthPage() {
                       key={value}
                       onClick={() => setActiveRole(value)}
                       className={`p-3 sm:p-4 rounded-xl border transition-all duration-200 flex flex-col items-center gap-1
-                ${isActive
-                          ? "border-blue-500 bg-blue-50 shadow-md"
-                          : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                        }`}
+                ${
+                  isActive
+                    ? "border-blue-500 bg-blue-50 shadow-md"
+                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                }`}
                     >
                       <Icon
-                        className={`w-6 h-6 ${isActive ? "text-blue-600" : "text-gray-400"
-                          }`}
+                        className={`w-6 h-6 ${
+                          isActive ? "text-blue-600" : "text-gray-400"
+                        }`}
                       />
                       <span
-                        className={`font-semibold text-sm ${isActive ? "text-blue-600" : "text-gray-800"
-                          }`}
+                        className={`font-semibold text-sm ${
+                          isActive ? "text-blue-600" : "text-gray-800"
+                        }`}
                       >
                         {label}
                       </span>
@@ -201,7 +202,10 @@ export default function AuthPage() {
 
           {mode === "login" && (
             <Typography align="left" sx={{ fontSize: 13 }}>
-              <button className="text-blue-600 font-medium hover:underline cursor-pointer" onClick={() => router.push("/forgotpassword")}>
+              <button
+                className="text-blue-600 font-medium hover:underline cursor-pointer"
+                onClick={() => router.push("/forgotpassword")}
+              >
                 Forgot your password?
               </button>
             </Typography>
@@ -273,26 +277,31 @@ export default function AuthPage() {
             {mode === "login" ? "Login" : "Sign Up"}
           </Button>
 
-          <Divider textAlign="center" className="text-gray-500">
-            or continue with
-          </Divider>
-          {/* OAuth Button */}
-          {authconfig.OAuthBtns && (
-            <Box sx={{ display: "flex", gap: 4, justifyContent: "center" }}>
-              {authconfig.OAuthBtns.map((btn, idx) => (
-                <Button
-                  key={idx}
-                  variant={btn.variant}
-                  startIcon={btn.icon}
-                  sx={btn.style}
-                  fullWidth
-                  onClick={() => handleOAuthSubmit(btn.name)}
-                >
-                  {btn.title}
-                </Button>
-              ))}
-            </Box>
+          {mode === "login" && (
+            <>
+              <Divider textAlign="center" className="text-gray-500">
+                or continue with
+              </Divider>
+
+              {authconfig.OAuthBtns && (
+                <Box sx={{ display: "flex", gap: 4, justifyContent: "center" }}>
+                  {authconfig.OAuthBtns.map((btn, idx) => (
+                    <Button
+                      key={idx}
+                      variant={btn.variant}
+                      startIcon={btn.icon}
+                      sx={btn.style}
+                      fullWidth
+                      onClick={() => handleOAuthSubmit(btn.name)}
+                    >
+                      {btn.title}
+                    </Button>
+                  ))}
+                </Box>
+              )}
+            </>
           )}
+
           <p className="mt-5 text-center text-sm text-gray-500">
             {mode === "login"
               ? "Don't have an account?"
