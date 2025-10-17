@@ -42,10 +42,10 @@ const ClientLayout = ({ children }) => {
 
     if (!errorRoutes.includes(path) && !generalRoutes.includes(path) && !excludeRoutes.includes(path)) { 
       sendPing();
-      const id = setInterval(() => {
-        sendPing();
-      }, 30000);
-      setIntervalId(id);
+      // const id = setInterval(() => {
+      //   sendPing();
+      // }, 30000);
+      // setIntervalId(id);
     }
 
     return () => {
