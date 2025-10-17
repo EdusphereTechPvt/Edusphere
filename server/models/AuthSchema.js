@@ -47,6 +47,11 @@ const UserSchema = new mongoose.Schema(
       enum: ["admin", "teacher", "parent", "student"],
       required: true,
     },
+    schoolId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "School",
+      required: true,
+    },
     avatar: {
       type: String,
     },
@@ -90,27 +95,40 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-
 UserSchema.methods.comparePassword = function (candidate) {
   return bcrypt.compare(candidate, this.password);
 };
 
-UserSchema.methods.addSession = async function ({ jti, refreshToken, expiresAt, ip, userAgent, fingerprint }) {
+UserSchema.methods.addSession = async function ({
+  jti,
+  refreshToken,
+  expiresAt,
+  ip,
+  userAgent,
+  fingerprint,
+}) {
   const hash = await bcrypt.hash(refreshToken, SALT_ROUNDS);
-  this.sessions.push({ jti, refreshTokenHash: hash, expiresAt, ip, userAgent, fingerprint });
+  this.sessions.push({
+    jti,
+    refreshTokenHash: hash,
+    expiresAt,
+    ip,
+    userAgent,
+    fingerprint,
+  });
   if (this.sessions.length > 20) this.sessions = this.sessions.slice(-20);
   await this.save();
 };
 
 UserSchema.methods.findSession = async function (jti, refreshToken) {
-  const s = this.sessions.find(x => x.jti === jti);
+  const s = this.sessions.find((x) => x.jti === jti);
   if (!s) return null;
   const ok = await bcrypt.compare(refreshToken, s.refreshTokenHash);
   return ok ? s : null;
 };
 
 UserSchema.methods.removeSession = async function (jti) {
-  this.sessions = this.sessions.filter(x => x.jti !== jti);
+  this.sessions = this.sessions.filter((x) => x.jti !== jti);
   await this.save();
 };
 
@@ -118,6 +136,5 @@ UserSchema.methods.clearAllSessions = async function () {
   this.sessions = [];
   await this.save();
 };
-
 
 module.exports = mongoose.model("User", UserSchema);

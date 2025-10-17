@@ -1,3 +1,5 @@
+import { signInWithPopup } from "firebase/auth";
+import { auth } from "../utils/Firebase";
 import { showToast } from "../utils/Toast";
 import api from "./MiddlewareService";
 
@@ -28,6 +30,30 @@ export const authenticateUser = async (mode, role, fields) => {
   }
 };
 
+export const handleOAuthLogin = async (provider) => {
+  const result = await signInWithPopup(auth, provider);
+  const token = await result.user.getIdToken();
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/auth/oauth`,{
+    method: 'POST',
+    credentials: "include",
+    headers: {
+      'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token })
+  })
+
+  const data = await res.json();
+  console.log(data)
+  
+  if(!data.status){
+    showToast(data.message || "Error while logging in", "error");
+    return false;
+  }
+
+
+  showToast(data.message, "success")
+  return true;
+};
 
 export const isUserAvailable = async (params) => {
   try{

@@ -4,8 +4,9 @@ import { TextField, Typography, Button, Divider, Box } from "@mui/material";
 import { roles, authconfig } from "@/app/config/AuthConfig.jsx";
 import { showToast } from "@/app/utils/Toast.jsx";
 import { matchPassword, validateField } from "@/app/utils/Validator.jsx";
-import { authenticateUser } from "@/app/services/AuthService.jsx";
+import { authenticateUser, handleOAuthLogin } from "@/app/services/AuthService.jsx";
 import { useParams, useRouter } from "next/navigation.js";
+import { googleProvider } from "@/app/utils/Firebase";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -60,6 +61,21 @@ export default function AuthPage() {
   const handleChange = (name) => (e) => {
     const value = e.target.value;
     setFields((prev) => ({ ...prev, [name]: value }));
+    clearTimeout(window.validationTimeout);
+    window.validationTimeout = setTimeout(() => {
+      if (value.trim() !== "") {
+        const field = fieldsConfig.find(f => f.name === name);
+        if (field) {
+          let validate = validateField(field, value, true);
+          if (field.name === "confirmPassword" && validate) {
+            validate = matchPassword(fields.password, value);
+          }
+          setError((prev) => ({ ...prev, [name]: !validate }));
+        }
+      } else {
+        setError((prev) => ({ ...prev, [name]: false }));
+      }
+    }, 1000);
   };
 
   const handleBlur = (field) => (e) => {
@@ -105,8 +121,20 @@ export default function AuthPage() {
     }
   };
 
-  const handleOAuthSubmit = (provider) => {
-    console.log("OAuth login with", provider);
+  const handleOAuthSubmit = async (providerName) => {
+    let provider;
+
+    switch(providerName){
+      case 'google':
+        provider = googleProvider;
+        break;
+    }
+
+    const isSuccess= await handleOAuthLogin(provider);
+    console.log(isSuccess)
+    if (isSuccess) {
+      router.back();
+    }
   };
 
   return (
@@ -271,7 +299,7 @@ export default function AuthPage() {
               fontWeight: 600,
               textTransform: "none",
               py: 1,
-              "&:hover": { backgroundColor: "#f0f0f0" },
+              "&:disabled": { backgroundColor: "#e0e0e0", color: "#9e9e9e" },
             }}
           >
             {mode === "login" ? "Login" : "Sign Up"}
