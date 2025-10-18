@@ -1,39 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { authconfig } from "@/app/config/AuthConfig";
-import { isUserAvailable, updatePassword } from "@/app/services/AuthService";
-import { matchPassword, validateField } from "@/app/utils/Validator";
-import { Lock, Visibility, VisibilityOff } from "@mui/icons-material";
+import { useState } from "react";
+import { authConfig } from "@/app/config/AuthConfig";
+import { isUserAvailable } from "@/app/services/AuthService";
+import { validateField } from "@/app/utils/Validator";
+import { EmailOutlined } from "@mui/icons-material";
+
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [validEmail, setValidEmail] = useState(false);
-  const [password, setPassword] = useState({ password: "", confirmPassword: "" });
-  const [disableButton, setDisableButton] = useState(true);
-  const [error, setError] = useState({});
-
-  useEffect(() => {
-    const hasErrors = Object.values(error).some((e) => e);
-    setDisableButton(hasErrors);
-  }, [error]);
-
-  useEffect(() => {
-    setError({});
-  }, [validEmail]);
-
-  const handleSubmit = async() => {
-    const validate = matchPassword(password.password, password.confirmPassword);
-    if (validate) {
-      let res = await updatePassword(email, password.password)
-      if(res){
-        window.location.replace("/auth/login")
-      }
-    }
-  };
 
   const handleVerifyEmail = async () => {
-    if (!validateField(authconfig["forgotPassword"].fields[0], email)) return;
+    if (!validateField(authConfig["forgotPassword"].fields[0], email)) return;
     let res = await isUserAvailable({ email });
     setValidEmail(res || false);
   };
@@ -45,72 +24,11 @@ export default function ForgotPasswordPage() {
       handleVerifyEmail={handleVerifyEmail}
     />
   ) : (
-    <ChangePassword
-      password={password}
-      setPassword={setPassword}
-      handleSubmit={handleSubmit}
-      setError={setError}
-      disableButton={disableButton}
-    />
+   <EmailSent email={email} />
   );
 }
-
-const ChangePassword = ({ password, setPassword, handleSubmit, setError, disableButton }) => {
-  const config = authconfig["changePass"];
-  const [visible, setVisible] = useState({ password: false, confirmPassword: false });
-
-  const handleBlur = (field, value) => {
-    let validate = validateField(field, value);
-    if (field.name === "confirmPassword" && validate && password.password && password.confirmPassword) {
-      validate = matchPassword(password.password, password.confirmPassword);
-    }
-    setError((prev) => ({ ...prev, [field.name]: !validate }));
-  };
-
-  return (
-    <div className={config.styles.container}>
-      <div className={config.styles.card}>
-        <h1 className={config.styles.heading}>Change Password</h1>
-        {config.fields.map((field, index) => (
-          <div key={index}>
-            <label className={config.styles.label}>{field.label}</label>
-            <div className="relative mb-4">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input
-                type={visible[field.name] ? "text" : "password"}
-                placeholder={field.label}
-                value={password[field.name] || ""}
-                onBlur={() => handleBlur(field, password[field.name])}
-                onChange={(e) => setPassword({ ...password, [field.name]: e.target.value })}
-                className={`${config.styles.input} pl-10`}
-              />
-              <button
-                type="button"
-                onClick={() =>
-                  setVisible({ ...visible, [field.name]: !visible[field.name] })
-                }
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-              >
-                {visible[field.name] ? <VisibilityOff size={18} /> : <Visibility size={18} />}
-              </button>
-            </div>
-          </div>
-        ))}
-        <button
-          onClick={handleSubmit}
-          disabled={disableButton}
-          style={disableButton ? { backgroundColor: "gray" } : {}}
-          className={config.styles.button}
-        >
-          Update Password
-        </button>
-      </div>
-    </div>
-  );
-};
-
 const ForgotPassword = ({ email, setEmail, handleVerifyEmail }) => {
-  const config = authconfig["forgotPassword"];
+  const config = authConfig["forgotPassword"];
   return (
     <div className={config.styles.container}>
       <div className={config.styles.form}>
@@ -143,3 +61,39 @@ const ForgotPassword = ({ email, setEmail, handleVerifyEmail }) => {
     </div>
   );
 };
+
+const EmailSent = ({ email }) => {
+  return (
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-b from-blue-50 to-white px-6 text-center">
+      <div className="bg-white shadow-xl rounded-2xl p-10 max-w-md">
+        <div className="flex justify-center mb-6">
+          <div className="bg-blue-100 p-4 rounded-full">
+            <EmailOutlined style={{ fontSize: 50, color: "#1E88E5" }} />
+          </div>
+        </div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-3">
+          Check your email 📬
+        </h2>
+        <p className="text-gray-600 mb-4">
+          We’ve sent a password reset link to
+          <span className="font-semibold text-blue-600"> {email}</span>.
+        </p>
+        <p className="text-sm text-gray-500 mb-6">
+          Please check your inbox (and spam folder) and follow the instructions
+          to reset your password. The link will expire in 15 minutes.
+        </p>
+        <div className="space-y-2">
+          <a
+            href="/auth/login"
+            className="block bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            Back to Login
+          </a>
+          <p className="text-xs text-gray-400">
+            Didn’t get the email? <a href="#" className="text-blue-500 hover:underline">Resend</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -16,7 +16,7 @@ export const roles = {
 };
 
 
-export const authconfig = {
+export const authConfig = {
   login: {
     title: "Welcome Back to Edusphere",
     desc: "Log in to access your account",

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { TextField, Typography, Button, Divider, Box } from "@mui/material";
-import { roles, authconfig } from "@/app/config/AuthConfig.jsx";
+import { roles, authConfig } from "@/app/config/AuthConfig.jsx";
 import { showToast } from "@/app/utils/Toast.jsx";
 import { matchPassword, validateField } from "@/app/utils/Validator.jsx";
 import { authenticateUser, handleOAuthLogin } from "@/app/services/AuthService.jsx";
@@ -17,7 +17,7 @@ export default function AuthPage() {
   const [error, setError] = useState({});
   const [disabled, setDisabled] = useState(true);
 
-  const fieldsConfig = authconfig[mode]?.options?.[activeRole] || [];
+  const fieldsConfig = authConfig[mode]?.options?.[activeRole] || [];
 
   const { authType } = useParams();
   if (!authType) return <p>Loading...</p>;
@@ -32,7 +32,7 @@ export default function AuthPage() {
     const roleToUse = mode === "signup" ? "admin" : activeRole;
     if (activeRole !== roleToUse) setActiveRole(roleToUse);
 
-    const initialFields = (authconfig[mode]?.options?.[roleToUse] || []).reduce(
+    const initialFields = (authConfig[mode]?.options?.[roleToUse] || []).reduce(
       (acc, field) => {
         acc[field.name] = "";
         return acc;
@@ -141,10 +141,10 @@ export default function AuthPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
       <div className="w-full max-w-lg bg-white rounded-3xl shadow-xl border border-gray-200 p-6 sm:p-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-900">
-          {authconfig[mode].title}
+          {authConfig[mode].title}
         </h1>
         <p className="text-sm text-center text-gray-500 mt-2">
-          {authconfig[mode].desc}
+          {authConfig[mode].desc}
         </p>
 
         {/* Role Switcher */}
@@ -311,9 +311,9 @@ export default function AuthPage() {
                 or continue with
               </Divider>
 
-              {authconfig.OAuthBtns && (
+              {authConfig.OAuthBtns && (
                 <Box sx={{ display: "flex", gap: 4, justifyContent: "center" }}>
-                  {authconfig.OAuthBtns.map((btn, idx) => (
+                  {authConfig.OAuthBtns.map((btn, idx) => (
                     <Button
                       key={idx}
                       variant={btn.variant}
