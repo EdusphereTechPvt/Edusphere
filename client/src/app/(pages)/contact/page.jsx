@@ -1,8 +1,25 @@
+"use client"
 import { ContactUsConfig } from '@/app/config/ContactUsConfig';
 import GenericCard from '@/app/components/CardComponent/GenericCard';
+import Loader from '@/app/components/Loader/Loader';
+import LoaderConfig from '@/app/config/LoaderConfig';
+import { useState, useEffect } from 'react';
 
 const ContactUs = () => {
     const config = ContactUsConfig;
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1500);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <Loader config={LoaderConfig.contact} />;
+    }
 
     return (
         <div className='bg-gray-50 py-5'>

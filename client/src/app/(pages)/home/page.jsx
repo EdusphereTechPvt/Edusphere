@@ -3,10 +3,28 @@
 import { Button } from "@mui/material";
 import { HomePageConfig } from "../../config/HomePageConfig";
 import CardComponent from "@/app/components/CardComponent/Index";
+import FilterCard from "@/app/components/CardComponent/FilterCard";
+import filterCardConfig from "../../config/FilterCardConfig";
+import Loader from "@/app/components/Loader/Loader";
+import LoaderConfig from "../../config/LoaderConfig";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 const page = () => {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleApplyFilters = (filters) => {
+    console.log('Applied filters:', filters);
+  };
   function DynamicRenderer({ config }) {
     switch (config.type) {
       case "text":
@@ -50,8 +68,21 @@ const page = () => {
     }
   }
 
+  if (loading) {
+    return <Loader config={LoaderConfig.home} />;
+  }
+
   return (
     <div>
+      {/* FilterCard Demo */}
+      <section style={{ padding: '20px', display: 'flex', justifyContent: 'center' }}>
+        <FilterCard
+          title={filterCardConfig.title}
+          filters={filterCardConfig.filters}
+          onApplyFilters={handleApplyFilters}
+        />
+      </section>
+
       {HomePageConfig.sections.map((section, idx) => (
         <section key={idx} className={section.styles?.className} style={section.styles?.inlineStyle}>
           {section.title && <h2 className={section.styles?.title?.className} style={section.styles?.title?.inlineStyle}>{section.title}</h2>}

@@ -6,6 +6,8 @@ import { showToast } from "@/app/utils/Toast.jsx";
 import { matchPassword, validateField } from "@/app/utils/Validator.jsx";
 import { authenticateUser } from "@/app/services/AuthService.jsx";
 import { useParams, useRouter } from "next/navigation.js";
+// import Loader from "@/app/components/Loader/Loader";
+// import LoaderConfig from "@/app/config/LoaderConfig";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -15,6 +17,7 @@ export default function AuthPage() {
   const [state, setState] = useState({ terms: false, consent: false });
   const [error, setError] = useState({});
   const [disabled, setDisabled] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   const fieldsConfig = authconfig[mode]?.options?.[activeRole] || [];
 
@@ -27,6 +30,12 @@ export default function AuthPage() {
       setMode(type)
     else
       window.location.href = '/error/404';
+
+    //   const timer = setTimeout(() => {
+    //   setLoading(false);
+    // }, 1500);
+
+    // return () => clearTimeout(timer);
   }, [authType])
 
   useEffect(() => {
@@ -117,6 +126,10 @@ export default function AuthPage() {
     console.log("OAuth login with", provider);
   };
 
+  // if (loading) {
+    // return <Loader config={LoaderConfig.auth} />;
+  // }
+// 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
       <div className="w-full max-w-lg bg-white rounded-3xl shadow-xl border border-gray-200 p-6 sm:p-8">
@@ -298,14 +311,14 @@ export default function AuthPage() {
               ))}
             </Box>
           )}
-          <p className="mt-5 text-center text-sm text-gray-500">
+          <p className="mt-5 text-center text-sm text-gray-500 cursor-pointer">
             {mode === "login"
               ? "Don't have an account?"
               : "Already have an account?"}{" "}
             <button
               type="button"
               onClick={() => setMode(mode === "login" ? "signup" : "login")}
-              className="text-blue-600 font-medium hover:underline"
+              className="text-blue-600 font-medium hover:underline cursor-pointer"
             >
               {mode === "login" ? "Register Here" : "Log In"}
             </button>
@@ -313,5 +326,4 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
-  );
-}
+  );}
