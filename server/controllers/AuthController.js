@@ -16,6 +16,8 @@ const {
   verifyAccessToken,
 } = require("../utils/tokenUtils");
 const InviteToken = require("../models/InviteToken");
+const { sendEmail } = require("../utils/Email");
+const { signupTemplate } = require("../utils/templates/EmailTemplates");
 
 const cookieOptions = {
   httpOnly: true,
@@ -169,6 +171,19 @@ const signupController = async (req, res) => {
     await invite.save({ session });
 
     await session.commitTransaction();
+
+    await sendEmail(
+      email,
+      `Hey ${name}, You’re Officially Part of Edusphere 🚀`,
+      signupTemplate(
+        name,
+        school.name,
+        `${process.env.FRONTENDPOINT}/dashboard`, // add env files
+        `${process.env.FRONTENDPOINT}/help`,
+        `${process.env.FRONTENDPOINT}/demo`,
+        `${process.env.FRONTENDPOINT}/contact`
+      )
+    );
 
     res.status(201).json({
       message: "Admin registered successfully",
@@ -561,7 +576,7 @@ const ping = async (req, res) => {
       user: {
         name: req.user.name,
         role: req.user.role,
-        avatar: req.user.avatar
+        avatar: req.user.avatar,
       },
       message: "User is online & authorized",
     });

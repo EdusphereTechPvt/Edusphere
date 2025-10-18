@@ -1,7 +1,9 @@
 import { Twitter, Facebook, LinkedIn, Instagram, Email, Phone, LocationOn } from "@mui/icons-material";
 import { Person, Settings, Logout } from "@mui/icons-material";
 export const excludeRoutes = [
-  "/auth/login", "/auth/signup", "/forgotpassword"
+  /^\/auth\/login$/,
+  /^\/auth\/signup$/,
+  /^\/forgotpassword(\/.*)?$/
 ];
 
 export const generalRoutes = [
