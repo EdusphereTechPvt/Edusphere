@@ -5,6 +5,7 @@ import { authConfig } from "@/app/config/AuthConfig";
 import { isUserAvailable } from "@/app/services/AuthService";
 import { validateField } from "@/app/utils/Validator";
 import { EmailOutlined } from "@mui/icons-material";
+import { showToast } from "@/app/utils/Toast";
 
 
 export default function ForgotPasswordPage() {
@@ -24,7 +25,7 @@ export default function ForgotPasswordPage() {
       handleVerifyEmail={handleVerifyEmail}
     />
   ) : (
-   <EmailSent email={email} />
+   <EmailSent email={email} handleVerifyEmail={handleVerifyEmail} />
   );
 }
 const ForgotPassword = ({ email, setEmail, handleVerifyEmail }) => {
@@ -62,7 +63,30 @@ const ForgotPassword = ({ email, setEmail, handleVerifyEmail }) => {
   );
 };
 
-const EmailSent = ({ email }) => {
+const EmailSent = ({ email, handleVerifyEmail }) => {
+  const [isResending, setIsResending] = useState(false);
+
+  const onResend = async (e) => {
+    e.preventDefault();
+    if (isResending) return;
+    setIsResending(true);
+
+    try {
+      const res = await handleVerifyEmail();
+
+      if (res?.status) {
+        showToast("Password reset email sent again!","success");
+      } else {
+        showToast("Failed to resend email. Try again.", "error");
+      }
+    } catch (err) {
+      console.error("Error resending email:", err);
+      showToast("Something went wrong. Please try again.", "error");
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-b from-blue-50 to-white px-6 text-center">
       <div className="bg-white shadow-xl rounded-2xl p-10 max-w-md">
@@ -80,7 +104,7 @@ const EmailSent = ({ email }) => {
         </p>
         <p className="text-sm text-gray-500 mb-6">
           Please check your inbox (and spam folder) and follow the instructions
-          to reset your password. The link will expire in 15 minutes.
+          to reset your password. The link will expire in 10 minutes.
         </p>
         <div className="space-y-2">
           <a
@@ -90,7 +114,16 @@ const EmailSent = ({ email }) => {
             Back to Login
           </a>
           <p className="text-xs text-gray-400">
-            Didn’t get the email? <a href="#" className="text-blue-500 hover:underline">Resend</a>
+            Didn’t get the email?{" "}
+            <button
+              onClick={onResend}
+              disabled={isResending}
+              className={`text-blue-500 hover:underline ${
+                isResending ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {isResending ? "Resending..." : "Resend"}
+            </button>
           </p>
         </div>
       </div>

@@ -1,16 +1,21 @@
 const mongoose = require("mongoose");
+const User = require("../models/AuthSchema");
 const Teacher = require("../models/Teacher");
 const Subject = require("../models/Subject");
 const Class = require("../models/Class");
-const Section = require("../models/Section")
-const Student = require("../models/Student")
+const Section = require("../models/Section");
+const Student = require("../models/Student");
+const TemporaryToken = require("../models/TemporaryToken");
+const { sendEmail } = require("../utils/Email");
+const { resetPasswordTemplate } = require("../utils/templates/EmailTemplates");
+const { signAccessToken } = require("../utils/tokenUtils");
 
 const models = {
   teacher: Teacher,
   subject: Subject,
   class: Class,
   section: Section,
-  student: Student
+  student: Student,
 };
 
 const getDistinctValues = async (req, res) => {
@@ -60,7 +65,9 @@ const getDistinctValues = async (req, res) => {
         });
       }
 
-      const refValues = await RefModel.find({ schoolId }).select("_id name").lean();
+      const refValues = await RefModel.find({ schoolId })
+        .select("_id name")
+        .lean();
       const values = refValues.map((item) => ({
         id: item._id,
         value: item.name,
@@ -100,4 +107,64 @@ const getDistinctValues = async (req, res) => {
   }
 };
 
-module.exports = { getDistinctValues };
+const sendEmailController = async (req, res) => {
+  const { type, data } = req.body;
+
+  try {
+    const user = await User.findById(data.id);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        status: false,
+      });
+    }
+
+    switch (type) {
+      case "RESET_PASSWORD": {
+        await TemporaryToken.deleteMany({
+          userId: user._id,
+          tokenType: "RESET_PASSWORD",
+        });
+
+        let token = signAccessToken({
+          data: { id: user._id, name: user.name },
+          time: new Date(),
+        });
+
+        
+        await TemporaryToken.create({
+          userId: user._id,
+          tokenType: "RESET_PASSWORD",
+          token,
+        });
+        
+        token = encodeURIComponent(token)
+        
+        await sendEmail(
+          user.email,
+          "Reset your Edusphere password",
+          resetPasswordTemplate(user.name, token)
+        );
+
+        return res.status(200).json({
+          message: "Reset password email sent successfully.",
+          status: true,
+        });
+      }
+
+      default:
+        return res.status(400).json({
+          message: "Invalid email type",
+          status: false,
+        });
+    }
+  } catch (err) {
+    console.error("Error in sendEmailController:", err);
+    res.status(500).json({
+      message: "Internal Server Error",
+      status: false,
+    });
+  }
+};
+
+module.exports = { getDistinctValues, sendEmailController };

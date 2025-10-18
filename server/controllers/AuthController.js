@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const User = require("../models/AuthSchema");
-const Student = require("../models/Student");
-const Teacher = require("../models/Teacher");
-const Parent = require("../models/Parent");
+const TemporaryToken = require("../models/TemporaryToken");
 const School = require("../models/SchoolSchema");
 const Admin = require("../models/Admin");
 const bcrypt = require("bcrypt");
@@ -175,14 +173,7 @@ const signupController = async (req, res) => {
     await sendEmail(
       email,
       `Hey ${name}, You’re Officially Part of Edusphere 🚀`,
-      signupTemplate(
-        name,
-        school.name,
-        `${process.env.FRONTENDPOINT}/dashboard`, // add env files
-        `${process.env.FRONTENDPOINT}/help`,
-        `${process.env.FRONTENDPOINT}/demo`,
-        `${process.env.FRONTENDPOINT}/contact`
-      )
+      signupTemplate(name, school.name)
     );
 
     res.status(201).json({
@@ -232,13 +223,60 @@ const searchUser = async (req, res) => {
   }
 };
 
+const verifyTemporaryToken = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    let { token } = req.body;
+
+    const tokenData = await TemporaryToken.findOne({
+      token,
+      used: false,
+    }).session(session);
+
+    console.log(token, tokenData)
+
+    if (!tokenData) {
+      return res.status(404).json({
+        message: "Invalid or expired token.",
+        status: false,
+      });
+    }
+
+    if (tokenData.expireAt < new Date()) {
+      await TemporaryToken.deleteOne({ _id: tokenData._id });
+      return res.status(400).json({
+        message: "Token expired. Please request a new reset link.",
+        status: false,
+      });
+    }
+
+    const decoded = verifyAccessToken(token);
+
+    if (!decoded?.data?.id) {
+      return res.status(400).json({ message: "Invalid token.", status: false });
+    }
+
+    session.commitTransaction();
+    return res.status(200).json({
+      message: "Token verified successfully.",
+      status: true,
+      userId: decoded.data.id,
+    });
+  } catch (err) {
+    session.abortTransaction();
+    console.error(err);
+    res.status(500).json({ message: "Server error", status: false });
+  }
+};
+
 const forgetPassword = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    let { email, password } = req.body;
+    let { userId, password, token } = req.body;
 
-    let user = await User.findOne({ email }).session(session);
+    let user = await User.findOne({ _id: userId }).session(session);
 
     if (!user) {
       await session.abortTransaction();
@@ -251,6 +289,14 @@ const forgetPassword = async (req, res) => {
     user.password = password;
 
     await user.save({ session });
+
+    if (token) {
+      await TemporaryToken.updateOne(
+        { token, userId, used: false },
+        { $set: { used: true } },
+        { session }
+      );
+    }
 
     await session.commitTransaction();
     session.endSession();
@@ -592,6 +638,7 @@ module.exports = {
   loginController,
   signupController,
   searchUser,
+  verifyTemporaryToken,
   forgetPassword,
   verify,
   revokeAll,

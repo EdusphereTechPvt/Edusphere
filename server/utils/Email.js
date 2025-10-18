@@ -9,8 +9,15 @@ export const sendEmail = async (to, subject, template) => {
       subject,
       html: template,
     });
-    console.log("Email sent:", data);
+    if (data.error) {
+      console.error("Resend error:", data.error);
+      throw new Error(data.error.message || "Email send failed");
+    }
+
+    console.log("Email sent successfully:", data);
+    return data;
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("Error sending email:", error.message || error);
+    throw error;
   }
 };

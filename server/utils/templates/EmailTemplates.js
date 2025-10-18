@@ -1,4 +1,4 @@
-export const signupTemplate = (userName, school,dashboardLink, helpLink, demoLink, supportLink) => {
+export const signupTemplate = (userName, school) => {
 
 return `
 <!DOCTYPE html>
@@ -33,7 +33,7 @@ return `
           </p>
 
           <div style="text-align:center;margin:30px 0;">
-            <a href="${dashboardLink}" 
+            <a href="${process.env.FRONTEND_URL}/dashboard" 
                style="background-color:#3b82f6;color:#ffffff;text-decoration:none;
                       padding:12px 28px;border-radius:6px;font-weight:bold;
                       font-size:16px;display:inline-block;">
@@ -46,9 +46,9 @@ return `
           </p>
 
           <div style="text-align:center;margin-top:20px;">
-            <a href="${helpLink}" style="color:#3b82f6;text-decoration:none;margin:0 10px;font-size:14px;">Help Center</a> |
-            <a href="${demoLink}" style="color:#3b82f6;text-decoration:none;margin:0 10px;font-size:14px;">Request a Demo</a> |
-            <a href="${supportLink}" style="color:#3b82f6;text-decoration:none;margin:0 10px;font-size:14px;">Contact Support</a>
+            <a href="${process.env.FRONTEND_URL}/help" style="color:#3b82f6;text-decoration:none;margin:0 10px;font-size:14px;">Help Center</a> |
+            <a href="${process.env.FRONTEND_URL}/demo" style="color:#3b82f6;text-decoration:none;margin:0 10px;font-size:14px;">Request a Demo</a> |
+            <a href="${process.env.FRONTEND_URL}/contact" style="color:#3b82f6;text-decoration:none;margin:0 10px;font-size:14px;">Contact Support</a>
           </div>
 
           <hr style="margin:30px 0;border:none;border-top:1px solid #e5e7eb;" />
@@ -63,4 +63,68 @@ return `
   </body>
 </html>
 `
+}
+
+export const resetPasswordTemplate = (name,token) => {
+  return `
+  <!DOCTYPE html>
+<html lang="en" style="margin:0;padding:0;">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Reset Your Edusphere Password</title>
+  </head>
+  <body style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background-color:#f4f7fb;">
+    <table align="center" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.1);margin-top:40px;">
+      <tr>
+        <td align="center" style="background-color:#3b82f6;padding:30px 20px;">
+          <h1 style="color:#ffffff;margin:0;font-size:28px;">Reset Your Password 🔐</h1>
+          <p style="color:#e0e7ff;margin:8px 0 0 0;font-size:16px;">Your security matters to us at Edusphere</p>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:30px 40px;color:#111827;">
+          <p style="font-size:16px;">Hello <strong>${name}</strong>,</p>
+
+          <p style="font-size:15px;line-height:1.6;">
+            We received a request to reset your password for your <strong>Edusphere</strong> account.
+            If this was you, you can safely reset your password using the link below.
+          </p>
+
+          <div style="text-align:center;margin:30px 0;">
+            <a href="${process.env.FRONTEND_URL}/forgotpassword/${token}" 
+               style="background-color:#3b82f6;color:#ffffff;text-decoration:none;
+                      padding:12px 28px;border-radius:6px;font-weight:bold;
+                      font-size:16px;display:inline-block;">
+              Reset My Password 🔁
+            </a>
+          </div>
+
+          <p style="font-size:14px;line-height:1.6;color:#4b5563;">
+            This link will be active for the next <strong>10 minutes</strong>.  
+            If you did not request a password reset, please ignore this message — your account will remain secure.
+          </p>
+
+          <p style="font-size:14px;color:#4b5563;margin-top:20px;">
+            After resetting, you’ll be able to access your dashboard and continue your learning journey smoothly.
+          </p>
+
+          <div style="text-align:center;margin-top:30px;">
+            <a href="${process.env.FRONTEND_URL}/help" style="color:#3b82f6;text-decoration:none;margin:0 10px;font-size:14px;">Help Center</a> |
+            <a href="${process.env.FRONTEND_URL}/contact" style="color:#3b82f6;text-decoration:none;margin:0 10px;font-size:14px;">Contact Support</a>
+          </div>
+
+          <hr style="margin:30px 0;border:none;border-top:1px solid #e5e7eb;" />
+
+          <p style="font-size:12px;color:#9ca3af;text-align:center;">
+            © 2025 Edusphere. All rights reserved. <br />
+            Transforming education, one school at a time.
+          </p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+  `
 }
