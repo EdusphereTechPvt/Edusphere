@@ -32,7 +32,7 @@ const StatCard = ({ label, value, change, text, icon: Icon, iconStyles, classNam
       {Icon && <Icon className="w-6 h-6 mr-2" />}
       <Typography
         fontWeight="medium"
-        color={change.includes("+") ? "green" : "red"}
+        color={change?.includes("+") ? "green" : "red"}
       >
         {change}
       </Typography>

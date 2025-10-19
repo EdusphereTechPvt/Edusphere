@@ -8,6 +8,47 @@ import {
   Delete,
 } from "@mui/icons-material";
 
+export const manageConfig = {
+  header: {
+    title: "Manage",
+    subtitle: "Centralized control panel for Edusphere Admins"
+  },
+  sections: [
+    {
+      type: "statcards",
+      items: [
+        {
+          name: "total",
+          label: "Total Users",
+        },
+        {
+          name: "admin",
+          label: "Admins",
+          isRole: true
+        },
+        {
+          name: "teacher",
+          label: "Teachers",
+          isRole: true
+        },
+        {
+          name: "student",
+          label: "Students",
+          isRole: true
+        },
+        {
+          name: "active",
+          label: "Active",
+        },
+        {
+          name: "inactive",
+          label: "In-Active",
+        },
+      ]
+    }
+  ]
+}
+
 export const listConfig = {
   //Just for information if there is a object inside the array then you can use like object[fieldName]
   student: {

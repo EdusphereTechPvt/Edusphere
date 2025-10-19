@@ -14,9 +14,9 @@ const SectionSchema = new mongoose.Schema({
   capacity: { type: Number, default: 40 },
   roomNumber: { type: String },
   schoolId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "School",
-      required: true,
+      required: true
     },
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });

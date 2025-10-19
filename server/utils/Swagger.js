@@ -12,6 +12,7 @@ const pathTagMap = {
   "/class": "Class",
   "/section": "Section",
   "/subject": "Subject",
+  "/user": "User",
   "/permission": "Permission",
   "/helpcenter": "HelpCenter",
 };
@@ -31,6 +32,7 @@ const doc = {
     { name: "Class", description: "Class profile management" },
     { name: "Section", description: "Section profile management" },
     { name: "Subject", description: "Subject profile management" },
+    { name: "User", description: "User management" },
     { name: "Permission", description: "Element access control management" },
     { name: "General", description: "General endpoints" },
     { name: "HelpCenter", description: "Help Center article management" },
