@@ -7,10 +7,15 @@ import {
   AccordionDetails,
   Button,
   TableCell,
+  Tooltip,
+  Checkbox,
+  TextField,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Link from "next/link";
 import Dropdown from "../components/Dropdown/Dropdown";
+import LableChip from "../components/LableChip/LableChip";
+import { formatLabel } from "./Format";
 
 export const DynamicRenderer = ({
   config,
@@ -18,6 +23,7 @@ export const DynamicRenderer = ({
   isDrawer = false,
   onClick,
   path = "",
+  onChange,
 }) => {
   switch (config?.type?.toLowerCase()) {
     case "points":
@@ -204,13 +210,135 @@ export const DynamicRenderer = ({
         </Box>
       );
 
+    case "labelchip":
+      return (
+        <LableChip
+          key={index}
+          variant={config.variant || "outlined"}
+          styles={config.styles}
+          rowStyle={config.rowStyle}
+          value={config.text}
+        />
+      );
+
+    case "checkbox":
+      return (
+        <Tooltip key={index} title={config?.title || ""} enterDelay={500}>
+          <Checkbox
+            checked={config?.checked || false}
+            onChange={onChange}
+            sx={{
+              transform: { xs: "scale(0.7)", md: "scale(0.9)" },
+              padding: 0.5,
+              ...config?.styles,
+            }}
+          />
+        </Tooltip>
+      );
+
+    case "inputfield": {
+      const handleChange = (e) => {
+        let value = e.target.value;
+        value = value.slice(0, config?.maxLength || value.length).trimStart();
+
+        if (config?.fieldType === "text") {
+          if (config?.pattern && !new RegExp(config?.pattern).test(value))
+            return;
+        }
+
+        if (config?.fieldType === "number") {
+          if (config?.maxLength && value.length > config?.maxLength) return;
+          if (value !== "") value = Number(value);
+          if (config?.max !== undefined && value > config?.max)
+            value = config?.max;
+        }
+        config?.onChangeValue(
+          typeof value === "string" ? formatLabel(value).trimStart() : value
+        );
+      };
+
+      return (
+        <>
+          {config?.fieldType === "number" && (
+            <style jsx>{`
+              input::-webkit-inner-spin-button,
+              input::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+              }
+              input[type="number"] {
+                -moz-appearance: textfield;
+              }
+            `}</style>
+          )}
+          <TextField
+            key={index}
+            value={config?.text}
+            placeholder={config?.placeholder}
+            onChange={handleChange}
+            onBlur={config?.onBlur}
+            variant="outlined"
+            size="small"
+            fullWidth
+            type={config?.fieldType}
+            InputProps={{
+              inputProps: {
+                pattern: config?.pattern || undefined,
+                style: { MozAppearance: "textfield" }, // Firefox
+              },
+            }}
+            sx={{
+              fontSize: { xs: "0.7rem", sm: "0.8rem", md: "0.9rem" },
+              "& input[type=number]::-webkit-inner-spin-button": {
+                WebkitAppearance: "none",
+                margin: 0,
+              },
+              "& input[type=number]::-webkit-outer-spin-button": {
+                WebkitAppearance: "none",
+                margin: 0,
+              },
+              "& .MuiOutlinedInput-input": { py: "6px" },
+              ...config?.styles.inlineStyle,
+            }}
+            className={config?.styles.className || ""}
+          />
+        </>
+      );
+    }
+
+    case "dropdown":
+      return (
+        <Dropdown
+          value={config.text}
+          data={config}
+          style={config.styles}
+          resetFlag={config.resetFlag}
+          onSelect={config.onChangeValue}
+          onBlur={config.onBlur}
+        />
+      );
+
     default:
-      return null;
+      return (
+        <Typography
+          sx={{
+            fontSize: {
+              xs: "0.65rem",
+              sm: "0.75rem",
+              md: "0.85rem",
+            },
+            ...config.styles,
+          }}
+        >
+          {config.text}
+        </Typography>
+      );
   }
 };
 
 //topHeaderRenderer
-export const renderTopHeader = (items) => {
+export const renderTopHeader = (items, data = {}) => {
+  const { tableData, isEditable, selected, handleAction } = data;
   return items?.map(
     (
       {
@@ -280,7 +408,9 @@ export const renderTopHeader = (items) => {
             <Button
               key={idx}
               variant={variant || "contained"}
-              onClick={() => handleAction(action, actionValue, actionUse)}
+              onClick={() =>
+                handleAction(action, actionValue, actionUse, data)
+              }
               sx={{
                 borderRadius: "1.5rem",
                 flexWrap: "nowrap",
@@ -296,7 +426,13 @@ export const renderTopHeader = (items) => {
               }}
             >
               {Icon && <Icon sx={{ ...styles?.iconStyles }} />}
-              <div style={{ ...styles?.labelStyles }}>{label}</div>
+              <div style={{ ...styles?.labelStyles }}>
+                {actionUse === "edit" && data?.isEditable !== undefined
+                  ? data.isEditable
+                    ? "Done"
+                    : "Edit"
+                  : label}
+              </div>
             </Button>
           );
 

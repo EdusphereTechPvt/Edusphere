@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Table,
   TableHead,
@@ -11,6 +11,8 @@ import {
   Typography,
   TableFooter,
   Tooltip,
+  Checkbox,
+  Box,
 } from "@mui/material";
 import CustomPagination from "./Pagination";
 import {
@@ -18,9 +20,8 @@ import {
   useHandleAction,
 } from "@/app/utils/HelperFunctions";
 import { useMemo } from "react";
-import LableChip from "../LableChip/LableChip";
-import { Checkbox } from "@mui/material";
-import { renderTopHeader } from "@/app/utils/DynamicRender";
+import { DynamicRenderer, renderTopHeader } from "@/app/utils/DynamicRender";
+import { getSubjectColors } from "@/app/config/StatusConfig";
 
 export const TableComponent = ({
   topHeader = [],
@@ -34,6 +35,7 @@ export const TableComponent = ({
   styles = {},
   colors = [],
   clickableFields = [],
+  editableFields = [],
   checkBox = true,
   selectedRow,
   onPaginationChange,
@@ -43,6 +45,12 @@ export const TableComponent = ({
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [statusRowStyle, setStatusRowStyle] = useState({});
   const [selected, setSelected] = useState([]);
+  const [isEditable, setEditable] = useState(false);
+  const [tableData, setTableData] = useState(data);
+
+  useEffect(() => {
+    setTableData(data);
+  }, [data]);
 
   //pagination logic
   useEffect(() => {
@@ -51,7 +59,8 @@ export const TableComponent = ({
 
   useEffect(() => {
     if (selectedRow) {
-      selectedRow(selected);
+      const newData = selected.map(({ select, ...rest }) => rest);
+      selectedRow(newData);
     }
   }, [selected]);
 
@@ -61,14 +70,18 @@ export const TableComponent = ({
 
   const startIndex = (page - 1) * rowsPerPage;
   const paginatedData = useMemo(
-    () => data.slice(startIndex, startIndex + rowsPerPage),
-    [data, page, rowsPerPage]
+    () => tableData.slice(startIndex, startIndex + rowsPerPage),
+    [tableData, page, rowsPerPage]
   );
   const date = new Date();
   const currentDay = date.toLocaleDateString("en-US", { weekday: "long" });
 
-  const handleCellClick = (header, value, rowData) => {
-    if (onClick) onClick(header, value, rowData);
+  const getCellData = (row, header) => {
+    if (!row || !header) return null;
+    const key = Object.keys(row).find(
+      (k) => k.toLowerCase() === header.toLowerCase()
+    );
+    return key ? row[key] : null;
   };
 
   const handleSelect = (row) => {
@@ -86,6 +99,26 @@ export const TableComponent = ({
       setSelected([...data]);
     }
   };
+
+  const handleEdit = useCallback(
+    (rowIndex, header, newValue) => {
+      const updatedData = [...tableData];
+      updatedData[rowIndex] = {
+        ...updatedData[rowIndex],
+        [header]: newValue,
+      };
+      setTableData(updatedData);
+
+      setSelected((prev) =>
+        prev.includes(tableData[rowIndex])
+          ? prev.map((r) =>
+              r === tableData[rowIndex] ? { ...r, [header]: newValue } : r
+            )
+          : prev
+      );
+    },
+    [tableData]
+  );
 
   return (
     <div className={`${className}`}>
@@ -108,8 +141,18 @@ export const TableComponent = ({
                   <div className="flex flex-row items-center justify-between gap-4 w-full px-2">
                     {/* left */}
                     <div className="flex items-center justify-start gap-5">
-                      {topHeader.filter((item) =>
-                        ["text", "search", "dropdown"].includes(item.type)
+                      {renderTopHeader(
+                        topHeader.filter((item) =>
+                          ["text", "search", "dropdown"].includes(item.type)
+                        ),
+                        {
+                          isEditable,
+                          selected,
+                          setEditable,
+                          tableData,
+                          setTableData,
+                          handleAction,
+                        }
                       )}
                     </div>
                     {/* right */}
@@ -117,7 +160,15 @@ export const TableComponent = ({
                       {renderTopHeader(
                         topHeader.filter((item) =>
                           ["button", "link"].includes(item.type)
-                        )
+                        ),
+                        {
+                          isEditable,
+                          selected,
+                          setEditable,
+                          tableData,
+                          setTableData,
+                          handleAction,
+                        }
                       )}
                     </div>
                   </div>
@@ -139,7 +190,7 @@ export const TableComponent = ({
                   }}
                   padding="checkbox"
                 >
-                  <Tooltip title="Select All" enterDelay={500}>
+                  <Tooltip popover="top" title="Select All" enterDelay={500}>
                     <Checkbox
                       checked={selected.length === data.length}
                       onChange={handleSelectAll}
@@ -151,39 +202,43 @@ export const TableComponent = ({
                   </Tooltip>
                 </TableCell>
               )}
-
               {headers?.map((header, index) => (
                 <TableCell
                   key={index}
                   sx={{
                     width: `${100 / headers.length}%`,
-
-                    fontWeight: 600,
                     whiteSpace: "normal",
                     px: { xs: 1, sm: 1.5, md: 2 },
                     color: "#9ca3af",
                     borderLeft:
                       type === "timetable"
                         ? currentDay === header
-                          ? "2px solid #3b82f6 "
+                          ? "3px solid #3b82f6 "
                           : "1px solid #e5e7eb"
                         : "none",
                     borderRight:
                       type === "timetable"
                         ? currentDay === header
-                          ? "2px solid #3b82f6 "
+                          ? "3px solid #3b82f6 "
                           : "1px solid #e5e7eb"
                         : "none",
-                    fontSize: {
-                      xs: "0.75rem",
-                      sm: "0.82rem",
-                      md: "0.87rem",
-                      lg: "0.9rem",
-                    },
                     ...styles?.headerCell,
                   }}
                 >
-                  {header}
+                  <DynamicRenderer
+                    config={{
+                      text: header,
+                      styles: {
+                        fontWeight: 600,
+                        fontSize: {
+                          xs: "0.75rem",
+                          sm: "0.82rem",
+                          md: "0.87rem",
+                          lg: "0.9rem",
+                        },
+                      },
+                    }}
+                  />
                 </TableCell>
               ))}
             </TableRow>
@@ -192,162 +247,191 @@ export const TableComponent = ({
           {/* Table Body */}
           <TableBody>
             {paginatedData?.length > 0 ? (
-              paginatedData?.map((row, rowIndex) => {
-                switch (type) {
-                  case "timetable":
-                    return (
-                      <TableRow key={rowIndex}>
-                        {headers.map((header, colIndex) => (
+              paginatedData.map((row, rowIndex) => {
+                if (type === "timetable") {
+                  return (
+                    <TableRow key={rowIndex}>
+                      {headers.map((header, colIndex) => {
+                        const cellData = getCellData(row, header);
+                        const { bg, text, hover } = getSubjectColors(
+                          cellData?.subject || ""
+                        );
+
+                        return (
                           <TableCell
                             key={colIndex}
                             sx={{
-                              fontSize: { xs: "0.75rem", lg: "0.85rem" },
-                              fontWeight: header === "Time" ? "bold" : "500",
+                              textAlign: "center",
                               borderRight:
                                 header === currentDay
-                                  ? "2px solid #3b82f6 "
+                                  ? "3px solid #3b82f6"
                                   : "1px solid #e5e7eb",
-                              textAlign: "center",
-                              backgroundColor:
-                                row[header] &&
-                                getBackgroundColor(row[header].status, colors),
                               borderLeft:
                                 header === currentDay
-                                  ? "2px solid #3b82f6 "
+                                  ? "3px solid #3b82f6"
                                   : "1px solid #e5e7eb",
-                              borderRadius:
-                                row[header] &&
-                                row[header].status === "Current Period"
-                                  ? "20px"
-                                  : "0px",
+                              backgroundColor: bg,
+                              cursor: cellData?.subject && cellData?.teacher ? "pointer" : "default",
+                              transition: "0.2s",
+                              color: text,
+                              "&:hover": {
+                                backgroundColor: cellData?.subject && cellData?.teacher
+                                  ? hover
+                                  : "transparent",
+                              },
+                            }}
+                            onClick={() => {
+                              if (cellData?.subject)
+                                handleCellClick(header, cellData);
                             }}
                           >
-                            {row[header] && row[header].value ? (
-                              row[header].value.split("\n").map((line, idx) => (
-                                <div
-                                  key={idx}
-                                  style={{
-                                    fontWeight: idx === 0 ? "bold" : "",
-                                  }}
-                                >
-                                  {line}
-                                </div>
-                              ))
-                            ) : (
-                              <div
-                                style={{
-                                  fontWeight: "500",
-                                  fontSize: "2.5rem",
+                            {cellData &&
+                            typeof cellData === "object" &&
+                            Object.values(cellData).some(Boolean) ? (
+                              <Box
+                                fontSize={{
+                                  xs: "0.75rem",
+                                  sm: "0.82rem",
+                                  md: "0.87rem",
+                                  lg: "0.9rem",
                                 }}
+                                className="flex flex-col items-center leading-tight text-center"
                               >
-                                -
-                              </div>
+                                {cellData.subject && (
+                                  <Typography
+                                    variant="subtitle2"
+                                    sx={{
+                                      fontWeight: 600,
+                                      fontSize: "1em",
+                                      color: text,
+                                    }}
+                                  >
+                                    {cellData.subject}
+                                  </Typography>
+                                )}
+                                {cellData.teacher && (
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      fontStyle: "italic",
+                                      fontSize: "0.9em",
+                                      color: "#555",
+                                    }}
+                                  >
+                                    {cellData.teacher}
+                                  </Typography>
+                                )}
+                                {cellData.roomno && (
+                                  <Typography
+                                    variant="caption"
+                                    sx={{ fontSize: "0.8em", color: "#777" }}
+                                  >
+                                    Room {cellData.roomno}
+                                  </Typography>
+                                )}
+                              </Box>
+                            ) : (
+                              <Typography
+                                variant="body2"
+                                sx={{ color: cellData === "" ? "#999" : text }}
+                              >
+                                {cellData === "" ? "-" : cellData}
+                              </Typography>
                             )}
                           </TableCell>
-                        ))}
-                      </TableRow>
-                    );
-                  default:
-                    return (
-                      <TableRow
-                        key={rowIndex}
-                        sx={{
-                          backgroundColor: statusRowStyle[rowIndex]?.bg,
-                          "&:hover": {
-                            backgroundColor: statusRowStyle[rowIndex]?.hoverBg,
-                          },
-                        }}
-                      >
-                        {checkBox && type !== "timetable" && (
-                          <TableCell
+                        );
+                      })}
+                    </TableRow>
+                  );
+                } else {
+                  return (
+                    <TableRow
+                      key={rowIndex}
+                      sx={{
+                        backgroundColor: statusRowStyle[rowIndex]?.bg,
+                        "&:hover": {
+                          backgroundColor: statusRowStyle[rowIndex]?.hoverBg,
+                        },
+                      }}
+                    >
+                      {checkBox && type !== "timetable" && (
+                        <TableCell
+                          sx={{
+                            minWidth: 50,
+                            whiteSpace: "normal",
+                            px: { xs: 1, sm: 1.5, md: 2 },
+                          }}
+                          padding="checkbox"
+                        >
+                          <Checkbox
+                            checked={selected.includes(row)}
+                            onChange={() => handleSelect(row)}
                             sx={{
-                              minWidth: 50,
-                              whiteSpace: "normal",
-                              px: { xs: 1, sm: 1.5, md: 2 },
+                              transform: {
+                                xs: "scale(0.7)",
+                                md: "scale(0.9)",
+                              },
+                              padding: 0.5,
                             }}
-                            padding="checkbox"
+                          />
+                        </TableCell>
+                      )}
+                      {headers.map((header, colIndex) => {
+                        const editableFieldConfig = editableFields.find(
+                          (f) => f.name?.toLowerCase() === header?.toLowerCase()
+                        );
+                        const type =
+                          header?.toLowerCase() === "status"
+                            ? "labelchip"
+                            : selected.includes(row) && isEditable
+                            ? editableFieldConfig?.type
+                            : "default";
+                        return (
+                          <TableCell
+                            key={colIndex}
+                            onClick={
+                              clickableFields.some(
+                                (field) =>
+                                  field.toLowerCase() === header.toLowerCase()
+                              )
+                                ? () =>
+                                    handleCellClick(header, row[header], row)
+                                : undefined
+                            }
+                            sx={{
+                              cursor: clickableFields.some(
+                                (field) =>
+                                  field.toLowerCase() === header.toLowerCase()
+                              )
+                                ? "pointer"
+                                : "default",
+                            }}
                           >
-                            <Checkbox
-                              checked={selected.includes(row)}
-                              onChange={() => handleSelect(row)}
-                              sx={{
-                                transform: {
-                                  xs: "scale(0.7)",
-                                  md: "scale(0.9)",
-                                },
-                                padding: 0.5,
+                            <DynamicRenderer
+                              config={{
+                                ...editableFieldConfig,
+                                type: type,
+                                text: getCellData(row, header),
+                                styles: columnStyles?.[header] || {},
+                                rowStyle: (colors) =>
+                                  setStatusRowStyle((prev) => ({
+                                    ...prev,
+                                    [rowIndex]: colors,
+                                  })),
+                                onChangeValue: (newVal) =>
+                                  handleEdit(rowIndex, header, newVal),
                               }}
                             />
                           </TableCell>
-                        )}
-                        {headers?.map((header, colIndex) => {
-                          const cellValue =
-                            row[header] || row[header.toLowerCase()];
-                          const isClickable = clickableFields.some(
-                            (field) =>
-                              field.toLowerCase() === header.toLowerCase()
-                          );
-
-                          return (
-                            <TableCell
-                              key={colIndex}
-                              onClick={
-                                isClickable
-                                  ? () => handleCellClick(header, cellValue)
-                                  : undefined
-                              }
-                              sx={{
-                                cursor: isClickable ? "pointer" : "default",
-                                transition: "filter 0.2s",
-                                "&:hover": {
-                                  filter: isClickable
-                                    ? "brightness(0.7)"
-                                    : "none",
-                                },
-                              }}
-                            >
-                              {/* check to add chip */}
-                              {header.toLowerCase().includes("status") ? (
-                                <LableChip
-                                  value={cellValue}
-                                  variant="outlined"
-                                  style={columnStyles?.[header]}
-                                  rowStyle={(colors) =>
-                                    setStatusRowStyle((prev) => ({
-                                      ...prev,
-                                      [rowIndex]: colors,
-                                    }))
-                                  }
-                                />
-                              ) : (
-                                <Typography
-                                  sx={{
-                                    fontSize: {
-                                      xs: "0.65rem",
-                                      sm: "0.75rem",
-                                      md: "0.85rem",
-                                    },
-
-                                    ...columnStyles?.[header],
-                                  }}
-                                >
-                                  {cellValue}
-                                </Typography>
-                              )}
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    );
+                        );
+                      })}
+                    </TableRow>
+                  );
                 }
               })
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={headers?.length}
-                  align="center"
-                  sx={{ py: 6, color: "gray" }}
-                >
+                <TableCell colSpan={headers.length + 1} align="center">
                   No data available
                 </TableCell>
               </TableRow>

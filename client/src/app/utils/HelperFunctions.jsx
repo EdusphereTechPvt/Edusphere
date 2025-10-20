@@ -13,10 +13,8 @@ export const useHandleAction = () => {
   const handleAction = (action, actionValue, actionUse, data) => {
     switch (action) {
       case "navigate":
-        if (actionUse === "edit")
-          router.push(`/${actionValue}?id=${data.id}`);
-        if (actionUse === "add")
-          router.push(`/${actionValue}`);
+        if (actionUse === "edit") router.push(`/${actionValue}?id=${data.id}`);
+        if (actionUse === "add") router.push(`/${actionValue}`);
 
         break;
       case "modal":
@@ -24,6 +22,21 @@ export const useHandleAction = () => {
           setModalProps({ type: "warning", action, actionValue, data });
         }
         break;
+      case "table":
+        switch(actionUse){
+          case "edit":
+            if (data?.setEditable && data?.isEditable !== undefined) {
+              const newMode = !data.isEditable;
+              data.setEditable(newMode);
+            }
+        //     case "fillter":
+        //       if (actionUse === "dropdownFilter") {
+        // const { tableData, setTableData, field, value } = data;
+        // if (!setTableData || !tableData) return;
+
+        // const filteredData = tableData.filter((item) => item[field] === value);
+        // setTableData(filteredData);
+      }
       default:
         break;
     }
