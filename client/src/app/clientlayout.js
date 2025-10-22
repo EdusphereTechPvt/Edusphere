@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import Header from "./components/Header/Header";
@@ -9,12 +8,15 @@ import { Provider } from "react-redux";
 import store from "./store";
 import { ping } from "./services/AuthService";
 import Footer from "./components/Footer/Footer";
+import Loader from "./components/Loader/Loader.jsx";
+import LoaderConfig from "./config/LoaderConfig";
 
 const ClientLayout = ({ children }) => {
   const [mounted, setMounted] = useState(false);
   const [userData, setUserData] = useState(null)
   const path = usePathname();
-   const [intervalId, setIntervalId] = useState(null);
+  const [intervalId, setIntervalId] = useState(null);
+  const [pageLoading, setPageLoading] = useState(true);
 
   const sendPing = async () => {
     try{
@@ -39,7 +41,6 @@ const ClientLayout = ({ children }) => {
       setIntervalId(null);
     }
 
-
     if (!errorRoutes.includes(path) && !generalRoutes.includes(path) && !excludeRoutes.includes(path)) { 
       sendPing();
       const id = setInterval(() => {
@@ -57,9 +58,42 @@ const ClientLayout = ({ children }) => {
       setMounted(true);
     }, []);
 
-    if (!mounted) {
-      return null;
-    }
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setPageLoading(false);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }, [path]);
+
+  if (!mounted) {
+    return null;
+  }
+
+  const getLoaderConfig = (pathname) => {
+    if (pathname === '/')
+    return LoaderConfig.home;
+    if (pathname.startsWith('/about'))
+      return LoaderConfig.about;
+    if (pathname.startsWith('/contact'))
+      return LoaderConfig.contact;
+    if (pathname.startsWith('/demo'))
+      return LoaderConfig.demo;
+    if (pathname.startsWith('/pricing'))
+      return LoaderConfig.pricing;
+    if (pathname.startsWith('/list/'))
+      return LoaderConfig.list;
+    if (pathname.startsWith('/auth/'))
+      return LoaderConfig.auth;
+    if (pathname.startsWith('/ptm-scheduling'))
+      return LoaderConfig.ptm;
+      // return null;
+  };
+
+  if (pageLoading && !excludeRoutes.includes(path) && !errorRoutes.includes(path)) {
+    const loaderConfig = getLoaderConfig(path);
+    return <Loader config={loaderConfig} />;
+  }
 
   return (
     <Provider store={store}>
