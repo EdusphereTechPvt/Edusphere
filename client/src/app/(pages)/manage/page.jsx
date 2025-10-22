@@ -21,7 +21,7 @@ const Manage = () => {
     total: 0,
     active: 0,
     inactive: 0,
-    roles: { admin: 0, teacher: 0, student: 0 },
+    roles: { admin: 0, teacher: 0, student: 0, parent: 0 },
   });
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const Manage = () => {
       total: result.length,
       active: 0,
       inactive: 0,
-      roles: { admin: 0, teacher: 0, student: 0 },
+      roles: { admin: 0, teacher: 0, student: 0, parent: 0 },
     };
 
     result.forEach((user) => {
@@ -188,7 +188,7 @@ const Manage = () => {
 
       <div className="flex items-center gap-4 flex-wrap my-12">
         {manageConfig.sections[2].items.map((item, index) => (
-          <div key={index} className="flex-1">
+          <div key={index} className="flex-1 w-full">
             <GenericCard
               title={item.title}
               icon={item.icon}
