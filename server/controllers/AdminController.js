@@ -165,7 +165,7 @@ const getAllAdminsList = async (req, res) => {
     }
 
     const formattedAdmins = admins.map((admin) => ({
-      employeeId: admin.employeeId,
+      adminId: admin.adminId,
       name: admin.userId?.name,
       email: admin.userId?.email,
       contactNumber: admin.contactNumber,

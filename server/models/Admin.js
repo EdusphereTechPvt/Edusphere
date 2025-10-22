@@ -13,7 +13,7 @@ const AdminProfileSchema = new mongoose.Schema(
       ref: "School",
       required: true
     },
-    employeeId: {
+    adminId: {
       type: String,
       unique: true,
       sparse:true,

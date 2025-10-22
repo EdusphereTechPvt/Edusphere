@@ -272,10 +272,12 @@
 // };
 
 // module.exports = { addOrUpdateStudent, getStudentDetails, deleteStudent, getAllStudentsList, getProfileCardData };
+
+
 const { default: mongoose } = require("mongoose");
 const User = require("../models/AuthSchema");
 const Student = require("../models/Student");
-// const School = require("../models/SchoolSchema");
+const School = require("../models/SchoolSchema");
 const { sendEmail } = require("../utils/Email");
 const { signupTemplate } = require("../utils/templates/EmailTemplates");
 const { syncReferences } = require("../utils/Sync");
@@ -314,7 +316,7 @@ const save = async (req, res) => {
       });
     }
 
-    
+    // Check if user exists or create
     let user = await User.findOne({ email: parentEmail }).session(session);
     if (!user) {
       const dobStr = new Date(dateOfBirth).toISOString().split("T")[0].replace(/-/g, "");
@@ -345,7 +347,6 @@ const save = async (req, res) => {
       });
 
       await student.save({ session });
-
       await syncReferences({ action: "save", targetModel: "Student", targetId: student._id, session });
 
       await session.commitTransaction();
@@ -380,7 +381,7 @@ const save = async (req, res) => {
     res.status(201).json({ message: "Student added successfully", data: newStudent, status: true });
   } catch (err) {
     await session.abortTransaction();
-    console.error(err);
+    console.error("Save Student Error:", err);
     res.status(500).json({ message: "Server error during student add/update", status: false });
   } finally {
     session.endSession();
@@ -388,24 +389,20 @@ const save = async (req, res) => {
 };
 
 const getStudentDetails = async (req, res) => {
-  const { id, studentId, name = "", parentEmail = "", parentContactNumber = "" } = req.body;
+  const { id, studentId, name = "", parentContactNumber = "" } = req.body;
 
-  if (![id, studentId, name, parentEmail, parentContactNumber].some(Boolean)) {
-    return res.status(400).json({
-      message: "At least one search field is required",
-      status: false,
-    });
+  if (![id, studentId, name, parentContactNumber].some(Boolean)) {
+    return res.status(400).json({ message: "At least one search field is required", status: false });
   }
 
   const searchFields = {};
   if (id && mongoose.Types.ObjectId.isValid(id)) searchFields._id = id;
   if (studentId) searchFields.studentId = studentId;
   if (name) searchFields.name = { $regex: name, $options: "i" };
-  if (parentEmail) searchFields.parentEmail = { $regex: parentEmail, $options: "i" };
   if (parentContactNumber) searchFields.parentContactNumber = { $regex: parentContactNumber, $options: "i" };
 
   try {
-    const response = await Student.find(searchFields);
+    const response = await Student.find(searchFields).populate("userId", "email studentContactNumber name");
 
     if (response.length === 0) {
       return res.status(404).json({ data: [], message: "No student found", status: false });
@@ -423,7 +420,7 @@ const getStudentDetails = async (req, res) => {
 const getAllStudentsList = async (req, res) => {
   try {
     const students = await Student.find({ schoolId: req.user.schoolId })
-      .populate("userId", "name email dateOfBirth role avatar isActive");
+      .populate("userId", "name email avatar studentContactNumber isActive");
 
     if (!students || students.length === 0) {
       return res.status(200).json({ data: [], message: "No student found", status: false });
@@ -431,13 +428,13 @@ const getAllStudentsList = async (req, res) => {
 
     const formattedStudents = students.map(student => ({
       studentId: student.studentId,
-      name: student.userId?.name,
-      parentEmail: student.parentEmail,
+      name: student.name,
+      email: student.userId?.email || null,
+      studentContactNumber: student.studentContactNumber || student.userId?.studentContactNumber || null,
+      parentName: student.parentName,
       parentContactNumber: student.parentContactNumber,
-      dateOfBirth: student.userId?.dateOfBirth,
-      role: student.userId?.role,
-      avatar: student.userId?.avatar,
-      isActive: student.userId?.isActive,
+      avatar: student.userId?.avatar || null,
+      isActive: student.isActive,
       gender: student.gender,
       classId: student.classId,
       sectionId: student.sectionId,
@@ -449,7 +446,7 @@ const getAllStudentsList = async (req, res) => {
       status: true,
     });
   } catch (err) {
-    console.error("Get All students Error:", err);
+    console.error("Get All Students Error:", err);
     res.status(500).json({ message: "Server error while fetching student details", status: false });
   }
 };
@@ -459,7 +456,7 @@ const getProfileCardData = async (req, res) => {
     const { key, value } = req.body.searchBy;
 
     const studentProfileData = await Student.findOne({ [key]: value })
-      .populate("userId", "name email dateOfBirth role avatar isActive");
+      .populate("userId", "name email avatar studentContactNumber isActive");
 
     if (!studentProfileData) {
       return res.status(404).json({ message: "Student not found", status: false });
@@ -469,17 +466,21 @@ const getProfileCardData = async (req, res) => {
       _id: studentProfileData._id,
       id: studentProfileData.studentId,
       name: studentProfileData.name,
-      avatar: studentProfileData.userId?.avatar,
+      email: studentProfileData.userId?.email || null,
+      studentContactNumber: studentProfileData.studentContactNumber || studentProfileData.userId?.studentContactNumber || null,
+      parentName: studentProfileData.parentName,
+      parentContactNumber: studentProfileData.parentContactNumber,
+      avatar: studentProfileData.userId?.avatar || null,
       classId: studentProfileData.classId,
       sectionId: studentProfileData.sectionId,
-      parentName: studentProfileData.parentName,
-      address: studentProfileData.address,
+      gender: studentProfileData.gender,
+      isActive: studentProfileData.isActive,
     };
 
     res.status(200).json({ status: true, data: formattedStudent });
   } catch (err) {
-    console.error("Get Student Error:", err);
-    res.status(500).json({ message: "Server error while fetching student details", status: false });
+    console.error("Get Profile Card Error:", err);
+    res.status(500).json({ message: "Server error while fetching student profile data", status: false });
   }
 };
 
@@ -503,7 +504,7 @@ const deleteStudent = async (req, res) => {
     res.status(200).json({ message: "Student deleted successfully", status: true });
   } catch (err) {
     await session.abortTransaction();
-    console.error("Delete student error:", err);
+    console.error("Delete Student Error:", err);
     res.status(500).json({ message: "Server error while deleting student", status: false });
   } finally {
     session.endSession();
