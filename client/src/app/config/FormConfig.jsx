@@ -470,10 +470,10 @@ const formConfig = {
             placeholder: "Select Size",
             required: true,
             items: [
-              { value: "Less than 100", id : "Less than 100" },
-              { value: "Between 100 and 250", id : "Between 100 and 250" },
-              { value: "Between 250 and 500", id : "Between 250 and 500" },
-              { value: "More than 500", id : "More than 500" },
+              { value: "Less than 100", id: "Less than 100" },
+              { value: "Between 100 and 250", id: "Between 100 and 250" },
+              { value: "Between 250 and 500", id: "Between 250 and 500" },
+              { value: "More than 500", id: "More than 500" },
             ],
           },
           {
@@ -510,10 +510,10 @@ const formConfig = {
             placeholder: "Select an option",
             required: true,
             items: [
-              { value: "Facebook",  id : "Facebook"},
-              { value: "Google", id : "Google" },
-              { value: "News Paper", id : "New Paper" },
-              { value: "Instagram", id : "Instagram" },
+              { value: "Facebook", id: "Facebook" },
+              { value: "Google", id: "Google" },
+              { value: "News Paper", id: "New Paper" },
+              { value: "Instagram", id: "Instagram" },
             ],
           },
         ],
@@ -1039,6 +1039,146 @@ const formConfig = {
       },
     ],
   },
+  addclass: {
+    api: {
+      fetch: "/class/search",
+      submit: "/class/save",
+      page: {
+        mode: {
+          add: "/form/class/add",
+          edit: "/form/class/edit"
+        }
+      }
+    },
+    info: [
+      {
+        type: "title",
+        value: "Add Time table",
+        tag: "h1",
+        styles: {
+          className:
+            "text-xl sm:text-2xl md:text-3xl font-bold text-[var(--color-text)]",
+          inlineStyle: {},
+        },
+        mode: {
+          add: {
+            value: "Add Time table"
+          },
+          edit: {
+            value: "Edit Time table"
+          }
+        }
+      },
+      {
+        type: "desc",
+        value: "Fill in the details below to add a new Class.",
+        tag: "p",
+        styles: {
+          className: "text-[var(--color-text-secondary)] mb-2",
+          inlineStyle: {},
+        },
+        mode: {
+          add: {
+            value: "Fill in the details below to add new class."
+          },
+          edit: {
+            value: "Fill in the details below to edit class."
+          }
+        }
+      },
+    ],
+    sections: [
+      {
+        title: "",
+        fields: [
+          {
+            type: "dropdown",
+            name: "name",
+            label: "Class",
+            placeholder: "e.g., Class 10",
+            items: [],
+            isDistinct: true,
+            required: true,
+          },
+          {
+            type: "dropdown",
+            name: "section",
+            label: "Section",
+            placeholder: "e.g., A",
+            items: [],
+            isDistinct: true,
+            required: true,
+          },
+          {
+            type: "multiselect",
+            name: "subject",
+            label: "Subject",
+            placeholder: "e.g., Maths",
+            items: [],
+            isDistinct: true,
+            required: true,
+          },
+          {
+            type: "multiselect",
+            name: "teacher",
+            label: "Teacher",
+            placeholder: "e.g., Mr. Ashu",
+            items: ["math" , "science" , "social"],
+            isDistinct: true,
+            required: true,
+          },
+          {
+            type: "multiselect",
+            name: "roomNumber",
+            label: "Room Number",
+            placeholder: "e.g., 101",
+            items: [],
+            isDistinct: true,
+            required: false,
+          },
+          {
+            type: "text",
+            name: "classtime",
+            label: "Start Time",
+            placeholder: "e.g., 9:00",
+            required: true,
+          },
+          {
+            type: "text",
+            name: "endTime",
+            label: "End Time",
+            placeholder: "e.g., 10:00",
+            required: true,
+          },
+        ]
+      },
+      {
+        title: "Actions",
+        fields: [
+          {
+            type: "button",
+            text: "Cancel",
+            variant: "outlined",
+            action: "cancel",
+          },
+          {
+            type: "button",
+            text: "Save Class",
+            variant: "contained",
+            action: "submit",
+            mode: {
+              add: {
+                text: "Save Class"
+              },
+              edit: {
+                text: "Update Class"
+              }
+            }
+          },
+        ],
+      },
+    ]
+  }
 };
 
 export default formConfig;
