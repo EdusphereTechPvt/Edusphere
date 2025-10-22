@@ -182,7 +182,6 @@ const getAllClasses = async (req, res) => {
         status: false,
       });
     }
-console.log("classes", classes)
     const formattedClasses = classes.map((cls) => ({
       classId: cls.classId,
       name: cls.name,
