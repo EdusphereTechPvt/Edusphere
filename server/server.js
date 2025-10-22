@@ -19,7 +19,8 @@ const AuthGuard = require("./middleware/AuthGuard");
 const RoleGuard = require("./middleware/RoleGuard");
 const { ping } = require("./controllers/AuthController");
 const utilsRoute = require("./routes/UtilsRoutes")
-
+const parentroutes = require("./routes/ParentRoutes")
+const adminroutes = require("./routes/AdminRoutes")
 const app = express();
 
 dotenv.config();
@@ -41,6 +42,8 @@ app.use("/class", classRoutes);
 app.use("/subject", subjectRoutes);
 app.use("/section", sectionRoutes)
 app.use("/user", userRoutes)
+app.use("/parent", parentroutes)
+app.use("/admin", adminroutes)
 
 mongoose
   .connect(process.env.MONGO_URL, {})
