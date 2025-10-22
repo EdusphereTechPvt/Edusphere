@@ -61,7 +61,12 @@ export default function Form({ type, mode, id }) {
               !field.dependancy ||
               field.dependancy.every((dep) => formData[dep]?.length > 0);
             if (depsSatisfied) {
-              const options = await fetchDistinctValues(field, formData, config?.api?.page?.mode?.[mode], mode);
+              const options = await fetchDistinctValues(
+                field,
+                formData,
+                config?.api?.page?.mode?.[mode],
+                mode
+              );
               dynamicUpdateConfig(config, {
                 fieldName: "items",
                 matchKey: "name",
@@ -111,8 +116,7 @@ export default function Form({ type, mode, id }) {
           setFormData({});
           setResetFlag((f) => !f);
           setDisabled(true);
-          if(mode === "edit")
-            router.back();
+          if (mode === "edit") router.back();
         }
       }
     },
@@ -302,8 +306,16 @@ export default function Form({ type, mode, id }) {
                               // type TExt
                               if (type === "text") {
                                 const pattern =
-                                  field?.pattern && new RegExp(field.pattern);
-                                if (pattern && !pattern.test(value)) return;
+                                  field?.pattern && new RegExp(field.pattern.value);
+
+                                if (pattern && value && !pattern.test(value)) {
+                                  showToast(
+                                    field?.pattern.message ||
+                                      `${label} format is invalid`,
+                                    "warning"
+                                  );
+                                  return;
+                                }
                                 if (field?.maxLength) {
                                   value = formatLabel(
                                     value.slice(0, field.maxLength)
