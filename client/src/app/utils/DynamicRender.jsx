@@ -223,6 +223,7 @@ export const renderTopHeader = (items, handleAction) => {
         path,
         onClick,
         Icon,
+        disabled,
         variant,
         options = [],
         placeholder,
@@ -280,6 +281,7 @@ export const renderTopHeader = (items, handleAction) => {
             <Button
               key={idx}
               variant={variant || "contained"}
+              disabled={disabled}
               onClick={() => handleAction(action, actionValue, actionUse)}
               sx={{
                 borderRadius: "1.5rem",
