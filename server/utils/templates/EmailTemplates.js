@@ -1,4 +1,13 @@
-export const signupTemplate = (userName, school) => {
+export const signupTemplate = (userName, school, isAdmin) => {
+
+  const passwordNote = !isAdmin
+    ? `<p style="font-size:15px;line-height:1.6;color:#111827;">
+        Please note: Your password is generated using your <strong>first name</strong> and your <strong>date of birth</strong> in the format 
+        <code>Firstname@YYYYMMDD</code>. <br/><br/>
+        For example, if your name is <strong>Edusphere Team</strong> and your date of birth is <strong>15th August 2000</strong>, your password will be: 
+        <code>Edusphere@20000815</code>.
+      </p>`
+    : "";
 
 return `
 <!DOCTYPE html>
@@ -26,6 +35,8 @@ return `
             You’ve been successfully added to the <strong>${school}</strong> group.  
             We can’t wait to see the amazing things you’ll accomplish with Edusphere.
           </p>
+
+          ${passwordNote}
 
           <p style="font-size:15px;line-height:1.6;">
             Get started by exploring your personalized dashboard, tracking performance, and managing your school activities seamlessly.  

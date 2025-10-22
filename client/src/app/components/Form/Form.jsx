@@ -61,7 +61,7 @@ export default function Form({ type, mode, id }) {
               !field.dependancy ||
               field.dependancy.every((dep) => formData[dep]?.length > 0);
             if (depsSatisfied) {
-              const options = await fetchDistinctValues(field, formData, config?.api?.page?.mode?.[mode]);
+              const options = await fetchDistinctValues(field, formData, config?.api?.page?.mode?.[mode], mode);
               dynamicUpdateConfig(config, {
                 fieldName: "items",
                 matchKey: "name",
@@ -111,6 +111,8 @@ export default function Form({ type, mode, id }) {
           setFormData({});
           setResetFlag((f) => !f);
           setDisabled(true);
+          if(mode === "edit")
+            router.back();
         }
       }
     },

@@ -1,101 +1,56 @@
 const mongoose = require("mongoose");
 const User = require("../models/AuthSchema");
-const Teacher = require("../models/Teacher");
-const Subject = require("../models/Subject");
-const Class = require("../models/Class");
-const Section = require("../models/Section");
-const Student = require("../models/Student");
 const TemporaryToken = require("../models/TemporaryToken");
 const { sendEmail } = require("../utils/Email");
 const { resetPasswordTemplate } = require("../utils/templates/EmailTemplates");
 const { signAccessToken } = require("../utils/tokenUtils");
 
-const models = {
-  teacher: Teacher,
-  subject: Subject,
-  class: Class,
-  section: Section,
-  student: Student,
-};
-
 const getDistinctValues = async (req, res) => {
   try {
-    const pageHeader = req.headers["x-page"];
-    const { fieldName, filter = {} } = req.body;
-    const { schoolId } = req.user || {};
+    const { collectionName, fieldName, filter = {} } = req.body;
 
-    if (!pageHeader || !fieldName) {
+    if (!collectionName || !fieldName) {
       return res.status(400).json({
         success: false,
-        message: "Please provide 'x-page' header and 'fieldName'.",
+        message: "Please provide collectionName and fieldName",
       });
     }
 
-    const segments = pageHeader.split("/").filter(Boolean);
-    const resource = segments[1]?.toLowerCase();
-    const Model = models[resource];
+    const Model = mongoose.model(
+      collectionName.charAt(0).toUpperCase() + collectionName.slice(1)
+    );
 
     if (!Model) {
       return res.status(404).json({
         success: false,
-        message: `No model found for resource '${resource}'`,
+        message: `Model '${collectionName}' not found`,
       });
     }
 
-    if (schoolId && Model.schema.paths["schoolId"]) {
-      filter.schoolId = schoolId;
+    const schoolId = req.user?.schoolId;
+    if (!schoolId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized: schoolId missing in user context",
+      });
     }
 
-    const schemaPath = Model.schema.paths[fieldName];
-    let refModelName;
+    const finalFilter = { ...filter, schoolId: new mongoose.Types.ObjectId(schoolId) };
 
-    // Detect if it's a reference field (single or array)
-    if (schemaPath?.options?.ref) {
-      refModelName = schemaPath.options.ref.toLowerCase();
-    } else if (schemaPath?.caster?.options?.ref) {
-      refModelName = schemaPath.caster.options.ref.toLowerCase();
-    }
+    const docs = await Model.find(finalFilter).select(`_id ${fieldName}`).lean();
 
-    if (refModelName) {
-      const RefModel = models[refModelName];
-      if (!RefModel) {
-        return res.status(404).json({
-          success: false,
-          message: `Referenced model '${refModelName}' not found`,
-        });
+    const uniqueMap = new Map();
+    docs.forEach((doc) => {
+      if (doc[fieldName] && !uniqueMap.has(doc[fieldName])) {
+        uniqueMap.set(doc[fieldName], { id: doc._id, value: doc[fieldName] });
       }
-
-      const refValues = await RefModel.find({ schoolId })
-        .select("_id name")
-        .lean();
-      const values = refValues.map((item) => ({
-        id: item._id,
-        value: item.name,
-      }));
-
-      return res.status(200).json({
-        success: true,
-        resource,
-        field: fieldName,
-        distinctValues: values,
-      });
-    }
-
-    // Normal field
-    let values;
-    if (Model.schema.paths["name"]) {
-      values = await Model.find(filter).select("_id name").lean();
-      values = values.map((item) => ({ id: item._id, value: item.name }));
-    } else {
-      const distinctValues = await Model.distinct(fieldName, filter);
-      values = distinctValues.map((val) => ({ id: val, value: val }));
-    }
+    });
 
     return res.status(200).json({
       success: true,
-      resource,
+      collection: collectionName,
       field: fieldName,
-      distinctValues: values,
+      distinctValues: Array.from(uniqueMap.values()),
     });
   } catch (error) {
     console.error("Error in getDistinctValues:", error);
@@ -131,15 +86,14 @@ const sendEmailController = async (req, res) => {
           time: new Date(),
         });
 
-        
         await TemporaryToken.create({
           userId: user._id,
           tokenType: "RESET_PASSWORD",
           token,
         });
-        
-        token = encodeURIComponent(token)
-        
+
+        token = encodeURIComponent(token);
+
         await sendEmail(
           user.email,
           "Reset your Edusphere password",

@@ -117,7 +117,8 @@ export const TableComponent = ({
                       {renderTopHeader(
                         topHeader.filter((item) =>
                           ["button", "link"].includes(item.type)
-                        )
+                        ),
+                        handleAction
                       )}
                     </div>
                   </div>
