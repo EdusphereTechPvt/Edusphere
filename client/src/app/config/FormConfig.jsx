@@ -138,6 +138,8 @@ const formConfig = {
           {
             type: "multiselect",
             name: "classes",
+            fieldName: "name",
+            collectionName: "class",
             label: "Assigned Classes",
             placeholder: "Select classes",
             items: [],
@@ -151,6 +153,8 @@ const formConfig = {
           {
             type: "multiselect",
             name: "sections",
+            fieldName: "name",
+            collectionName: "section",
             label: "Assigned Sections",
             placeholder: "Select sections",
             isDistinct: true,
@@ -165,10 +169,12 @@ const formConfig = {
           {
             type: "multiselect",
             name: "subjects",
+            fieldName: "name",
+            collectionName: "subject",
             label: "Assigned Subjects",
             placeholder: "Select subjects",
             isDistinct: true,
-            dependancy: ["sections"],
+            dependancy: ["classes"],
             items: [],
             styles: {
               selectStyle: {
@@ -611,7 +617,7 @@ const formConfig = {
           },
           {
             type: "text",
-            name: "subjectCode",
+            name: "code",
             label: "Subject Code (Optional)",
             placeholder: "e.g., MATH101",
             required: false,
@@ -625,8 +631,10 @@ const formConfig = {
           },
           {
             type: "multiselect",
-            name: "classIds",
+            name: "classes",
             label: "Classes",
+            fieldName: "name",
+            collectionName: "class",
             placeholder: "Enter the classes associated with the subject",
             isDistinct: true,
             required: false,
@@ -639,8 +647,10 @@ const formConfig = {
           },
           {
             type: "multiselect",
-            name: "teacherIds",
+            name: "teachers",
             label: "Teachers",
+            fieldName: "name",
+            collectionName: "teacher",
             placeholder: "Enter the teachers associated with the subject",
             required: false,
             isDistinct: true,
@@ -767,6 +777,12 @@ const formConfig = {
             type: "multiselect",
             name: "sections",
             label: "Sections",
+            fieldName: "name",
+            collectionName: "section",
+            filter: {
+              add: {classes: null},
+              edit: {classes: `$_id`}
+             },
             placeholder: "Select the sections to include",
             required: false,
             items: [],
@@ -781,6 +797,8 @@ const formConfig = {
             type: "multiselect",
             name: "subjects",
             label: "Subjects",
+            fieldName: "name",
+            collectionName: "subject",
             placeholder: "Select the Subjects to be included",
             required: true,
             items: [],
@@ -910,8 +928,10 @@ const formConfig = {
           },
           {
             type: "dropdown",
-            name: "classId",
+            name: "classes",
             label: "Select Class",
+            fieldName: "name",
+            collectionName: "class",
             placeholder: "e.g., Class 10",
             required: true,
             items: [],
@@ -927,6 +947,8 @@ const formConfig = {
           {
             type: "dropdown",
             name: "classTeacher",
+            fieldName: "name",
+            collectionName: "teacher",
             label: "Select Class Teacher",
             placeholder: "e.g., Mr. Ashutosh",
             required: true,
@@ -938,10 +960,12 @@ const formConfig = {
             required: false,
             name: "students",
             label: "Students",
+            fieldName: "name",
+            collectionName: "student",
             placeholder: "Select the students",
             items: [],
             isDistinct: true,
-            dependancy: ["classId"],
+            dependancy: ["classes"],
             styles: {
               selectStyle: {
                 height: "3.5rem",
@@ -952,6 +976,8 @@ const formConfig = {
             type: "multiselect",
             name: "teachers",
             label: "Teachers",
+            fieldName: "name",
+            collectionName: "teacher",
             placeholder: "Select the teachers",
             required: true,
             items: [],

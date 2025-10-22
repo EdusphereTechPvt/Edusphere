@@ -39,9 +39,9 @@ export const authConfig = {
       ],
       teacher: [
         {
-          name: "email",
-          label: "Email",
-          type: "email",
+          name: "uidOrEmail",
+          label: "Email or Username",
+          type: "email | text",
           required: true,
           minLength: 5,
         },
@@ -55,9 +55,9 @@ export const authConfig = {
       ],
       parent: [
         {
-          name: "email",
-          label: "Email",
-          type: "email",
+          name: "uidOrEmail",
+          label: "Email or Username",
+          type: "email | text",
           required: true,
           minLength: 5,
         },
@@ -71,9 +71,9 @@ export const authConfig = {
       ],
       student: [
         {
-          name: "email",
-          label: "Email",
-          type: "email",
+          name: "uidOrEmail",
+          label: "Email or Username",
+          type: "email | text",
           required: true,
           minLength: 5,
         },

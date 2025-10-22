@@ -210,7 +210,7 @@ export const DynamicRenderer = ({
 };
 
 //topHeaderRenderer
-export const renderTopHeader = (items) => {
+export const renderTopHeader = (items, handleAction) => {
   return items?.map(
     (
       {

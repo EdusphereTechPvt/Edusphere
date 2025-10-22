@@ -173,7 +173,7 @@ const signupController = async (req, res) => {
     await sendEmail(
       email,
       `Hey ${name}, You’re Officially Part of Edusphere 🚀`,
-      signupTemplate(name, school.name)
+      signupTemplate(name, school.name, true)
     );
 
     res.status(201).json({
@@ -233,8 +233,6 @@ const verifyTemporaryToken = async (req, res) => {
       token,
       used: false,
     }).session(session);
-
-    console.log(token, tokenData)
 
     if (!tokenData) {
       return res.status(404).json({
