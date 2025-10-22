@@ -19,6 +19,8 @@ const AuthGuard = require("./middleware/AuthGuard");
 const RoleGuard = require("./middleware/RoleGuard");
 const { ping } = require("./controllers/AuthController");
 const utilsRoute = require("./routes/UtilsRoutes")
+const eventRoutes = require("./routes/EventRoutes");
+const qrSessionRoutes = require("./routes/QrSessionRoutes")
 
 const app = express();
 
@@ -41,6 +43,8 @@ app.use("/class", classRoutes);
 app.use("/subject", subjectRoutes);
 app.use("/section", sectionRoutes)
 app.use("/user", userRoutes)
+app.use("/event", eventRoutes);
+app.use("/QrSession",qrSessionRoutes )
 
 mongoose
   .connect(process.env.MONGO_URL, {})
