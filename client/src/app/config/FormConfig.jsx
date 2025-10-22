@@ -327,12 +327,74 @@ const formConfig = {
         ],
       },
       {
+        title: "Parent/Guardian Informations",
+        fields: [
+          {
+            type: "text",
+            name: "parentName",
+            label: "Parent Name",
+            placeholder: "Enter parent's full name",
+            required: true,
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message:
+                "Parent Name can only contain letters and spaces",
+            },
+          },
+          {
+            type: "text",
+            name: "guardianName",
+            label: "Guardian Name",
+            placeholder: "Enter guardian's full name",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Guardian Name can only contain letters and spaces",
+            },
+          },
+          {
+            type: "email",
+            name: "parentEmail",
+            label: "Parent/Guardian Email",
+            required: true,
+            placeholder: "Enter parent's email",
+          },
+          {
+            type: "number",
+            name: "parentPhone",
+            label: "Parent/Guardian Contact Number",
+            placeholder: "Enter parent's contact number",
+            required: true,
+            maxLength: 10,
+          },
+          {
+            type: "text",
+            name: "parentOccupation",
+            label: "Occupation",
+            placeholder: "Enter parent/guardian's occupation",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Occupation can only contain letters and spaces",
+            },
+          },
+          {
+            type: "text",
+            name: "motherName",
+            label: "Mother's Name",
+            placeholder: "Enter mother's full name",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Mother's Name can only contain letters and spaces",
+            },
+          }
+        ],
+      },
+      {
         title: "Contact Information",
         fields: [
           {
             type: "number",
             name: "contactNumber",
-            label: "Parent/Guardian Contact Number",
+            label: "Student Contact Number",
             placeholder: "Enter contact number",
             maxLength: 10,
           },
@@ -646,7 +708,8 @@ const formConfig = {
             placeholder: "e.g., MATH101",
             pattern: {
               value: "^[A-Za-z0-9s]*$",
-              message: "Subject Code can only contain letters, numbers, and spaces",
+              message:
+                "Subject Code can only contain letters, numbers, and spaces",
             },
             required: false,
           },
@@ -803,7 +866,6 @@ const formConfig = {
               value: "^\\d{0,4}(-\\d{0,4})?$",
               message: "Academic Year must be in the format YYYY-YYYY",
             },
-            
           },
           {
             type: "multiselect",
