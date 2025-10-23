@@ -5,10 +5,10 @@ const RoleGuard = require("../middleware/RoleGuard");
 
 const router = express.Router();
 
-router.post("/save", save);
+router.post("/save", AuthGuard, RoleGuard(), save);
 router.post("/search",AuthGuard, RoleGuard(), getStudentDetails);
 router.post("/getAll/",AuthGuard, RoleGuard(), getAllStudentsList);
 router.post("/getProfileCardData", getProfileCardData)
-router.delete("/delete/:id", deleteStudent);
+router.delete("/delete/:id", AuthGuard, RoleGuard(), deleteStudent);
 
 module.exports = router;
