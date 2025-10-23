@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Button }from '@mui/material';
 
 export default function HeroSection({ title, subtitle, buttonText, imageUrl, onButtonClick })
 {
@@ -18,12 +19,21 @@ export default function HeroSection({ title, subtitle, buttonText, imageUrl, onB
           <p className="mt-2 max-w-4xl">{subtitle}</p>
         )}
         {buttonText && (
-          <button 
+          <Button 
             onClick={onButtonClick} 
-            className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-medium"
+            sx={{
+              mt: 4,
+              px: 6,
+              py: 2,
+              borderRadius: '8px',
+              fontWeight: '300',
+              fontSize: { xs: '0.9rem', sm: '1rem' },
+            }}
+            variant="contained"
+            
           >
             {buttonText}
-          </button>
+          </Button>
         )}
       </div>
     </section>

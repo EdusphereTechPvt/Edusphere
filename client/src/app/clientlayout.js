@@ -40,12 +40,12 @@ const ClientLayout = ({ children }) => {
     }
 
 
-    if (!errorRoutes.includes(path) && !generalRoutes.includes(path) && !excludeRoutes.includes(path)) { 
+    if (!errorRoutes.includes(path) && !generalRoutes.includes(path) && !excludeRoutes.some(route => route.test(path))) { 
       sendPing();
-      const id = setInterval(() => {
-        sendPing();
-      }, 30000);
-      setIntervalId(id);
+      // const id = setInterval(() => {
+      //   sendPing();
+      // }, 30000);
+      // setIntervalId(id);
     }
 
     return () => {
@@ -63,10 +63,10 @@ const ClientLayout = ({ children }) => {
 
   return (
     <Provider store={store}>
-      {!excludeRoutes.includes(path) && <Header path={path} userData={userData}/>}
+      {!excludeRoutes.some(route => route.test(path)) && <Header path={path} userData={userData}/>}
       <ToastContainer />
       {children}
-      {!excludeRoutes.includes(path) && <Footer />}
+      {!excludeRoutes.some(route => route.test(path)) && <Footer />}
     </Provider>
   );
 };

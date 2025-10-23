@@ -2,7 +2,7 @@ import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import SchoolIcon from "@mui/icons-material/School";
 import GroupIcon from "@mui/icons-material/Group";
 import PersonIcon from "@mui/icons-material/Person";
-import { Facebook, Google, Mail } from "@mui/icons-material";
+import { Mail } from "@mui/icons-material";
 
 
 export const roles = {
@@ -16,7 +16,7 @@ export const roles = {
 };
 
 
-export const authconfig = {
+export const authConfig = {
   login: {
     title: "Welcome Back to Edusphere",
     desc: "Log in to access your account",
@@ -39,9 +39,9 @@ export const authconfig = {
       ],
       teacher: [
         {
-          name: "email",
-          label: "Email",
-          type: "email",
+          name: "uidOrEmail",
+          label: "Email or Username",
+          type: "email | text",
           required: true,
           minLength: 5,
         },
@@ -55,9 +55,9 @@ export const authconfig = {
       ],
       parent: [
         {
-          name: "email",
-          label: "Email",
-          type: "email",
+          name: "uidOrEmail",
+          label: "Email or Username",
+          type: "email | text",
           required: true,
           minLength: 5,
         },
@@ -71,9 +71,9 @@ export const authconfig = {
       ],
       student: [
         {
-          name: "email",
-          label: "Email",
-          type: "email",
+          name: "uidOrEmail",
+          label: "Email or Username",
+          type: "email | text",
           required: true,
           minLength: 5,
         },
@@ -133,31 +133,14 @@ export const authconfig = {
     {
       name: "google",
       variant: "contained",
-      icon: <Google />,
+      icon: <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" width="18" height="18" />,
       title: "Google",
       style: {
         mt: 1,
         backgroundColor: "#fff",
         color: "#000",
         fontSize: "0.9rem",
-        fontWeight: 600,
-        textTransform: "none",
-        py: 1,
-        "&:hover": { backgroundColor: "#f0f0f0" },
-      },
-
-    },
-    {
-      name: "facebook",
-      variant: "contained",
-      icon: <Facebook />,
-      title: "Facebook",
-      style: {
-        mt: 1,
-        backgroundColor: "#fff",
-        color: "#000",
-        fontSize: "0.9rem",
-        fontWeight: 600,
+        fontWeight: 500,
         textTransform: "none",
         py: 1,
         "&:hover": { backgroundColor: "#f0f0f0" },

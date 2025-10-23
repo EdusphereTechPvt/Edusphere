@@ -8,13 +8,11 @@ const page = () => {
   const { pageTitle, lastUpdated, tableOfContents, sections } =
     PrivacyPolicyConfig;
 
-  const ref = useRef(null);
+  const sectionRefs = useRef(sections.map(() => React.createRef()));
 
-  const scrollToRef = (ref) => {
-    if (ref && ref.current) {
-      ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
+  const scrollToSection = (index) => {
+    sectionRefs.current[index]?.current?.scrollIntoView({behavior: "smooth", block: "start",});
+  };
 
   return (
     <div className="p-6 bg-white text-gray-800 min-h-screen">
@@ -22,11 +20,11 @@ const page = () => {
 
         <div className="flex flex-col lg:flex-row gap-8">
 
-          <aside className="w-full my-[15%] lg:w-1/4">
+          <aside className="w-full sm:my-[10%] my-[15%] lg:w-1/4">
             <h2 className="text-lg font-semibold mb-4">Table of Contents</h2>
             <ul className="space-y-2 text-gray-600">
               {tableOfContents.map((item, idx) => (
-                <li key={idx} className="text-sm hover:text-black cursor-pointer" onClick={() => scrollToRef(ref)}>
+                <li key={idx} className="text-sm hover:text-black cursor-pointer" onClick={() => scrollToSection(idx)}>
                   {item}
                 </li>
               ))}
@@ -40,7 +38,7 @@ const page = () => {
               <p className="text-gray-500">Last updated: {lastUpdated}</p>
             </header>
             {sections.map((section, idx) => (
-              <section key={idx} className="space-y-3" ref={ref}>
+              <section key={idx} className="space-y-3" ref={sectionRefs.current[idx]}>
                 <h2 className="text-xl font-semibold">{section.title}</h2>
                 {section.content.map((line, i) => (
                   <p

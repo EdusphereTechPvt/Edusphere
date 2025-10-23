@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const User = require("../models/AuthSchema");
-const Student = require("../models/Student");
-const Teacher = require("../models/Teacher");
-const Parent = require("../models/Parent");
+const TemporaryToken = require("../models/TemporaryToken");
 const School = require("../models/SchoolSchema");
 const Admin = require("../models/Admin");
 const bcrypt = require("bcrypt");
@@ -16,6 +14,8 @@ const {
   verifyAccessToken,
 } = require("../utils/tokenUtils");
 const InviteToken = require("../models/InviteToken");
+const { sendEmail } = require("../utils/Email");
+const { signupTemplate } = require("../utils/templates/EmailTemplates");
 
 const cookieOptions = {
   httpOnly: true,
@@ -32,7 +32,6 @@ const loginController = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-
     const { role, uidOrEmail, password } = req.body;
 
     const ip = req.ip;
@@ -48,24 +47,16 @@ const loginController = async (req, res) => {
       return res.status(404).json({ message: "User not found", status: false });
 
     if (user.lockedUntil && user.lockedUntil > new Date()) {
-      return res
-        .status(423)
-        .json({
-          message: "Account locked. Try later or contact admin.",
-          status: false,
-        });
+      return res.status(423).json({
+        message: "Account locked. Try later or contact admin.",
+        status: false,
+      });
     }
 
     if (user.role !== role)
       return res
         .status(400)
         .json({ message: "Invalid role for this user", status: false });
-
-    if (user.googleId && user.emailVerified === true)
-      return res.status(403).json({
-        message: "This account uses Google login. Please login via Google.",
-        status: false,
-      });
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
@@ -179,6 +170,12 @@ const signupController = async (req, res) => {
 
     await session.commitTransaction();
 
+    await sendEmail(
+      email,
+      `Hey ${name}, You’re Officially Part of Edusphere 🚀`,
+      signupTemplate(name, school.name, true)
+    );
+
     res.status(201).json({
       message: "Admin registered successfully",
       status: true,
@@ -188,12 +185,10 @@ const signupController = async (req, res) => {
   } catch (err) {
     await session.abortTransaction();
     console.error("Signup Error:", err);
-    res
-      .status(500)
-      .json({
-        message: err.message || "Server error during signup",
-        status: false,
-      });
+    res.status(500).json({
+      message: err.message || "Server error during signup",
+      status: false,
+    });
   } finally {
     session.endSession();
   }
@@ -228,14 +223,58 @@ const searchUser = async (req, res) => {
   }
 };
 
+const verifyTemporaryToken = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    let { token } = req.body;
+
+    const tokenData = await TemporaryToken.findOne({
+      token,
+      used: false,
+    }).session(session);
+
+    if (!tokenData) {
+      return res.status(404).json({
+        message: "Invalid or expired token.",
+        status: false,
+      });
+    }
+
+    if (tokenData.expireAt < new Date()) {
+      await TemporaryToken.deleteOne({ _id: tokenData._id });
+      return res.status(400).json({
+        message: "Token expired. Please request a new reset link.",
+        status: false,
+      });
+    }
+
+    const decoded = verifyAccessToken(token);
+
+    if (!decoded?.data?.id) {
+      return res.status(400).json({ message: "Invalid token.", status: false });
+    }
+
+    session.commitTransaction();
+    return res.status(200).json({
+      message: "Token verified successfully.",
+      status: true,
+      userId: decoded.data.id,
+    });
+  } catch (err) {
+    session.abortTransaction();
+    console.error(err);
+    res.status(500).json({ message: "Server error", status: false });
+  }
+};
+
 const forgetPassword = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
+    let { userId, password, token } = req.body;
 
-    let { email, password } = req.body;
-
-    let user = await User.findOne({ email }).session(session);
+    let user = await User.findOne({ _id: userId }).session(session);
 
     if (!user) {
       await session.abortTransaction();
@@ -248,6 +287,14 @@ const forgetPassword = async (req, res) => {
     user.password = password;
 
     await user.save({ session });
+
+    if (token) {
+      await TemporaryToken.updateOne(
+        { token, userId, used: false },
+        { $set: { used: true } },
+        { session }
+      );
+    }
 
     await session.commitTransaction();
     session.endSession();
@@ -292,12 +339,10 @@ const refreshController = async (req, res) => {
     if (!session) {
       user.sessions = [];
       await user.save();
-      return res
-        .status(403)
-        .json({
-          message: "Refresh token reuse detected. All sessions revoked.",
-          status: false,
-        });
+      return res.status(403).json({
+        message: "Refresh token reuse detected. All sessions revoked.",
+        status: false,
+      });
     }
     const matches = await bcrypt.compare(
       refreshToken,
@@ -306,12 +351,10 @@ const refreshController = async (req, res) => {
     if (!matches) {
       user.sessions = [];
       await user.save();
-      return res
-        .status(403)
-        .json({
-          message: "Refresh token reuse detected. All sessions revoked.",
-          status: false,
-        });
+      return res.status(403).json({
+        message: "Refresh token reuse detected. All sessions revoked.",
+        status: false,
+      });
     }
 
     const newJti = genJti();
@@ -450,8 +493,12 @@ const verify = async (req, res) => {
 };
 
 const oAuthController = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
-    const { token, role, dateOfBirth, name } = req.body;
+    const { token } = req.body;
+    const ip = req.ip;
+    const ua = req.headers["user-agent"] || "";
 
     const decodedToken = await admin.auth().verifyIdToken(token);
     if (!decodedToken)
@@ -459,38 +506,51 @@ const oAuthController = async (req, res) => {
         .status(400)
         .json({ message: "Invalid Google Token", status: false });
 
-    let user = await User.findOne({ email: decodedToken.email });
+    let user = await User.findOne({ email: decodedToken.email }).session(
+      session
+    );
 
     if (!user) {
-      user = new User({
-        name: name || decodedToken.name,
-        dateOfBirth: dateOfBirth || null,
-        email: decodedToken.email,
-        googleId: decodedToken.uid,
-        role,
-        emailVerified: true,
-      });
-      await user.save();
-
-      switch (role) {
-        case "student":
-          await new Student({ userId: user._id }).save();
-          break;
-        case "teacher":
-          await new Teacher({ userId: user._id }).save();
-          break;
-        case "parent":
-          await new Parent({ userId: user._id }).save();
-          break;
-        case "admin":
-          await new Admin({ userId: user._id }).save();
-          break;
-        default:
-          return res
-            .status(400)
-            .json({ message: "Invalid role", status: false });
-      }
+      return res.status(404).json({ message: "User not found", status: false });
     }
+
+    user.avatar = decodedToken.picture;
+    user.emailVerified = decodedToken.email_verified;
+    user.googleId = decodedToken.uid;
+    await user.save({ session });
+
+    const jti = genJti();
+    const refreshPayload = { userId: user._id, jti };
+    const refreshToken = signRefreshToken(refreshPayload);
+
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    await user.addSession({
+      jti,
+      refreshToken,
+      expiresAt,
+      ip,
+      userAgent: ua,
+    });
+
+    const accessEnc = signAccessToken({ userId: user._id, role: user.role });
+
+    res.cookie("accessToken", accessEnc, {
+      ...cookieOptions,
+      maxAge: 10 * 60 * 1000,
+    });
+    res.cookie("refreshToken", refreshToken, {
+      ...cookieOptions,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
+    const csrf = crypto.randomBytes(24).toString("hex");
+    res.cookie("csrfToken", csrf, {
+      secure: cookieOptions.secure,
+      sameSite: "Strict",
+    });
+
+    user.lastLogin = new Date();
+    await user.save({ session });
 
     const jwtToken = jwt.sign(
       { id: user._id, uid: user.uid, role: user.role, email: user.email },
@@ -498,13 +558,16 @@ const oAuthController = async (req, res) => {
       { expiresIn: "1h" }
     );
 
+    session.commitTransaction();
+
     res.status(200).json({
-      message: "Google login successful",
+      message: "Login successful",
       status: true,
       jwtToken,
-      user,
+      csrf,
     });
   } catch (err) {
+    session.abortTransaction();
     console.error("OAuth Error:", err);
     res.status(500).json({
       message: "Internal server error during Google login",
@@ -549,20 +612,23 @@ const generateInviteToken = async (req, res) => {
   }
 };
 
-const ping = async(req,res) => {
-   try {
+const ping = async (req, res) => {
+  try {
     res.status(200).json({
       status: true,
       authorized: true,
       user: {
         name: req.user.name,
-        role: req.user.role
+        role: req.user.role,
+        avatar: req.user.avatar,
       },
       message: "User is online & authorized",
     });
   } catch (err) {
     console.error("Ping Error:", err);
-    res.status(500).json({ status: false, authorized: false, message: "Server error" });
+    res
+      .status(500)
+      .json({ status: false, authorized: false, message: "Server error" });
   }
 };
 
@@ -570,6 +636,7 @@ module.exports = {
   loginController,
   signupController,
   searchUser,
+  verifyTemporaryToken,
   forgetPassword,
   verify,
   revokeAll,
@@ -577,5 +644,5 @@ module.exports = {
   refreshController,
   generateInviteToken,
   oAuthController,
-  ping
+  ping,
 };

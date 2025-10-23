@@ -57,7 +57,10 @@ const formConfig = {
             label: "Full Name",
             placeholder: "Enter full name",
             required: true,
-            pattern: "^[A-Za-z\\s]*$",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Name can only contain letters and spaces",
+            },
           },
           {
             type: "date",
@@ -89,7 +92,7 @@ const formConfig = {
             label: "Contact Number",
             placeholder: "Enter contact number",
             required: true,
-            maxLength: 10,
+            minLength: 10,
           },
           {
             type: "email",
@@ -138,6 +141,8 @@ const formConfig = {
           {
             type: "multiselect",
             name: "classes",
+            fieldName: "name",
+            collectionName: "class",
             label: "Assigned Classes",
             placeholder: "Select classes",
             items: [],
@@ -151,6 +156,8 @@ const formConfig = {
           {
             type: "multiselect",
             name: "sections",
+            fieldName: "name",
+            collectionName: "section",
             label: "Assigned Sections",
             placeholder: "Select sections",
             isDistinct: true,
@@ -165,10 +172,12 @@ const formConfig = {
           {
             type: "multiselect",
             name: "subjects",
+            fieldName: "name",
+            collectionName: "subject",
             label: "Assigned Subjects",
             placeholder: "Select subjects",
             isDistinct: true,
-            dependancy: ["sections"],
+            dependancy: ["classes"],
             items: [],
             styles: {
               selectStyle: {
@@ -187,7 +196,10 @@ const formConfig = {
             label: "Contact Name",
             placeholder: "Emergency Contact Name",
             required: false,
-            pattern: "^[A-Za-z\\s]*$",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Contact Name can only contain letters and spaces",
+            },
           },
           {
             type: "text",
@@ -195,7 +207,10 @@ const formConfig = {
             label: "Relation To Teacher",
             placeholder: "Enter the relation to teacher",
             required: false,
-            pattern: "^[A-Za-z\\s]*$",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Relation can only contain letters and spaces",
+            },
           },
           {
             type: "number",
@@ -283,7 +298,10 @@ const formConfig = {
             name: "studentName",
             label: "Student Name",
             placeholder: "Enter student's full name",
-            pattern: "^[A-Za-z\\s]*$",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Student Name can only contain letters and spaces",
+            },
           },
           { type: "date", name: "dateOfBirth", label: "Date of Birth" },
           {
@@ -435,7 +453,11 @@ const formConfig = {
             name: "name",
             label: "Full Name",
             placeholder: "Enter full name",
-            pattern: "^[A-Za-z\\s]*$",
+            required: true,
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Student Name can only contain letters and spaces",
+            },
           },
           {
             type: "text",
@@ -454,7 +476,6 @@ const formConfig = {
             name: "phone",
             label: "Phone Number",
             placeholder: "Enter Your Phone Number",
-            maxLength: 10,
           },
         ],
       },
@@ -468,10 +489,10 @@ const formConfig = {
             placeholder: "Select Size",
             required: true,
             items: [
-              { value: "Less than 100", label: "Less than 100" },
-              { value: "Between 100 and 250", label: "Between 100 and 250" },
-              { value: "Between 250 and 500", label: "Between 250 and 500" },
-              { value: "More than 500", label: "More than 500" },
+              { value: "Less than 100", id: "Less than 100" },
+              { value: "Between 100 and 250", id: "Between 100 and 250" },
+              { value: "Between 250 and 500", id: "Between 250 and 500" },
+              { value: "More than 500", id: "More than 500" },
             ],
           },
           {
@@ -508,10 +529,10 @@ const formConfig = {
             placeholder: "Select an option",
             required: true,
             items: [
-              { value: "Facebook", label: "Facebook" },
-              { value: "Google", label: "Google" },
-              { value: "News Paper", label: "New Paper" },
-              { value: "Instagram", label: "Instagram" },
+              { value: "Facebook", id: "Facebook" },
+              { value: "Google", id: "Google" },
+              { value: "News Paper", id: "New Paper" },
+              { value: "Instagram", id: "Instagram" },
             ],
           },
         ],
@@ -606,7 +627,10 @@ const formConfig = {
             label: "Subject Name",
             placeholder: "e.g., Math",
             required: true,
-            pattern: "^[A-Za-z\\s]*$",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Subject Name can only contain letters and spaces",
+            },
           },
           {
             type: "text",
@@ -617,10 +641,13 @@ const formConfig = {
           },
           {
             type: "text",
-            name: "subjectCode",
+            name: "code",
             label: "Subject Code (Optional)",
             placeholder: "e.g., MATH101",
-            pattern: "/^[A-Za-z0-9\s]*$/",
+            pattern: {
+              value: "^[A-Za-z0-9s]*$",
+              message: "Subject Code can only contain letters, numbers, and spaces",
+            },
             required: false,
           },
           {
@@ -632,8 +659,10 @@ const formConfig = {
           },
           {
             type: "multiselect",
-            name: "classIds",
+            name: "classes",
             label: "Classes",
+            fieldName: "name",
+            collectionName: "class",
             placeholder: "Enter the classes associated with the subject",
             isDistinct: true,
             required: false,
@@ -646,8 +675,10 @@ const formConfig = {
           },
           {
             type: "multiselect",
-            name: "teacherIds",
+            name: "teachers",
             label: "Teachers",
+            fieldName: "name",
+            collectionName: "teacher",
             placeholder: "Enter the teachers associated with the subject",
             required: false,
             isDistinct: true,
@@ -768,12 +799,22 @@ const formConfig = {
             label: "Academic Year",
             placeholder: "e.g., 2025-2026",
             required: false,
-            pattern: "^[A-Za-z\\s-]*$",
+            pattern: {
+              value: "^\\d{0,4}(-\\d{0,4})?$",
+              message: "Academic Year must be in the format YYYY-YYYY",
+            },
+            
           },
           {
             type: "multiselect",
             name: "sections",
             label: "Sections",
+            fieldName: "name",
+            collectionName: "section",
+            filter: {
+              add: { classes: null },
+              edit: { classes: `$_id` },
+            },
             placeholder: "Select the sections to include",
             required: false,
             items: [],
@@ -788,6 +829,8 @@ const formConfig = {
             type: "multiselect",
             name: "subjects",
             label: "Subjects",
+            fieldName: "name",
+            collectionName: "subject",
             placeholder: "Select the Subjects to be included",
             required: true,
             items: [],
@@ -905,7 +948,10 @@ const formConfig = {
             placeholder: "e.g., A",
             required: true,
             maxLength: 1,
-            pattern: "^[A-Za-z\\s]*$",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Section Name can only contain one letter",
+            },
           },
           {
             type: "number",
@@ -916,8 +962,10 @@ const formConfig = {
           },
           {
             type: "dropdown",
-            name: "classId",
+            name: "classes",
             label: "Select Class",
+            fieldName: "name",
+            collectionName: "class",
             placeholder: "e.g., Class 10",
             required: true,
             items: [],
@@ -927,12 +975,14 @@ const formConfig = {
             type: "number",
             name: "roomNumber",
             label: "Room Number",
-            placeholder: "e.g., 2025-2026",
+            placeholder: "e.g., 102",
             required: false,
           },
           {
             type: "dropdown",
             name: "classTeacher",
+            fieldName: "name",
+            collectionName: "teacher",
             label: "Select Class Teacher",
             placeholder: "e.g., Mr. Ashutosh",
             required: true,
@@ -944,10 +994,12 @@ const formConfig = {
             required: false,
             name: "students",
             label: "Students",
+            fieldName: "name",
+            collectionName: "student",
             placeholder: "Select the students",
             items: [],
             isDistinct: true,
-            dependancy: ["classId"],
+            dependancy: ["classes"],
             styles: {
               selectStyle: {
                 minHeight: "2.5rem",
@@ -958,6 +1010,8 @@ const formConfig = {
             type: "multiselect",
             name: "teachers",
             label: "Teachers",
+            fieldName: "name",
+            collectionName: "teacher",
             placeholder: "Select the teachers",
             required: true,
             items: [],

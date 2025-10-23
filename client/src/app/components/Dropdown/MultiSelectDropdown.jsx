@@ -91,8 +91,8 @@ const MultiSelectDropdown = ({value, data, resetFlag, style = {}, onSelect ,onBl
   }
 
   useEffect(() => {
-    setSelectedValue([]);
-  }, [resetFlag]);
+  setSelectedValue(value || []);
+}, [value, resetFlag]);
 
   return (
     <Box className={`${style.className}`} sx={{ ...style.inlineStyle }}>
@@ -122,7 +122,7 @@ const MultiSelectDropdown = ({value, data, resetFlag, style = {}, onSelect ,onBl
           labelId="multiselect-label"
           id="multiselect-chip"
           multiple
-          value={selectedValue || value}
+          value={selectedValue}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           input={

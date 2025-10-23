@@ -25,13 +25,16 @@ const Header = ({ path, userData }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [useStateUserData, setUseStateUserData] = useState(userData)
   const open = Boolean(anchorEl);
 
   const router = useRouter();
   const toggleDrawer = (open) => () => setDrawerOpen(open);
 
+
   useEffect(() => {
     try {
+      setUseStateUserData(userData)
       const result = generalRoutes.includes(path)
         ? navItems.default
         : navItems[userData?.role];
@@ -123,8 +126,8 @@ const Header = ({ path, userData }) => {
           <>
             <IconButton onClick={handleMenuClick} sx={{ ml: 1 }}>
               <Avatar
-                alt={userData?.name || "User"}
-                src={userData?.avatar || "/default-avatar.png"}
+                alt={useStateUserData?.name || "User"}
+                src={useStateUserData?.avatar || "/default-avatar.png"}
                 sx={{ width: 36, height: 36 }}
               />
             </IconButton>

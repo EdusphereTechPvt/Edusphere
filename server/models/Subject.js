@@ -4,17 +4,17 @@ const SubjectSchema = new mongoose.Schema(
   {
     subjectId: { type: String, unique: true, required: true },
     name: { type: String, required: true, trim: true },
-    code: {type: String, required:true},
+    code: { type: String, required: true },
     description: { type: String },
-    classIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class" }],
-    teacherIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Teacher" }],
-     schoolId: {
-      type: String,
+    classes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class" }],
+    teachers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Teacher" }],
+    schoolId: {
+      type: mongoose.Schema.Types.ObjectId,
       ref: "School",
       required: true,
     },
     credits: { type: Number, default: 0 },
-    isActive: { type: Boolean, default: true },
+    isActive: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

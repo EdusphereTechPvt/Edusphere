@@ -14,13 +14,13 @@ const StudentProfileSchema = new mongoose.Schema(
       sparse: true,
     },
     schoolId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "School",
       required: true,
     },
     name: {
       type: String,
-      required: true
+      required: true,
     },
     grade: {
       type: String,
@@ -33,7 +33,7 @@ const StudentProfileSchema = new mongoose.Schema(
     gender: {
       type: String,
       enum: ["Male", "Female"],
-      required: true
+      required: true,
     },
     enrollmentDate: {
       type: Date,
@@ -71,11 +71,11 @@ const StudentProfileSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    status:{
+    status: {
       type: String,
       required: true,
-      enum: ["Active", "On Hold", "Inactive"]
-    }
+      enum: ["Active", "On Hold", "Inactive"],
+    },
   },
   { timestamps: true }
 );

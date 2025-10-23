@@ -14,6 +14,7 @@ const helpcenterroutes = require("./routes/HelpCenterRoutes");
 const classRoutes = require("./routes/ClassRoutes")
 const subjectRoutes = require("./routes/SubjectRoutes");
 const sectionRoutes = require("./routes/SectionRoute")
+const userRoutes = require("./routes/UserRoutes")
 const AuthGuard = require("./middleware/AuthGuard");
 const RoleGuard = require("./middleware/RoleGuard");
 const { ping } = require("./controllers/AuthController");
@@ -39,6 +40,7 @@ app.use("/teacher", teacherRoutes);
 app.use("/class", classRoutes);
 app.use("/subject", subjectRoutes);
 app.use("/section", sectionRoutes)
+app.use("/user", userRoutes)
 
 mongoose
   .connect(process.env.MONGO_URL, {})

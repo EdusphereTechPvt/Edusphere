@@ -234,7 +234,7 @@ export default function ImpactAndStatistic() {
       <h2 className="text-2xl md:text-3xl font-bold mb-10 text-black">
         Impact and Statistics
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+      <div className="flex flex-wrap justify-center items-center gap-6 mx-auto">
         {stats.map((stat, i) => (
           <CardComponent key={i} data={stat} />
         ))}

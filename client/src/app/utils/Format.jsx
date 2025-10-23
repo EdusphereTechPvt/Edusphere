@@ -76,6 +76,7 @@ export const formatElement = (formatType, elements = []) => {
             type: el.type,
             label: el.label,
             id: el.id,
+            disabled: el.disabled,
             action: el.action,
             actionValue: el.actionValue,
             variant: "contained",
