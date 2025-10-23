@@ -11,7 +11,8 @@ export const generalRoutes = [
   "/contact",
   "/privacy",
   "/pricing",
-  "/help"
+  "/help",
+  "/ptm-scheduling"
 ]
 
 export const errorRoutes = ["/error/404", "/error/403", "/error/401"]
