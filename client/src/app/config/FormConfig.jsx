@@ -267,6 +267,12 @@ const formConfig = {
     api: {
       fetch: "/student/getStudent",
       submit: "/student/save",
+      page: {
+        mode: {
+          add: "/form/student/add",
+          edit: "/form/student/edit",
+        },
+      },
     },
     info: [
       {
@@ -278,6 +284,14 @@ const formConfig = {
             "text-xl sm:text-2xl md:text-3xl font-bold text-[var(--color-text)]",
           inlineStyle: {},
         },
+        mode: {
+          add: {
+            value: "Add New Student",
+          },
+          edit: {
+            value: "Edit Student",
+          },
+        },
       },
       {
         type: "desc",
@@ -286,6 +300,15 @@ const formConfig = {
         styles: {
           className: "text-[var(--color-text-secondary)] mb-2",
           inlineStyle: {},
+        },
+        mode: {
+          add: {
+            value:
+              "Fill in the destails below to create a new student profile.",
+          },
+          edit: {
+            value: "Fill in the destails below to edit student profile.",
+          },
         },
       },
     ],
@@ -318,11 +341,14 @@ const formConfig = {
           },
           {
             type: "dropdown",
-            name: "class",
+            name: "classes",
+            fieldName: "name",
+            collectionName: "class",
             label: "Class",
             placeholder: "Select class",
             required: true,
             items: [],
+            isDistinct: true,
           },
         ],
       },
@@ -337,8 +363,7 @@ const formConfig = {
             required: true,
             pattern: {
               value: "^[A-Za-z\\s]*$",
-              message:
-                "Parent Name can only contain letters and spaces",
+              message: "Parent Name can only contain letters and spaces",
             },
           },
           {
@@ -385,7 +410,7 @@ const formConfig = {
               value: "^[A-Za-z\\s]*$",
               message: "Mother's Name can only contain letters and spaces",
             },
-          }
+          },
         ],
       },
       {
@@ -435,7 +460,15 @@ const formConfig = {
             type: "button",
             variant: "contained",
             text: "Save Student",
-            action: "save",
+            action: "submit",
+            mode: {
+              add: {
+                text: "Save Student",
+              },
+              edit: {
+                text: "Update Student",
+              },
+            },
           },
         ],
       },
