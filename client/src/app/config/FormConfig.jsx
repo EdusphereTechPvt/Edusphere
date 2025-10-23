@@ -323,6 +323,7 @@ const formConfig = {
             placeholder: "Select class",
             required: true,
             items: [],
+            isDistinct: true,
           },
         ],
       },
@@ -337,8 +338,7 @@ const formConfig = {
             required: true,
             pattern: {
               value: "^[A-Za-z\\s]*$",
-              message:
-                "Parent Name can only contain letters and spaces",
+              message: "Parent Name can only contain letters and spaces",
             },
           },
           {
@@ -385,7 +385,7 @@ const formConfig = {
               value: "^[A-Za-z\\s]*$",
               message: "Mother's Name can only contain letters and spaces",
             },
-          }
+          },
         ],
       },
       {
