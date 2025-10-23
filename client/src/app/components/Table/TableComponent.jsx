@@ -47,6 +47,7 @@ export const TableComponent = ({
   const [selected, setSelected] = useState([]);
   const [isEditable, setEditable] = useState(false);
   const [tableData, setTableData] = useState(data);
+  
 
   useEffect(() => {
     setTableData(data);
@@ -326,7 +327,7 @@ export const TableComponent = ({
                                     variant="caption"
                                     sx={{ fontSize: "0.8em", color: "#777" }}
                                   >
-                                    Room {cellData.roomno}
+                                    {cellData.roomno}
                                   </Typography>
                                 )}
                               </Box>

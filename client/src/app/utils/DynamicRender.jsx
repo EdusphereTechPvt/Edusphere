@@ -75,7 +75,7 @@ export const DynamicRenderer = ({
             className={config.styles.authorStyle.className}
             style={config.styles.authorStyle.inlineStyle}
             mt={1}
-          // variant="caption"
+            // variant="caption"
           >
             {config.author}
           </Typography>
@@ -338,7 +338,14 @@ export const DynamicRenderer = ({
 
 //topHeaderRenderer
 export const renderTopHeader = (items, data = {}) => {
-  const { tableData, isEditable, selected, handleAction } = data;
+  const {
+    isEditable,
+    selected,
+    setEditable,
+    tableData,
+    setTableData,
+    handleAction,
+  } = data;
   return items?.map(
     (
       {
@@ -406,14 +413,14 @@ export const renderTopHeader = (items, data = {}) => {
                   required,
                   items: items || [],
                 }}
-                onSelect={(value) => console.log("from dropdown", value)}
+                onSelect={(value) => handleAction(action, value, actionValue, actionUse, data)}
                 styles={{
                   ...styles,
                   minWidth: "280px",
                   width: "100%",
                   backgroundColor: "#fff",
                   borderRadius: "12px",
-                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)"
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
                 }}
               />
             </Box>
@@ -424,7 +431,6 @@ export const renderTopHeader = (items, data = {}) => {
             <Box
               key={idx}
               sx={{
-
                 justifyContent: "center",
                 width: "100%",
                 maxWidth: 400,
@@ -440,7 +446,7 @@ export const renderTopHeader = (items, data = {}) => {
 
                   ...styles?.elementStyles,
                 }}
-                onSearch={(value) => handleAction(action, value, actionUse)}
+                onSearch={(value) => handleAction(action, value, actionValue, actionUse, data)}
               />
             </Box>
           );
@@ -450,7 +456,7 @@ export const renderTopHeader = (items, data = {}) => {
               key={idx}
               variant={variant || "contained"}
               disabled={disabled}
-              onClick={() => handleAction(action, actionValue, actionUse)}
+              onClick={() => handleAction(action, actionValue, actionUse, data)}
               sx={{
                 display: "flex",
                 alignItems: "center",
