@@ -22,7 +22,7 @@ const Manage = () => {
     active: 0,
     inactive: 0,
     roles: { admin: 0, teacher: 0, student: 0, parent: 0 },
-  });
+  });  
 
   useEffect(() => {
     const getAllUsers = async () => {

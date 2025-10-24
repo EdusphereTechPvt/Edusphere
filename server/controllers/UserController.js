@@ -2,11 +2,9 @@ const User = require("../models/AuthSchema");
 
 const getAllUsers = async(req, res) => {
   try {
-    console.log("inside users")
     const users = await User.find({ schoolId: req.user.schoolId }).select(
-      "name uid dateOfBirth email role isActive lastLogin emailVerified"
+      "name uid dateOfBirth email role isActive lastLogin emailVerified createdAt updatedAt"
     );
-    console.log(users)
     if (!users || users.length === 0) {
       return res.status(404).json({
         message: "No user found",
