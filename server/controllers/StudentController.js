@@ -292,21 +292,22 @@ const save = async (req, res) => {
       name,
       dateOfBirth,
       gender,
-      classId,
-      sectionId,
+      classId : classes,
+      sectionId : sections,
       parentName,
       guardianName,
       parentEmail,
       parentContactNumber,
-      occupation,
+      parentOccupation,
       motherName,
-      studentContactNumber,
+      contactNumber,
       address,
       studentPhoto,
       isActive,
     } = req.body;
-
     const { schoolId } = req.user;
+    
+    
 
     if (!name || !dateOfBirth || !schoolId || !classId || !sectionId || !parentName || !parentEmail || !parentContactNumber) {
       await session.abortTransaction();
@@ -338,9 +339,9 @@ const save = async (req, res) => {
         guardianName,
         parentEmail,
         parentContactNumber,
-        occupation,
+        parentOccupation,
         motherName,
-        studentContactNumber,
+        contactNumber,
         address,
         studentPhoto,
         isActive,
@@ -365,9 +366,9 @@ const save = async (req, res) => {
       guardianName,
       parentEmail,
       parentContactNumber,
-      occupation,
+      parentOccupation,
       motherName,
-      studentContactNumber,
+      contactNumber,
       address,
       studentPhoto,
       isActive,
@@ -402,7 +403,7 @@ const getStudentDetails = async (req, res) => {
   if (parentContactNumber) searchFields.parentContactNumber = { $regex: parentContactNumber, $options: "i" };
 
   try {
-    const response = await Student.find(searchFields).populate("userId", "email studentContactNumber name");
+    const response = await Student.find(searchFields).populate("userId", "email contactNumber name");
 
     if (response.length === 0) {
       return res.status(404).json({ data: [], message: "No student found", status: false });
@@ -420,7 +421,7 @@ const getStudentDetails = async (req, res) => {
 const getAllStudentsList = async (req, res) => {
   try {
     const students = await Student.find({ schoolId: req.user.schoolId })
-      .populate("userId", "name email avatar studentContactNumber isActive");
+      .populate("userId", "name email avatar contactNumber isActive");
 
     if (!students || students.length === 0) {
       return res.status(200).json({ data: [], message: "No student found", status: false });
@@ -430,7 +431,7 @@ const getAllStudentsList = async (req, res) => {
       studentId: student.studentId,
       name: student.name,
       email: student.userId?.email || null,
-      studentContactNumber: student.studentContactNumber || student.userId?.studentContactNumber || null,
+      contactNumber: student.contactNumber || student.userId?.contactNumber || null,
       parentName: student.parentName,
       parentContactNumber: student.parentContactNumber,
       avatar: student.userId?.avatar || null,
@@ -456,7 +457,7 @@ const getProfileCardData = async (req, res) => {
     const { key, value } = req.body.searchBy;
 
     const studentProfileData = await Student.findOne({ [key]: value })
-      .populate("userId", "name email avatar studentContactNumber isActive");
+      .populate("userId", "name email avatar contactNumber isActive");
 
     if (!studentProfileData) {
       return res.status(404).json({ message: "Student not found", status: false });
@@ -467,7 +468,7 @@ const getProfileCardData = async (req, res) => {
       id: studentProfileData.studentId,
       name: studentProfileData.name,
       email: studentProfileData.userId?.email || null,
-      studentContactNumber: studentProfileData.studentContactNumber || studentProfileData.userId?.studentContactNumber || null,
+      contactNumber: studentProfileData.contactNumber || studentProfileData.userId?.contactNumber || null,
       parentName: studentProfileData.parentName,
       parentContactNumber: studentProfileData.parentContactNumber,
       avatar: studentProfileData.userId?.avatar || null,
