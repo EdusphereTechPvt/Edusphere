@@ -92,7 +92,7 @@ const formConfig = {
             label: "Contact Number",
             placeholder: "Enter contact number",
             required: true,
-            minLength: 10,
+            maxLength: 10,
           },
           {
             type: "email",
@@ -120,9 +120,9 @@ const formConfig = {
             required: true,
           },
           {
-            type: "text",
+            type: "number",
             name: "experienceYears",
-            label: "Experience",
+            label: "Experience (In Years)",
             placeholder: "Select Experience",
             required: true,
           },
@@ -177,6 +177,7 @@ const formConfig = {
             label: "Assigned Subjects",
             placeholder: "Select subjects",
             isDistinct: true,
+            required: false,
             dependancy: ["classes"],
             items: [],
             styles: {
@@ -318,15 +319,21 @@ const formConfig = {
         fields: [
           {
             type: "text",
-            name: "studentName",
+            name: "name",
             label: "Student Name",
             placeholder: "Enter student's full name",
+            required: true,
             pattern: {
               value: "^[A-Za-z\\s]*$",
               message: "Student Name can only contain letters and spaces",
             },
           },
-          { type: "date", name: "dateOfBirth", label: "Date of Birth" },
+          {
+            type: "date",
+            name: "dateOfBirth",
+            label: "Date of Birth",
+            required: true,
+          },
           {
             type: "dropdown",
             name: "gender",
@@ -347,6 +354,18 @@ const formConfig = {
             label: "Class",
             placeholder: "Select class",
             required: true,
+            items: [],
+            isDistinct: true,
+          },
+          {
+            type: "dropdown",
+            name: "sections",
+            fieldName: "name",
+            collectionName: "section",
+            label: "Section",
+            placeholder: "Select Section",
+            required: true,
+            dependancy: ["classes"],
             items: [],
             isDistinct: true,
           },
@@ -385,7 +404,7 @@ const formConfig = {
           },
           {
             type: "number",
-            name: "parentPhone",
+            name: "parentContactNumber",
             label: "Parent/Guardian Contact Number",
             placeholder: "Enter parent's contact number",
             required: true,
@@ -436,7 +455,7 @@ const formConfig = {
         fields: [
           {
             type: "file",
-            name: "photo",
+            name: "studentPhoto",
             label: "Student Photo",
             placeholder: "Upload Photo",
           },
@@ -761,7 +780,7 @@ const formConfig = {
             collectionName: "class",
             placeholder: "Enter the classes associated with the subject",
             isDistinct: true,
-            required: false,
+            required: true,
             items: [],
             styles: {
               selectStyle: {
@@ -777,6 +796,7 @@ const formConfig = {
             collectionName: "teacher",
             placeholder: "Enter the teachers associated with the subject",
             required: false,
+            dependancy: ["classes"],
             isDistinct: true,
             items: [],
             styles: {
@@ -906,6 +926,10 @@ const formConfig = {
             label: "Sections",
             fieldName: "name",
             collectionName: "section",
+            filter: {
+              add: { classes: null },
+              edit: { classes: `$_id` },
+            },
             filter: {
               add: { classes: null },
               edit: { classes: `$_id` },
@@ -1149,15 +1173,15 @@ const formConfig = {
           },
           {
             type: "button",
-            text: "Save Subject",
+            text: "Save Section",
             variant: "contained",
             action: "submit",
             mode: {
               add: {
-                text: "Save Subject",
+                text: "Save Section",
               },
               edit: {
-                text: "Update Subject",
+                text: "Update Section",
               },
             },
           },
