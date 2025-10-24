@@ -133,7 +133,7 @@ const MultiSelectDropdown = ({value, data, resetFlag, style = {}, onSelect ,onBl
               notched={shouldLabelShrink}
             />
           }
-          sx={{...style.selectStyle}}
+          sx={{minHeight: '2.5rem', ...style.selectStyle}}
           renderValue={(selected) => (
             <Box sx={{ 
               display: 'flex', 

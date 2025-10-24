@@ -844,8 +844,8 @@ const formConfig = {
   },
   section: {
     api: {
-      fetch: "/section/search",
-      submit: "/section/save",
+      fetch: "",
+      submit: "",
       page: {
         mode: {
           add: "/form/section/add",
@@ -1013,6 +1013,337 @@ const formConfig = {
       },
     ],
   },
+ptm: {
+  api: {
+    fetch: "",
+    submit: "",
+    page: {
+      mode: {
+        add: "",
+        edit: ""
+      }
+    }
+  },
+  info: [
+    {
+      type: "title",
+      value: "Configure PTM Session",
+      tag: "h1",
+      styles: {
+        className: "text-xl sm:text-2xl md:text-3xl font-bold text-[var(--color-text)]",
+        inlineStyle: {},
+      }
+    },
+    {
+      type: "desc",
+      value: "Set up the details for your Parent-Teacher Meetings.",
+      tag: "p",
+      styles: {
+        className: "text-[var(--color-text-secondary)] mb-2",
+        inlineStyle: {},
+      }
+    }
+  ],
+  sections: [
+    {
+      title: "Basic Information",
+      fields: [
+        {
+          type: "text",
+          name: "ptmTitle",
+          label: "PTM Title",
+          placeholder: "e.g., Spring Term Parent-Teacher Conferences",
+          required: true,
+          pattern: {
+            value: "^[A-Za-z0-9\\s\\-',.!&()]{10,100}$",
+            message: "Title should be 10-100 characters with only letters, numbers, spaces, and basic punctuation"
+          },
+          maxLength: 100
+        }
+      ]
+    },
+    {
+      title: "",
+      fields: [
+        {
+          type: "textArea",
+          name: "description",
+          label: "Description",
+          placeholder: "Provide an agenda or any relevant notes for the PTM session.",
+          required: false,
+          pattern: {
+            value: "^[A-Za-z0-9\\s\\-',.!:;?()\\n]{0,500}$",
+            message: "Description can contain up to 500 characters with letters, numbers, and basic punctuation"
+          },
+          maxLength: 500
+        }
+      ]
+    },
+    {
+      title: "Date & Time Configuration",
+      fields: [
+        {
+          type: "date",
+          name: "startDate",
+          label: "Start Date",
+          required: true,
+          validation: {
+            beforeEndDate: "Start date must be before end date"
+          }
+        },
+        {
+          type: "date",
+          name: "endDate",
+          label: "End Date",
+          required: true,
+          validation: {
+            afterStartDate: "End date must be after start date"
+          }
+        },
+        {
+          type: "number",
+          name: "meetingDuration",
+          label: "Meeting Duration (minutes)",
+          placeholder: "e.g., 20",
+          required: true,
+          min: 5,
+          max: 480,
+          pattern: {
+            value: "^([5-9]|[1-9][0-9]|[1-4][0-9]{2}|480)$",
+            message: "Duration must be between 5-480 minutes"
+          }
+        },
+        {
+          type: "radio",
+          name: "meetingType",
+          label: "Meeting Type",
+          required: true,
+          values: [
+            { 
+              name: "inPerson", 
+              text: "In-person",
+              icon: "Business" 
+            },
+            { 
+              name: "virtual", 
+              text: "Virtual",
+              icon: "Videocam" 
+            },
+            { 
+              name: "hybrid", 
+              text: "Hybrid",
+              icon: "Blender" 
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "Scheduling Details",
+      fields: [
+        {
+          type: "number",
+          name: "durationPerAppointment",
+          label: "Duration per Appointment (minutes)",
+          placeholder: "e.g., 20",
+          required: true,
+          min: 5,
+          max: 120,
+          pattern: {
+            value: "^([5-9]|[1-9][0-9]|1[0-1][0-9]|120)$",
+            message: "Appointment duration must be 5-120 minutes"
+          }
+        },
+        {
+          type: "text",
+          name: "sessionStartTime",
+          label: "Session Start Time",
+          placeholder: "e.g., 09:00 AM",
+          required: true,
+          pattern: {
+            value: "^(0?[1-9]|1[0-2]):[0-5][0-9]\\s?(AM|PM|am|pm)$",
+            message: "Please enter time in format: HH:MM AM/PM (e.g., 09:00 AM)"
+          }
+        },
+        {
+          type: "text",
+          name: "sessionEndTime",
+          label: "Session End Time",
+          placeholder: "e.g., 03:00 PM",
+          required: true,
+          pattern: {
+            value: "^(0?[1-9]|1[0-2]):[0-5][0-9]\\s?(AM|PM|am|pm)$",
+            message: "Please enter time in format: HH:MM AM/PM (e.g., 03:00 PM)"
+          }
+        },
+        {
+          type: "number",
+          name: "breakMinutes",
+          label: "Add Break (minutes)",
+          placeholder: "e.g., 15",
+          required: false,
+          min: 0,
+          max: 120,
+          pattern: {
+            value: "^([0-9]|[1-9][0-9]|1[0-1][0-9]|120)$",
+            message: "Break time must be 0-120 minutes"
+          }
+        },
+        {
+          type: "number",
+          name: "maxAppointmentsPerSlot",
+          label: "Maximum Appointments per Slot",
+          placeholder: "e.g., 1",
+          required: true,
+          min: 1,
+          max: 10,
+          pattern: {
+            value: "^([1-9]|10)$",
+            message: "Maximum appointments must be 1-10"
+          }
+        }
+      ]
+    },
+    {
+      title: "Participant Selection",
+      fields: [
+        {
+          type: "multiselect",
+          name: "teachers",
+          label: "Teacher Selection",
+          placeholder: "Select teachers",
+          items: [],
+          isDistinct: true,
+          styles: {
+            selectStyle: {
+              height: "3.5rem"
+            }
+          }
+        },
+        {
+          type: "multiselect",
+          name: "Classes",
+          label: "Grade/Class Inclusion",
+          placeholder: "Select grades/classes",
+          items: [],
+          isDistinct: true,
+          styles: {
+            selectStyle: {
+              height: "3.5rem"
+            }
+          }
+        },
+        {
+          type: "multiselect",
+          name: "specialParticipants",
+          label: "Special Participant Options",
+          placeholder: "Select special participants",
+          items: [
+            { id: "counselors", value: "Counselors" },
+            { id: "specialEd", value: "Special Ed. Specialists" }
+          ],
+          styles: {
+            selectStyle: {
+              height: "3.5rem"
+            }
+          }
+        },
+        {
+          type: "dropdown",
+          name: "parentAttendance",
+          label: "Parent Attendance Requirements",
+          placeholder: "Select requirement",
+          required: true,
+          items: [
+            { id: "mandatory", value: "Mandatory" },
+            { id: "optional", value: "Optional" },
+            { id: "inviteOthers", value: "Invite Others" }
+          ]
+        }
+      ]
+    },
+    {
+      title: "Location & Resources",
+      fields: [
+        {
+          type: "dropdown",
+          name: "physicalRoom",
+          label: "Physical Room Allocation",
+          placeholder: "Select room",
+          required: false,
+          items: [],
+          isDistinct: true
+        },
+        {
+          type: "dropdown", 
+          name: "virtualPlatform",
+          label: "Virtual Meeting Platform",
+          placeholder: "Select platform",
+          required: false,
+          items: [
+            { id: "school-link", value: "School Provided Link" },
+            { id: "zoom", value: "Zoom" },
+            { id: "google-meet", value: "Google Meet" },
+            { id: "microsoft-teams", value: "Microsoft Teams" },
+            { id: "other", value: "Other" }
+          ]
+        },
+        {
+          type: "checkBox",
+          name: "virtualMeetingOptions",
+          label: "Virtual Meeting Options",
+          values: [
+            { name: "enableWaitingRoom", text: "Enable Waiting Room for Virtual Meetings" }
+          ]
+        },
+        {
+          type: "textArea",
+          name: "resourceRequirements",
+          label: "Resource Requirements",
+          placeholder: "e.g., Projector, Documents for parents",
+          required: false,
+          pattern: {
+            value: "^[A-Za-z0-9\\s\\-',.!:;?()\\n]{0,300}$",
+            message: "Resource requirements can contain up to 300 characters"
+          },
+          maxLength: 300
+        }
+      ]
+    },
+    {
+      title: "Actions",
+      position: "bottom",
+      fields: [
+        {
+          type: "button",
+          variant: "outlined",
+          text: "Cancel",
+          action: "cancel"
+        },
+        {
+          type: "button",
+          variant: "outlined",
+          text: "Save Draft",
+          action: "saveDraft"
+        },
+        {
+          type: "button",
+          variant: "contained",
+          text: "Publish PTM",
+          action: "submit",
+          mode: {
+            add: {
+              text: "Publish PTM"
+            },
+            edit: {
+              text: "Update PTM"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
 };
 
 export default formConfig;

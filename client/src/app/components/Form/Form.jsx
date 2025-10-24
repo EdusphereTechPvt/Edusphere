@@ -8,6 +8,7 @@ import {
   FormControlLabel,
   FormGroup,
 } from "@mui/material";
+import * as MuiIcons from "@mui/icons-material";
 import { Cancel, CloudUpload, Person, QrCode } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import Dropdown from "../Dropdown/Dropdown";
@@ -61,7 +62,12 @@ export default function Form({ type, mode, id }) {
               !field.dependancy ||
               field.dependancy.every((dep) => formData[dep]?.length > 0);
             if (depsSatisfied) {
-              const options = await fetchDistinctValues(field, formData, config?.api?.page?.mode?.[mode]);
+              const options = await fetchDistinctValues(
+                field,
+                formData,
+                config?.api?.page?.mode?.[mode],
+                mode
+              );
               dynamicUpdateConfig(config, {
                 fieldName: "items",
                 matchKey: "name",
@@ -111,6 +117,7 @@ export default function Form({ type, mode, id }) {
           setFormData({});
           setResetFlag((f) => !f);
           setDisabled(true);
+          if (mode === "edit") router.back();
         }
       }
     },
@@ -300,8 +307,16 @@ export default function Form({ type, mode, id }) {
                               // type TExt
                               if (type === "text") {
                                 const pattern =
-                                  field?.pattern && new RegExp(field.pattern);
-                                if (pattern && !pattern.test(value)) return;
+                                  field?.pattern && new RegExp(field.pattern.value);
+
+                                if (pattern && value && !pattern.test(value)) {
+                                  showToast(
+                                    field?.pattern.message ||
+                                      `${label} format is invalid`,
+                                    "warning"
+                                  );
+                                  return;
+                                }
                                 if (field?.maxLength) {
                                   value = formatLabel(
                                     value.slice(0, field.maxLength)
@@ -463,6 +478,59 @@ export default function Form({ type, mode, id }) {
                         />
                       </div>
                     );
+                  case "radio":
+                      return (
+                        <div key={i} className="flex flex-col w-full">
+                          <label className="mb-1 text-sm font-medium text-gray-700"> 
+                            {label} {required && "*"}
+                          </label>
+                          <div className="flex gap-3 "> 
+                            {values.map((option, idx) => {
+                              const IconComponent = option.icon ? MuiIcons[option.icon] : null;
+                              
+                              return (
+                                <label 
+                                  key={idx} 
+                                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all flex-1 min-w-0 ${ /* Reduced padding from px-4 py-3 to px-3 py-2 */
+                                    formData[name] === option.name 
+                                      ? 'border-blue-600 bg-blue-50 shadow-sm' 
+                                      : 'border-gray-300 hover:border-gray-400'
+                                  }`}
+                                >
+                                  <input
+                                    type="radio"
+                                    name={name}
+                                    value={option.name}
+                                    checked={formData[name] === option.name}
+                                    onChange={(e) => handleChange(name, e.target.value)}
+                                    onBlur={handleBlur(field)}
+                                    className="hidden"
+                                  />
+                                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                                    formData[name] === option.name 
+                                      ? 'border-blue-600 bg-blue-600' 
+                                      : 'border-gray-400'
+                                  }`}>
+                                    {formData[name] === option.name && (
+                                      <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                                    )}
+                                  </div>
+                                  {IconComponent && (
+                                    <IconComponent 
+                                      fontSize="small" 
+                                      className="text-gray-600 flex-shrink-0" 
+                                      sx={{ fontSize: 16 }} 
+                                    />
+                                  )}
+                                  <span className="text-sm text-gray-700 whitespace-nowrap">
+                                    {option.text}
+                                  </span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
                   default:
                     return null;
                 }
