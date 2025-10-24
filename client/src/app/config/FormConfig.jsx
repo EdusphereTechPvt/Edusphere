@@ -930,10 +930,6 @@ const formConfig = {
               add: { classes: null },
               edit: { classes: `$_id` },
             },
-            filter: {
-              add: { classes: null },
-              edit: { classes: `$_id` },
-            },
             placeholder: "Select the sections to include",
             required: false,
             items: [],
