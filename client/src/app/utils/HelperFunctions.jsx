@@ -14,7 +14,6 @@ export const useHandleAction = () => {
 
   const handleAction = async (action, actionValue, actionUse, data = {}) => {
     switch (action) {
-
       case "navigate":
         if (actionUse === "edit") router.push(`/${actionValue}?id=${data.id}`);
         if (actionUse === "add") router.push(`/${actionValue}`);
@@ -30,9 +29,8 @@ export const useHandleAction = () => {
         switch (actionUse) {
           case "edit": {
             if (data?.setEditable && data?.isEditable !== undefined) {
-              const newMode = !data.isEditable;
-              data.setEditable(newMode);
-              return; 
+              data.setEditable(!data.isEditable);
+              return;
             }
 
             if (!data.isEditable && data.selected) {

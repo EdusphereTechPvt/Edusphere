@@ -1,13 +1,13 @@
-const ElementAccessController = require("../models/ElementAccessController");
+const ElementAccessController = require("../models/ElementAccess");
 const { verifyAccessToken } = require("../utils/tokenUtils");
 
-const getElement = async(req,res) => {
+const getElement = async (req, res) => {
   try {
     let rolesToCheck = ["default"];
-    
+
     const token = req.cookies?.accessToken;
 
-    const {page} = req.body
+    const { page } = req.body
     if (token) {
       try {
         const decoded = verifyAccessToken(token);
@@ -23,9 +23,9 @@ const getElement = async(req,res) => {
 
     // query
     const elements = await ElementAccessController.find({
-      page: {$in: page},
+      page: { $in: page },
       enableFor: { $in: rolesToCheck },
-    }).sort({order: 1});
+    }).sort({ order: 1 });
 
     res.json({ success: true, elements });
   } catch (err) {
@@ -34,8 +34,8 @@ const getElement = async(req,res) => {
   }
 }
 
-const addElement = async(req,res) => {
-    try {
+const addElement = async (req, res) => {
+  try {
     const {
       page,
       type,
@@ -47,12 +47,13 @@ const addElement = async(req,res) => {
       collection,
       enableFor = [],
       order = 0,
+      isDistinct= false,
     } = req.body;
 
-     let rolesToCheck = ["default"];
-     const token = req.cookies?.accessToken;
+    let rolesToCheck = ["default"];
+    const token = req.cookies?.accessToken;
 
-     if (token) {
+    if (token) {
       try {
         const decoded = verifyAccessToken(token);
 
@@ -71,7 +72,7 @@ const addElement = async(req,res) => {
     }
 
     // Check if element already exists for same page + id
-    const exists = await ElementAccessController.findOne({ page, id,  enableFor: { $in: rolesToCheck } });
+    const exists = await ElementAccessController.findOne({ page, id, enableFor: { $in: rolesToCheck } });
     if (exists) {
       return res.status(409).json({ message: "Element already exists" });
     }
@@ -87,6 +88,7 @@ const addElement = async(req,res) => {
       collection,
       enableFor,
       order,
+      isDistinct
     });
 
     await newElementAccessController.save();

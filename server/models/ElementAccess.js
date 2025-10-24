@@ -16,6 +16,7 @@ const ElementAccessControllerSchema = new mongoose.Schema({
   collection: { type: String },
   enableFor: [{ type: String }],
   order: { type: Number, default: 0 },
+  isDistinct : {type: Boolean, default: false},
 }, {timestamps: true});
 
 module.exports = mongoose.model(

@@ -47,7 +47,6 @@ export const TableComponent = ({
   const [selected, setSelected] = useState([]);
   const [isEditable, setEditable] = useState(false);
   const [tableData, setTableData] = useState(data);
-  
 
   useEffect(() => {
     setTableData(data);
@@ -84,38 +83,38 @@ export const TableComponent = ({
     );
     return key ? row[key] : null;
   };
+  const getRowId = (row) =>
+    row?._id ?? row?.ID ?? row?.Id ?? row?.id ?? row?.$id ?? null;
+  const isRowSelected = (row) =>
+    selected.some((r) => getRowId(r) === getRowId(row));
 
   const handleSelect = (row) => {
+    const rowId = getRowId(row);
     setSelected((prev) => {
-      const isSelected = prev.includes(row);
-      if (isSelected) return prev.filter((r) => r !== row);
-      return [...prev, row];
+      const isSelected = prev.some((r) => getRowId(r) === rowId);
+      return isSelected
+        ? prev.filter((r) => getRowId(r) !== rowId)
+        : [...prev, row];
     });
   };
 
   const handleSelectAll = () => {
-    if (selected.length === data.length) {
-      setSelected([]);
-    } else {
-      setSelected([...data]);
-    }
+    setSelected((prev) => (prev.length === data.length ? [] : [...data]));
   };
 
   const handleEdit = useCallback(
     (rowIndex, header, newValue) => {
       const updatedData = [...tableData];
-      updatedData[rowIndex] = {
-        ...updatedData[rowIndex],
-        [header]: newValue,
-      };
+      const row = updatedData[rowIndex];
+      updatedData[rowIndex] = { ...row, [header]: newValue };
       setTableData(updatedData);
 
+      const rowId = getRowId(row);
+
       setSelected((prev) =>
-        prev.includes(tableData[rowIndex])
-          ? prev.map((r) =>
-              r === tableData[rowIndex] ? { ...r, [header]: newValue } : r
-            )
-          : prev
+        prev.map((r) =>
+          getRowId(r) === rowId ? { ...r, [header]: newValue } : r
+        )
       );
     },
     [tableData]
@@ -272,13 +271,17 @@ export const TableComponent = ({
                                   ? "3px solid #3b82f6"
                                   : "1px solid #e5e7eb",
                               backgroundColor: bg,
-                              cursor: cellData?.subject && cellData?.teacher ? "pointer" : "default",
+                              cursor:
+                                cellData?.subject && cellData?.teacher
+                                  ? "pointer"
+                                  : "default",
                               transition: "0.2s",
                               color: text,
                               "&:hover": {
-                                backgroundColor: cellData?.subject && cellData?.teacher
-                                  ? hover
-                                  : "transparent",
+                                backgroundColor:
+                                  cellData?.subject && cellData?.teacher
+                                    ? hover
+                                    : "transparent",
                               },
                             }}
                             onClick={() => {
@@ -365,7 +368,7 @@ export const TableComponent = ({
                           padding="checkbox"
                         >
                           <Checkbox
-                            checked={selected.includes(row)}
+                            checked={isRowSelected(row)}
                             onChange={() => handleSelect(row)}
                             sx={{
                               transform: {
@@ -381,10 +384,11 @@ export const TableComponent = ({
                         const editableFieldConfig = editableFields.find(
                           (f) => f.name?.toLowerCase() === header?.toLowerCase()
                         );
+
                         const type =
                           header?.toLowerCase() === "status"
                             ? "labelchip"
-                            : selected.includes(row) && isEditable
+                            : isRowSelected(row) && isEditable
                             ? editableFieldConfig?.type
                             : "default";
                         return (

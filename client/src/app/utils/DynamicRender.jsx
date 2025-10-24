@@ -257,6 +257,15 @@ export const DynamicRenderer = ({
         );
       };
 
+      const handleBlur = () => {
+        let value = config?.text;
+        if (value === "" || value === null || value === undefined) {
+          if (config?.fieldType === "number") value = 0;
+          if (config?.fieldType === "text") value = "-";
+          config?.onChangeValue(value);
+        }
+      };
+
       return (
         <>
           {config?.fieldType === "number" && (
@@ -276,7 +285,7 @@ export const DynamicRenderer = ({
             value={config?.text}
             placeholder={config?.placeholder}
             onChange={handleChange}
-            onBlur={config?.onBlur}
+            onBlur={handleBlur}
             variant="outlined"
             size="small"
             fullWidth
@@ -404,16 +413,17 @@ export const renderTopHeader = (items, data = {}) => {
 
         case "dropdown":
           return (
-            <Box sx={{ minWidth: "280px", width: "100%" }}>
+            <Box key={idx} sx={{ minWidth: "280px", width: "100%" }}>
               <Dropdown
-                key={idx}
                 data={{
                   label,
                   placeholder,
                   required,
                   items: items || [],
                 }}
-                onSelect={(value) => handleAction(action, value, actionValue, actionUse, data)}
+                onSelect={(value) =>
+                  handleAction(action, value, actionValue, actionUse, data)
+                }
                 styles={{
                   ...styles,
                   minWidth: "280px",
@@ -446,7 +456,9 @@ export const renderTopHeader = (items, data = {}) => {
 
                   ...styles?.elementStyles,
                 }}
-                onSearch={(value) => handleAction(action, value, actionValue, actionUse, data)}
+                onSearch={(value) =>
+                  handleAction(action, value, actionValue, actionUse, data)
+                }
               />
             </Box>
           );
@@ -455,7 +467,7 @@ export const renderTopHeader = (items, data = {}) => {
             <Button
               key={idx}
               variant={variant || "contained"}
-              disabled={disabled}
+              disabled={disabled ? (selected.length > 0 ? false : true) : false}
               onClick={() => handleAction(action, actionValue, actionUse, data)}
               sx={{
                 display: "flex",
