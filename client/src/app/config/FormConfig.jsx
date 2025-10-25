@@ -327,9 +327,9 @@ const formConfig = {
             placeholder: "Select gender",
             required: true,
             items: [
-              { id: "male", value: "Male" },
-              { id: "female", value: "Female" },
-              { id: "other", value: "Other" },
+              { id: "Male", value: "Male" },
+              { id: "Female", value: "Female" },
+              { id: "Other", value: "Other" },
             ],
           },
           {
@@ -354,6 +354,18 @@ const formConfig = {
             dependancy: ["classes"],
             items: [],
             isDistinct: true,
+          },
+          {
+            type: "dropdown",
+            name: "status",
+            label: "Status",
+            placeholder: "Select Student Status",
+            required: true,
+            items: [
+              {id: "Active", value: "Active"},
+              {id: "Inactive", value: "Inactive"},
+              {id: "On Hold", value: "On Hold"},
+            ],
           },
         ],
       },
@@ -441,7 +453,7 @@ const formConfig = {
         fields: [
           {
             type: "file",
-            name: "studentPhoto",
+            name: "photo",
             label: "Student Photo",
             placeholder: "Upload Photo",
           },
