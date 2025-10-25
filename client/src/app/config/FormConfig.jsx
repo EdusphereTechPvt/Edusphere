@@ -428,6 +428,7 @@ const formConfig = {
             name: "parentDOB",
             label: "Parent/Guardian Date of Birth",
             placeholder: "Enter Parents Date of Birth",
+            required: true,
             format: "YYYY-MM-DD",
             min: new Date(
               today.getFullYear() - 80,
@@ -487,7 +488,6 @@ const formConfig = {
             name: " ",
             label: "Parent/Guardian Alternative Contact Number",
             placeholder: "Enter parent/guardian's contact number",
-            required: true,
             maxLength: 10,
           },
         ],
@@ -512,6 +512,7 @@ const formConfig = {
             type: "textArea",
             name: "address",
             label: "Address",
+            required: true,
             placeholder: "Enter student's address",
           },
         ],

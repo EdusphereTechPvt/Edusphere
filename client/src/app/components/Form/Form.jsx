@@ -48,6 +48,7 @@ export default function Form({ type, mode, id }) {
       if (Array.isArray(val)) return val.length > 0;
       if (val instanceof File) return true;
       if (typeof val === "boolean") return true;
+      if (typeof val === "object" && val?.startsWith && val.startsWith("data:image")) return true;
       return true;
     });
     setDisabled(hasErrors || !allRequiredFilled);
@@ -409,7 +410,7 @@ export default function Form({ type, mode, id }) {
                     return (
                       <div key={i} className="col-span-1 sm:col-span-2">
                         <label className="block mb-1 font-medium text-gray-700">
-                          {label}
+                          {label} {required && "*"}
                         </label>
                         <textarea
                           name={name}
