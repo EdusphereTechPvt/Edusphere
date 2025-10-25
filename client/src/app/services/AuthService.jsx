@@ -2,6 +2,8 @@ import { signInWithPopup } from "firebase/auth";
 import { auth } from "../utils/Firebase";
 import { showToast } from "../utils/Toast";
 import api from "./MiddlewareService";
+import { setConnectionStatus } from "../store/AuthSlice";
+import store from "../store";
 
 export const authenticateUser = async (mode, role, fields) => {
   try {
@@ -174,40 +176,44 @@ export const logout = async () => {
     showToast("Error Updating Password", "error")
     return false;
   }
+  finally {
+    store.dispatch(setConnectionStatus("disconnected"));
+    store.dispatch(logout());
+  }
 }
 
-export const ping = async (page) => {
+export const ping = async (page, isProtected) => {
   try {
-    const response = await api.post(
-      `/ping`,
-      {},
-      {
-        headers: { "x-page": page },
-        withCredentials: true
-      }
-    );
+    store.dispatch(setConnectionStatus("connecting"));
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/ping`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ page }),
+    });
 
-    if (!response.data.status) {
-      showToast("Unauthorized, please login", "error");
+    if (!response.status) {
+      store.dispatch(setConnectionStatus("disconnected"));
       throw new Error("Unauthorized");
     }
 
-    showToast("Connected & authorized", "success");
-    return response.data;
+    store.dispatch(setConnectionStatus("connected"));
+    return response.status;
   } catch (error) {
-    if (error.response) {
-      if (error.response.status === 401 || error.response.status === 403) {
-        showToast("Unauthorized, please login", "error");
-      } else {
-        showToast(`Server error (${error.response.status})`, "warning");
+    store.dispatch(setConnectionStatus("disconnected"));
+    if (isProtected) {
+      if (error.response) {
+        if (error.response.status === 401 || error.response.status === 403) {
+          console.error(error)
+        }
       }
-    } else if (error.request) {
-      showToast("You are offline", "warning");
-    } else {
-      showToast("Unexpected error", "warning");
     }
-
-    console.error("Ping Error:", error);
-    return null;
+    if (isProtected || (error.response && error.response.status !== 401)) {
+      console.error("Ping Error:", error);
+    }
+    console.error("Ping failed:", error);
+    return false;
   }
 };

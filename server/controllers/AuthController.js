@@ -391,7 +391,12 @@ const refreshController = async (req, res) => {
       sameSite: "Strict",
     });
 
-    res.json({ status: true, csrf });
+    res.json({ status: true, csrf, accessToken: newAccessEnc, user: {
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar,
+      role: user.role
+    } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error", status: false });
@@ -616,13 +621,6 @@ const ping = async (req, res) => {
   try {
     res.status(200).json({
       status: true,
-      authorized: true,
-      user: {
-        name: req.user.name,
-        role: req.user.role,
-        avatar: req.user.avatar,
-      },
-      message: "User is online & authorized",
     });
   } catch (err) {
     console.error("Ping Error:", err);
@@ -631,6 +629,24 @@ const ping = async (req, res) => {
       .json({ status: false, authorized: false, message: "Server error" });
   }
 };
+
+const me = async (req, res) => {
+  try{
+    res.status(200).json({
+      status: true,
+      user: {
+        name: req.user.name,
+        role: req.user.role,
+        avatar: req.user.avatar,
+        email: req.user.email
+      }
+    })
+  }
+  catch(err){
+    console.error("Me Error:", err);
+    res.status(500).json({ message: "Server error", status: false });
+  }
+}
 
 module.exports = {
   loginController,
@@ -645,4 +661,5 @@ module.exports = {
   generateInviteToken,
   oAuthController,
   ping,
+  me
 };

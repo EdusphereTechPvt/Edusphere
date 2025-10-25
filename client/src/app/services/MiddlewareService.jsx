@@ -1,6 +1,6 @@
 import axios from "axios";
 import store from "../store";
-import { setCredentials, logout } from "../store/AuthSlice";
+import { setCredentials, logout, setConnectionStatus } from "../store/AuthSlice";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_API,
@@ -60,6 +60,7 @@ api.interceptors.response.use(
         const { accessToken, user } = res.data;
 
         store.dispatch(setCredentials({ user, accessToken }));
+        store.dispatch(setConnectionStatus("connected"));
 
         processQueue(null, accessToken);
         isRefreshing = false;
@@ -69,7 +70,6 @@ api.interceptors.response.use(
       } catch (err) {
         processQueue(err, null);
         isRefreshing = false;
-
         store.dispatch(logout());
         window.location.href = "/auth/login";
         return Promise.reject(err);

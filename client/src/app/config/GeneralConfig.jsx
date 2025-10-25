@@ -61,6 +61,27 @@ export const userMenuItems = [
   },
 ];
 
+export const connectionStatusConfig = {
+    connected: { 
+      label: "Connected", 
+      color: "success",
+      bgColor: "rgba(76, 175, 80, 0.1)",
+      borderColor: "rgba(76, 175, 80, 0.3)"
+    },
+    disconnected: { 
+      label: "Disconnected", 
+      color: "error",
+      bgColor: "rgba(244, 67, 54, 0.1)",
+      borderColor: "rgba(244, 67, 54, 0.3)"
+    },
+    connecting: { 
+      label: "Connecting...", 
+      color: "warning",
+      bgColor: "rgba(255, 152, 0, 0.1)",
+      borderColor: "rgba(255, 152, 0, 0.3)"
+    },
+  };
+
 const generalConfig = {
   header: {
     sections: [

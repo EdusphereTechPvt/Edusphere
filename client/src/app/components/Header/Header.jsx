@@ -11,47 +11,67 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Chip,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Close, Person, Settings, Logout } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
-import generalConfig, { generalRoutes, navItems, userMenuItems } from "../../config/GeneralConfig";
+import { motion, AnimatePresence } from "framer-motion";
+import generalConfig, { connectionStatusConfig, generalRoutes, navItems, userMenuItems } from "../../config/GeneralConfig";
 import { staticUpdateConfig } from "@/app/utils/FormatConfig";
 import { DynamicRenderer } from "@/app/utils/DynamicRender";
 import { logout } from "@/app/services/AuthService";
+import { useAppSelector } from "@/app/store";
+import { AnimatedConnectionIcon } from "@/app/utils/Animation";
 
-const Header = ({ path, userData }) => {
+const ConnectionChip = ({ status }) => {
+
+  const config = connectionStatusConfig[status] || connectionStatusConfig.disconnected;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Chip
+        icon={<AnimatedConnectionIcon status={status} />}
+        label={config.label}
+        color={config.color}
+        size="small"
+        variant="outlined"
+        sx={{
+          ml: 1,
+          backgroundColor: config.bgColor,
+          borderColor: config.borderColor,
+          padding: '1rem',
+          fontWeight: 600,
+          fontSize: '0.75rem',
+          marginLeft: '0',
+          '& .MuiChip-icon': {
+            color: 'inherit'
+          },
+          '&:hover': {
+            backgroundColor: config.bgColor,
+            filter: 'brightness(0.95)'
+          }
+        }}
+      />
+    </motion.div>
+  );
+};
+
+const Header = ({ path, connectionStatus }) => {
   const [header, setHeader] = useState(generalConfig.header);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [useStateUserData, setUseStateUserData] = useState(userData)
+  const [mobileMenuAnchorEl, setMobileMenuAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
+  const { user } = useAppSelector((state) => state.auth);
   const router = useRouter();
+
   const toggleDrawer = (open) => () => setDrawerOpen(open);
-
-
-  useEffect(() => {
-    try {
-      setUseStateUserData(userData)
-      const result = generalRoutes.includes(path)
-        ? navItems.default
-        : navItems[userData?.role];
-
-      staticUpdateConfig(generalConfig, [
-        { key: "header", childType: "object" },
-        { key: "sections", childType: "array" },
-        { matchKey: "type", matchValue: "navigate" },
-        { dataKey: "navItems", data: result },
-      ]);
-
-      setHeader({ ...generalConfig.header });
-      setUserLoggedIn(!!userData);
-    } catch (err) {
-      console.error("Error fetching navbar items:", err);
-    }
-  }, [userData, path]);
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -63,14 +83,55 @@ const Header = ({ path, userData }) => {
 
     if (item.action === "navigate") {
       router.push(item.actionValue);
+      setDrawerOpen(false);
     } else if (item.action === "logout") {
-      const response = await logout();
-      if (response) {
-        setUserLoggedIn(false);
-        router.push(item.actionValue);
-      }
+      await logout();
+      router.push(item.actionValue);
     }
   };
+
+  const handleMobileMenuClose = async (item = null) => {
+    setMobileMenuAnchorEl(null);
+    if (!item) return;
+
+    if (item.action === "navigate") {
+      router.push(item.actionValue);
+      setDrawerOpen(false);
+    } else if (item.action === "logout") {
+      await logout();
+      router.push(item.actionValue);
+    }
+  };
+
+  useEffect(() => {
+    try {
+      let navItemsToUse;
+      if (generalRoutes.includes(path)) {
+        if (user) {
+          navItemsToUse = [
+            ...navItems.default,
+            { id: "dashboard", label: "Dashboard", actionValue: "/dashboard", type: "link", action: "navigate" }
+          ];
+        }
+        else {
+          navItemsToUse = navItems.default;
+        }
+      } else {
+        navItemsToUse = navItems[user?.role]
+      }
+
+      staticUpdateConfig(generalConfig, [
+        { key: "header", childType: "object" },
+        { key: "sections", childType: "array" },
+        { matchKey: "type", matchValue: "navigate" },
+        { dataKey: "navItems", data: navItemsToUse },
+      ]);
+
+      setHeader({ ...generalConfig.header });
+    } catch (err) {
+      console.error("Error updating navbar items:", err);
+    }
+  }, [user, path]);
 
   return (
     <Box
@@ -113,7 +174,11 @@ const Header = ({ path, userData }) => {
       </Box>
 
       <Box display={{ xs: "none", lg: "flex" }} alignItems="center">
-        {!userLoggedIn ? (
+        <AnimatePresence>
+          {user && <ConnectionChip status={connectionStatus} />}
+        </AnimatePresence>
+
+        {!user ? (
           <>
             {header.sections.map(
               (section, index) =>
@@ -124,10 +189,16 @@ const Header = ({ path, userData }) => {
           </>
         ) : (
           <>
-            <IconButton onClick={handleMenuClick} sx={{ ml: 1 }}>
+            <IconButton
+              onClick={handleMenuClick}
+              sx={{ ml: 1 }}
+              component={motion.div}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <Avatar
-                alt={useStateUserData?.name || "User"}
-                src={useStateUserData?.avatar || "/default-avatar.png"}
+                alt={user?.name || "User"}
+                src={user?.avatar || "/default-avatar.png"}
                 sx={{ width: 36, height: 36 }}
               />
             </IconButton>
@@ -138,15 +209,46 @@ const Header = ({ path, userData }) => {
               onClose={() => handleMenuClose()}
               PaperProps={{
                 elevation: 3,
-                sx: { mt: 1.5, borderRadius: "12px", minWidth: 160 },
+                sx: {
+                  mt: 1.5,
+                  borderRadius: "12px",
+                  minWidth: 160,
+                  overflow: 'visible',
+                  filter: 'drop-shadow(0px 4px 20px rgba(0,0,0,0.1))',
+                  '&:before': {
+                    content: '""',
+                    display: 'block',
+                    position: 'absolute',
+                    top: 0,
+                    right: 14,
+                    width: 10,
+                    height: 10,
+                    bgcolor: 'background.paper',
+                    transform: 'translateY(-50%) rotate(45deg)',
+                    zIndex: 0,
+                  }
+                },
               }}
               transformOrigin={{ horizontal: "right", vertical: "top" }}
               anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
               {userMenuItems.map((item, index) => (
-                <MenuItem key={index} onClick={() => handleMenuClose(item)}>
-                  <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText>{item.label}</ListItemText>
+                <MenuItem
+                  key={index}
+                  onClick={() => handleMenuClose(item)}
+                  component={motion.div}
+                  whileHover={{ backgroundColor: 'rgba(0,0,0,0.04)' }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ListItemIcon>
+                    {React.cloneElement(item.icon, {
+                      sx: { fontSize: 20 }
+                    })}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.label}
+                    primaryTypographyProps={{ fontSize: '0.9rem' }}
+                  />
                 </MenuItem>
               ))}
             </Menu>
@@ -176,26 +278,89 @@ const Header = ({ path, userData }) => {
             <Typography variant="h6" sx={{ fontWeight: "bold" }}>
               Menu
             </Typography>
-            <Close onClick={toggleDrawer(false)} />
+            <IconButton onClick={toggleDrawer(false)}>
+              <Close />
+            </IconButton>
           </Box>
 
           <Divider />
 
-          <Box sx={{ display: "flex", flexDirection: "column", mt: "1rem" }}>
-            {header.sections.map(
-              (section, index) =>
-                ["navigate", "action"].includes(section.type.toLowerCase()) && (
-                  <DynamicRenderer
+          {/* User Info Section */}
+          {user && (
+            <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+                <Avatar
+                  alt={user?.name || "User"}
+                  src={user?.avatar || "/default-avatar.png"}
+                  sx={{ width: 48, height: 48 }}
+                  component={motion.div}
+                  whileHover={{ scale: 1.05 }}
+                />
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="subtitle1" fontWeight="600">
+                    {user?.name || "User"}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {user?.email}
+                  </Typography>
+                </Box>
+                <ConnectionChip status={connectionStatus} />
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                {userMenuItems.map((item, index) => (
+                  <Chip
                     key={index}
-                    config={section}
-                    index={index}
-                    isDrawer
-                    path={path}
-                    onClick={toggleDrawer(false)}
+                    icon={React.cloneElement(item.icon, { sx: { fontSize: 16 } })}
+                    label={item.label}
+                    variant="outlined"
+                    size="small"
+                    onClick={() => handleMobileMenuClose(item)}
+                    sx={{
+                      mb: 0.5,
+                      '& .MuiChip-icon': {
+                        marginLeft: '6px',
+                        fontSize: '16px'
+                      }
+                    }}
+                    component={motion.div}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   />
-                )
-            )}
+                ))}
+              </Box>
+            </Box>
+          )}
+
+          {/* Navigation Sections */}
+          <Box sx={{ display: "flex", flexDirection: "column", mt: "1rem", p: 2 }}>
+            {header.sections
+              .filter((section) => {
+                if (!["navigate", "action"].includes(section.type.toLowerCase())) return false;
+                if (user && section.type.toLowerCase() === "action") return false;
+                return true;
+              })
+              .map((section, index) => (
+                <DynamicRenderer
+                  key={index}
+                  config={section}
+                  index={index}
+                  isDrawer
+                  path={path}
+                  onClick={toggleDrawer(false)}
+                />
+              ))}
           </Box>
+
+
+          {!user && (
+            <Box sx={{ p: 2, mt: 'auto', borderTop: 1, borderColor: 'divider' }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Connection Status
+              </Typography>
+              <ConnectionChip status={connectionStatus} />
+            </Box>
+          )}
         </Box>
       </Drawer>
     </Box>

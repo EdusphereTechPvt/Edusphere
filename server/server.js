@@ -29,7 +29,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
-app.use("/ping", AuthGuard, RoleGuard(), ping)
+app.use("/ping",AuthGuard, ping)
 app.use("/api", utilsRoute)
 app.use("/permission", elementRoutes);
 app.use("/auth", authRoutes);
