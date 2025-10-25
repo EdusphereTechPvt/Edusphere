@@ -8,11 +8,13 @@ const StudentProfileSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+
     studentId: {
       type: String,
       unique: true,
       sparse: true,
     },
+
     schoolId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "School",
@@ -24,6 +26,7 @@ const StudentProfileSchema = new mongoose.Schema(
       ref: "Class",
       required: true,
     },
+
     sections: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Section",
@@ -32,65 +35,54 @@ const StudentProfileSchema = new mongoose.Schema(
 
     name: {
       type: String,
-      required: true
+      required: true,
     },
+
+    studentEmail: {
+  type: String,
+  required: true,
+  unique: true,
+},
 
     dateOfBirth: {
       type: Date,
-      required: true
+      required: true,
     },
 
     gender: {
-      type: String, enum: ["Male", "Female", "Other"],
-      required: true
-    },
-
-
-    parentName: {
       type: String,
-      required: true
+      enum: ["Male", "Female", "Other"],
+      required: true,
     },
 
-    guardianName: {
-      type: String
-    },
-
-    parentEmail: {
-      type: String,
-      required: true
-    },
-
-    parentContactNumber: {
-      type: String,
-      required: true
-    },
-
-    parentOccupation: {
-      type: String
-    },
-    motherName: {
-      type: String
+    parentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Parent",
+      required: true,
     },
 
     contactNumber: {
-      type: String
+      type: String,
     },
 
     address: {
-      type: String
+      type: String,
     },
 
     photo: {
-      type: String
+      type: String,
     },
-    // qrId: { type: String },
 
-    enrollmentDate: { type: Date, default: Date.now },
+    enrollmentDate: {
+      type: Date,
+      default: Date.now,
+    },
+
     status: {
       type: String,
       enum: ["Active", "On Hold", "Inactive"],
       default: "Active",
-      required: true
+      required: true,
     },
   },
   { timestamps: true }
