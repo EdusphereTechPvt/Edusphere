@@ -126,17 +126,25 @@ export default function Form({ type, mode, id }) {
 
   const getInputValue = (name, type) => {
     const val = formData[name];
-    if (type === "number" && typeof val === "string" && val.toLowerCase().includes("class")) {
+    if (
+      type === "number" &&
+      typeof val === "string" &&
+      val.toLowerCase().includes("class")
+    ) {
       const num = Number(val.split(" ")[1]?.trim());
-    return isNaN(num) ? "" : num;      
+      return isNaN(num) ? "" : num;
     }
 
-     if (type === "text" && typeof val === "string" && val.toLowerCase().includes("section")) {
-    return val.split(" ")[1]?.trim() || "";
-  }
-    
-    return val || ""
-  }
+    if (
+      type === "text" &&
+      typeof val === "string" &&
+      val.toLowerCase().includes("section")
+    ) {
+      return val.split(" ")[1]?.trim() || "";
+    }
+
+    return val || "";
+  };
 
   const handleBlur = useCallback(
     (field) => () => {
@@ -147,22 +155,24 @@ export default function Form({ type, mode, id }) {
   );
 
   const photoUploader = ({ name, label, placeholder }, i) => (
-    <div key={i} className="col-span-1 sm:col-span-2">
-      <label className="block mb-2 text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <div className="flex items-center gap-4">
-        <div className="flex flex-col items-center">
-          <div className="lg:w-40 lg:h-40 w-28 h-28 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-            {formData[name] ? (
-              <img
-                src={URL.createObjectURL(formData[name])}
-                alt="Uploaded"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <Person sx={{ fontSize: { xs: 95, lg: 140 }, color: "gray" }} />
-            )}
+    <div key={i} className="flex flex-col w-full">
+      <div className="flex items-center justify-center gap-4">
+        <div className="flex flex-wrap gap-4 justify-between sm:justify-center">
+          <div className="text-center">
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              {label}
+            </label>
+            <div className="lg:w-40 lg:h-40 w-28 h-28 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+              {formData[name] ? (
+                <img
+                  src={formData[name]}
+                  alt="Uploaded"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Person sx={{ fontSize: { xs: 95, lg: 140 }, color: "gray" }} />
+              )}
+            </div>
           </div>
           {formData[name] && (
             <span className="text-xs mt-1 flex items-center text-gray-700">
@@ -180,7 +190,15 @@ export default function Form({ type, mode, id }) {
             type="file"
             accept="image/*"
             className="hidden"
-            onChange={(e) => handleChange(name, e.target.files[0])}
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                handleChange(name, reader.result);
+              };
+              reader.readAsDataURL(file);
+            }}
           />
         </label>
       </div>
@@ -382,8 +400,10 @@ export default function Form({ type, mode, id }) {
                       </div>
                     );
                   case "file":
-                    if (name === "photo") return photoUploader(field, i);
-                    if (name === "file") return fileUploader(field, i);
+                    if (name.toLowerCase().includes("photo"))
+                      return photoUploader(field, i);
+                    if (name.toLowerCase().includes("file"))
+                      return fileUploader(field, i);
                     return null;
                   case "textArea":
                     return (
@@ -505,6 +525,8 @@ export default function Form({ type, mode, id }) {
                           onChange={(value) => handleChange(name, value)}
                           placeholder={placeholder || "Select date"}
                           format={field?.format}
+                          minDate={field?.min}
+                          maxDate={field?.max}
                         />
                       </div>
                     );

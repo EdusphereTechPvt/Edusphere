@@ -1,3 +1,4 @@
+const today = new Date();
 const formConfig = {
   teacher: {
     api: {
@@ -318,8 +319,18 @@ const formConfig = {
             name: "dateOfBirth",
             label: "Date of Birth",
             placeholder: "Select Date of Birth",
-            format: "MM-DD-YYYY",
+            format: "YYYY-MM-DD",
             required: true,
+            min: new Date(
+              today.getFullYear() - 20,
+              today.getMonth(),
+              today.getDate()
+            ), //max age 20
+            max: new Date(
+              today.getFullYear() - 5,
+              today.getMonth(),
+              today.getDate()
+            ), //min age 5
           },
           {
             type: "dropdown",
@@ -363,10 +374,38 @@ const formConfig = {
             placeholder: "Select Student Status",
             required: true,
             items: [
-              {id: "Active", value: "Active"},
-              {id: "Inactive", value: "Inactive"},
-              {id: "On Hold", value: "On Hold"},
+              { id: "Active", value: "Active" },
+              { id: "Inactive", value: "Inactive" },
+              { id: "On Hold", value: "On Hold" },
             ],
+          },
+          {
+            type: "text",
+            name: "previousSchool",
+            label: "Previous School Name (optional)",
+            placeholder: "Enter student's full name",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message:
+                "Previous School Name can only contain letters and spaces",
+            },
+          },
+        ],
+      },
+      {
+        title: "",
+        fields: [
+          {
+            type: "file",
+            name: "photo",
+            label: "Student Photo",
+            placeholder: "Upload Photo",
+          },
+          {
+            type: "file",
+            name: "parentPhoto",
+            label: "Parent/Guardian Photo",
+            placeholder: "Upload Photo",
           },
         ],
       },
@@ -376,7 +415,7 @@ const formConfig = {
           {
             type: "text",
             name: "parentName",
-            label: "Parent Name",
+            label: "Parent/Guardian Name",
             placeholder: "Enter parent's full name",
             required: true,
             pattern: {
@@ -385,29 +424,47 @@ const formConfig = {
             },
           },
           {
-            type: "text",
-            name: "guardianName",
-            label: "Guardian Name",
-            placeholder: "Enter guardian's full name",
-            pattern: {
-              value: "^[A-Za-z\\s]*$",
-              message: "Guardian Name can only contain letters and spaces",
-            },
+            type: "date",
+            name: "parentDOB",
+            label: "Parent/Guardian Date of Birth",
+            placeholder: "Enter Parents Date of Birth",
+            format: "YYYY-MM-DD",
+            min: new Date(
+              today.getFullYear() - 80,
+              today.getMonth(),
+              today.getDate()
+            ), // max age 80
+            max: new Date(
+              today.getFullYear() - 18,
+              today.getMonth(),
+              today.getDate()
+            ), //min age 18
           },
           {
             type: "email",
             name: "parentEmail",
             label: "Parent/Guardian Email",
             required: true,
-            placeholder: "Enter parent's email",
+            placeholder: "Enter parent/guardian's email",
           },
           {
             type: "number",
             name: "parentContactNumber",
             label: "Parent/Guardian Contact Number",
-            placeholder: "Enter parent's contact number",
+            placeholder: "Enter parent/guardian's contact number",
             required: true,
             maxLength: 10,
+          },
+          {
+            type: "text",
+            name: "relation",
+            label: "Relation to Student",
+            placeholder: "Enter Relation",
+            required: true,
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Relation can only contain letters and spaces",
+            },
           },
           {
             type: "text",
@@ -420,14 +477,18 @@ const formConfig = {
             },
           },
           {
-            type: "text",
-            name: "motherName",
-            label: "Mother's Name",
-            placeholder: "Enter mother's full name",
-            pattern: {
-              value: "^[A-Za-z\\s]*$",
-              message: "Mother's Name can only contain letters and spaces",
-            },
+            type: "email",
+            name: "alternativeEmail",
+            label: "Parent/Guardian Alternative Email",
+            placeholder: "Enter parent/guardian's email",
+          },
+          {
+            type: "number",
+            name: " ",
+            label: "Parent/Guardian Alternative Contact Number",
+            placeholder: "Enter parent/guardian's contact number",
+            required: true,
+            maxLength: 10,
           },
         ],
       },
@@ -442,28 +503,24 @@ const formConfig = {
             maxLength: 10,
           },
           {
-            type: "text",
+            type: "email",
+            name: "studentEmail",
+            label: "Student Email",
+            placeholder: "Enter Student's email",
+          },
+          {
+            type: "textArea",
             name: "address",
             label: "Address",
             placeholder: "Enter student's address",
           },
         ],
       },
-      {
-        title: "Student Profile",
-        fields: [
-          {
-            type: "file",
-            name: "photo",
-            label: "Student Photo",
-            placeholder: "Upload Photo",
-          },
-        ],
-      },
-      {
-        title: "Identification",
-        fields: [{ type: "qr", name: "qrId", label: "Generate QR ID" }],
-      },
+
+      // {
+      //   title: "Identification",
+      //   fields: [{ type: "qr", name: "qrId", label: "Generate QR ID" }],
+      // },
       {
         title: "Actions",
         position: "bottom",
