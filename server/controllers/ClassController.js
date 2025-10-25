@@ -251,20 +251,50 @@ const getProfileCardData = async(req,res) => {
 const deleteClass = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
+
   try {
     const { id } = req.body;
-    const classData = await Class.findById(id).session(session);
 
+    const classData = await Class.findById(id).session(session);
     if (!classData) {
       return res.status(404).json({ message: "Class not found", status: false });
     }
 
-    await syncReferences({ action: "remove", targetModel: "Class", targetId: classData._id, session });
+    const sections = await Section.find({ classes: id }).session(session);
+
+    if (sections.length > 0) {
+      const sectionIds = sections.map(sec => sec._id);
+
+      for (const secId of sectionIds) {
+        await syncReferences({
+          action: "remove",
+          targetModel: "Section",
+          targetId: secId,
+          session,
+        });
+      }
+
+      await Section.deleteMany({ classes: id }).session(session);
+    }
+
+    await syncReferences({
+      action: "remove",
+      targetModel: "Class",
+      targetId: classData._id,
+      session,
+    });
 
     await Class.findByIdAndDelete(id).session(session);
 
     await session.commitTransaction();
-    res.status(200).json({ message: "Class deleted successfully", status: true });
+
+    res.status(200).json({
+      message:
+        sections.length > 0
+          ? "Class and related sections deleted successfully"
+          : "Class deleted successfully (no related sections)",
+      status: true,
+    });
   } catch (err) {
     await session.abortTransaction();
     console.error("Delete Class Error:", err);
