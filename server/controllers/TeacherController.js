@@ -119,6 +119,13 @@ const save = async (req, res) => {
 
     await syncReferences({ action: "save", targetModel: "Teacher", targetId: newTeacher._id, session });
 
+      const school = await School.findById(schoolId).session(session);
+    await sendEmail(
+            email,
+            `Hey ${name}, You’re Officially Part of Edusphere 🚀`,
+            signupTemplate(name, school.name, false)
+          );
+
     await session.commitTransaction();
 
     res.status(201).json({ message: "Teacher added successfully", data: newTeacher, status: true });
