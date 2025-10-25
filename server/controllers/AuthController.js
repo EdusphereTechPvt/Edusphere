@@ -106,7 +106,7 @@ const loginController = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    session.commitTransaction();
+    await session.commitTransaction();
 
     res.status(200).json({
       message: "Login successful",
@@ -115,7 +115,7 @@ const loginController = async (req, res) => {
       csrf,
     });
   } catch (err) {
-    session.abortTransaction();
+    await session.abortTransaction();
     console.error("Login Error:", err);
     res
       .status(500)
