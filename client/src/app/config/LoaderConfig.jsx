@@ -5,49 +5,6 @@ const LoaderConfig = {
       className: 'h-screen bg-gray-300 rounded',
     },
   ],
-  auth: [
-    // Title
-    {
-      type: 'rectangle',
-      className: 'h-8 bg-gray-300 rounded w-1/2 mx-auto mb-4',
-    },
-    // Role selector
-    {
-      type: 'grid',
-      className: 'grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6',
-      items: [
-        { type: 'rectangle', className: 'h-16 bg-gray-300 rounded' },
-        { type: 'rectangle', className: 'h-16 bg-gray-300 rounded' },
-        { type: 'rectangle', className: 'h-16 bg-gray-300 rounded' },
-        { type: 'rectangle', className: 'h-16 bg-gray-300 rounded' },
-      ],
-    },
-    // Form fields
-    {
-      type: 'list',
-      className: 'space-y-4 mb-6',
-      items: [
-        { type: 'rectangle', className: 'h-12 bg-gray-300 rounded' },
-        { type: 'rectangle', className: 'h-12 bg-gray-300 rounded' },
-        { type: 'rectangle', className: 'h-12 bg-gray-300 rounded' },
-        { type: 'rectangle', className: 'h-12 bg-gray-300 rounded' },
-      ],
-    },
-    // Checkboxes
-    {
-      type: 'list',
-      className: 'space-y-2 mb-6',
-      items: [
-        { type: 'rectangle', className: 'h-6 bg-gray-300 rounded w-3/4' },
-        { type: 'rectangle', className: 'h-6 bg-gray-300 rounded w-2/3' },
-      ],
-    },
-    // Button 
-    {
-      type: 'rectangle',
-      className: 'h-10 bg-gray-300 rounded w-full',
-    },
-  ],
   about: [
     // Hero section
     {

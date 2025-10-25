@@ -41,7 +41,7 @@ const ClientLayout = ({ children }) => {
       setIntervalId(null);
     }
 
-    if (!errorRoutes.includes(path) && !generalRoutes.includes(path) && !excludeRoutes.includes(path)) { 
+    if (!errorRoutes.includes(path) && !excludeRoutes.includes(path)) {
       sendPing();
       const id = setInterval(() => {
         sendPing();
@@ -59,6 +59,7 @@ const ClientLayout = ({ children }) => {
     }, []);
 
     useEffect(() => {
+      setPageLoading(true);
       const timer = setTimeout(() => {
         setPageLoading(false);
       }, 2000);
@@ -83,8 +84,6 @@ const ClientLayout = ({ children }) => {
       return LoaderConfig.pricing;
     if (pathname.startsWith('/list/'))
       return LoaderConfig.list;
-    if (pathname.startsWith('/auth/'))
-      return LoaderConfig.auth;
     if (pathname.startsWith('/ptm-scheduling'))
       return LoaderConfig.ptm;
       // return null;
@@ -92,7 +91,9 @@ const ClientLayout = ({ children }) => {
 
   if (pageLoading && !excludeRoutes.includes(path) && !errorRoutes.includes(path)) {
     const loaderConfig = getLoaderConfig(path);
-    return <Loader config={loaderConfig} />;
+    if (loaderConfig) {
+      return <Loader config={loaderConfig} />;
+    }
   }
 
   return (
