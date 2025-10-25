@@ -11,7 +11,7 @@ const DateComponent = ({
   onChange,
   placeholder = "Select Date",
   sx,
-  format = "DD/MM/YYYY",
+  format = "MM-DD-YYYY",
   readOnly = false,
   disabled = false,
   locale = "en",
@@ -25,8 +25,16 @@ const DateComponent = ({
     return date ? dayjs(date).format(format) : null;
   };
   useEffect(() => {
-    setSelectedDate(value ? dayjs(value) : null);
-  }, [value]);
+    if (!value) {
+      setSelectedDate(null);
+    } else if (dayjs(value, format, true).isValid()) {
+      setSelectedDate(dayjs(value, format));
+    } else if (dayjs(value).isValid()) {
+      setSelectedDate(dayjs(value));
+    } else {
+      setSelectedDate(null);
+    }
+  }, [value, format]);
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -44,14 +52,15 @@ const DateComponent = ({
         format={format}
         readOnly={readOnly}
         disabled={disabled}
-        minDate={minDate}
-        maxDate={maxDate}
+        minDate={minDate ? dayjs(minDate, format) : undefined}
+        maxDate={maxDate ? dayjs(maxDate, format) : undefined}
         onError={onError}
         views={["year", "month", "day"]}
         slotProps={{
           textField: {
             fullWidth: true,
             size: "small",
+            inputProps: { placeholder: format.toUpperCase() },
             InputProps: {
               sx: {
                 height: "2.5rem",

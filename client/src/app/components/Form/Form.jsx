@@ -501,10 +501,10 @@ export default function Form({ type, mode, id }) {
                           {label} {required && "*"}
                         </label>
                         <DateComponent
-                          value={formData[name]}
+                          value={formData[name] || ""}
                           onChange={(value) => handleChange(name, value)}
                           placeholder={placeholder || "Select date"}
-                          format="DD/MM/YYYY"
+                          format={field?.format}
                         />
                       </div>
                     );

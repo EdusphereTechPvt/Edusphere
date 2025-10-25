@@ -318,6 +318,7 @@ const formConfig = {
             name: "dateOfBirth",
             label: "Date of Birth",
             placeholder: "Select Date of Birth",
+            format: "MM-DD-YYYY",
             required: true,
           },
           {
