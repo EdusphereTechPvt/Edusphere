@@ -55,8 +55,8 @@ export const listConfig = {
     tableHeader: [
       { map: "studentId", displayName: "ID" },
       { name: "name", displayName: "Name" },
-      { name: "grade", displayName: "Class" },
-      { name: "section", displayName: "Section" },
+      { name: "className", displayName: "Class" },
+      { name: "sectionName", displayName: "Section" },
       { name: "gender", displayName: "Gender" },
       { name: "status", displayName: "Status" },
     ],

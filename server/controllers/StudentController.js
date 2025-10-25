@@ -1,286 +1,9 @@
-// const User = require("../models/AuthSchema");
-// const Student = require("../models/Student");
-// const bcrypt = require("bcrypt");
-
-
-// const addOrUpdateStudent = async (req, res) => {
-//   const session = await mongoose.startSession();
-//     session.startTransaction();
-//   try {
-//     const {
-//       name,
-//       dateOfBirth,
-//       email,
-//       phone,
-//       address,
-//       status,
-//       gender,
-//       grade,
-//       section,
-//       schoolId,
-//       enrollmentDate,
-//       previousSchool,
-//       guardianName,
-//       relationshipToStudent,
-//       guardianContact,
-//       allergies,
-//       medicalConditions,
-//       emergencyContacts
-//     } = req.body;
-
-//     if (!name || !dateOfBirth || !email || !grade || !section || !schoolId || !status || !gender) {
-//       return res.status(400).json({
-//         message: "Full name, dateOfBirth, Email, Grade, Section or School ID is required",
-//         status: false
-//       });
-//     }
-
-
-//     let user = await User.findOne({ email }).session(session);
-
-//     if (!user) {
-      
-//       const dateOfBirthString = new Date(dateOfBirth).toISOString().split("T")[0].replace(/-/g, "");
-//       const passwordPlain = ${name.split(" ")[0]}@${dateOfBirthString};
-//       const hashedPassword = await bcrypt.hash(passwordPlain, 10);
-
-//       user = new User({
-//         name,
-//         dateOfBirth,
-//         email,
-//         phone,
-//         address,
-//         password: hashedPassword,
-//         role: "student",
-//         avatar: "",
-//         isActive: true
-//       });
-//       await user.save({session});
-//     } else {
-    
-//       user.name = name || user.name;
-//       user.dateOfBirth = dateOfBirth || user.dateOfBirth;
-//       user.phone = phone || user.phone;
-//       user.address = address || user.address;
-//       await user.save({session});
-//     }
-
-    
-//     let studentProfile = await Student.findOne({ userId: user._id }).session(session);
-
-//     if (!studentProfile) {
-      
-//       studentProfile = new Student({
-//         userId: user._id,
-//         studentId: user.uid,
-//         grade,
-//         status,
-//         gender,
-//         section,
-//         enrollmentDate,
-//         schoolId,
-//         previousSchool,
-//         guardianName,
-//         relationshipToStudent,
-//         guardianContact,
-//         allergies,
-//         medicalConditions,
-//         emergencyContacts
-//       });
-//       await studentProfile.save({session});
-//     } else {
-      
-//       studentProfile.grade = grade || studentProfile.grade;
-//       studentProfile.section = section || studentProfile.section;
-//       studentProfile.enrollmentDate = enrollmentDate || studentProfile.enrollmentDate;
-//       studentProfile.previousSchool = previousSchool || studentProfile.previousSchool;
-//       studentProfile.guardianName = guardianName || studentProfile.guardianName;
-//       studentProfile.relationshipToStudent = relationshipToStudent || studentProfile.relationshipToStudent;
-//       studentProfile.guardianContact = guardianContact || studentProfile.guardianContact;
-//       studentProfile.allergies = allergies || studentProfile.allergies;
-//       studentProfile.medicalConditions = medicalConditions || studentProfile.medicalConditions;
-//       studentProfile.emergencyContacts = emergencyContacts || studentProfile.emergencyContacts;
-//       studentProfile.gender = gender || studentProfile.gender;
-//       studentProfile.status = status || studentProfile.status;
-
-//       await studentProfile.save({session});
-//     }
-
-//     res.status(200).json({
-//       message: studentProfile.isNew ? "Student added successfully" : "Student updated successfully",
-//       data: { user, profile: studentProfile },
-//       status: true
-//     });
-//   } catch (err) {
-//     console.error("Add/Update Student Error:", err);
-//     res.status(500).json({
-//       message: "Server error during add/update student",
-//       status: false
-//     });
-//   }
-// };
-
-// const getStudentDetails = async (req, res) => {
-//   const { name = "", email = "", grade = "", section = "" } = req.body;
-
-//   if (![name, email, grade, section].some(Boolean)) {
-//     return res.status(400).json({
-//       message: "At least one search field is required",
-//       status: false
-//     });
-//   }
-
-//   try {
-//     const query = {};
-//     if (grade) query.grade = { $regex: grade, $options: "i" };
-//     if (section) query.section = { $regex: section, $options: "i" };
-
-//     let students = await Student.find(query).populate("userId");
-//     console.log(students)
-
-//     if (name || email) {
-//       students = students.filter(s =>
-//         (name && s.userId.name.toLowerCase().includes(name.toLowerCase())) ||
-//         (email && s.userId.email.toLowerCase().includes(email.toLowerCase()))
-//       );
-//     }
-
-//     if (students.length === 0) {
-//       return res.status(404).json({
-//         data: [],
-//         message: "No student found",
-//         status: false
-//       });
-//     }
-
-//     res.status(200).json({
-//       data: students,
-//       message: ${students.length} student(s) found successfully,
-//       status: true
-//     });
-//   } catch (err) {
-//     console.error("Get Student Error:", err);
-//     res.status(500).json({
-//       message: "Server error while fetching student details",
-//       status: false
-//     });
-//   }
-// };
-
-// const getAllStudentsList = async (req, res) => {
-//   try {
-
-//     console.log(req.user)
-//     const students = await Student.find({ schoolId: req.user.schoolId })
-//       .populate("userId", "name email dateOfBirth role avatar isActive"); 
-
-//       console.log(students)
-//     if (!students || students.length === 0) {
-//       return res.status(404).json({
-//         data: [],
-//         message: "No student found",
-//         status: false,
-//       });
-//     }
-
-//      const formattedStudents = students.map((student) => ({
-//       studentId: student.studentId,
-//       name: student.userId?.name,
-//       email: student.userId?.email,
-//       dateOfBirth: student.userId?.dateOfBirth,
-//       role: student.userId?.role,
-//       avatar: student.userId?.avatar,
-//       isActive: student.userId?.isActive,
-//       gender: student.gender,
-//       grade: student.grade,
-//       section: student.section,
-//       status: student.status,
-//     }));
-
-//     res.status(200).json({
-//       data: formattedStudents,
-//       message: ${students.length} student(s) found successfully,
-//       status: true,
-//     });
-//   } catch (err) {
-//     console.error("Get All Students Error:", err);
-//     res.status(500).json({
-//       message: "Server error while fetching student details",
-//       status: false,
-//     });
-//   }
-// };
-
-// const getProfileCardData = async(req,res) => {
-//   try{
-
-//     let keyName = req.body.key;
-//     let keyValue = req.body.value
-
-//     let studentProfileData = await Student.findOne({ keyName:keyValue })
-//       .populate("userId", "name email dateOfBirth role avatar isActive"); 
-
-//       const formattedStudents = {
-//       id: studentProfileData.studentId,
-//       name: studentProfileData.userId?.name,
-//       avatar: studentProfileData.userId?.avatar,
-//       grade: studentProfileData.grade,
-//       section: studentProfileData.section
-//     };
-
-//       res.status(200).json({
-//         status: true,
-//         data: formattedStudents
-//       })
-//   }
-//   catch (err) {
-//     console.error("Get Student Error:", err);
-//     res.status(500).json({
-//       message: "Server error while fetching student details",
-//       status: false
-//     });
-//   }
-// }
-
-
-// const deleteStudent = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-
-//     const studentProfile = await StudentProfile.findById(id);
-//     if (!studentProfile) {
-//       return res.status(404).json({
-//         message: "Student profile not found",
-//         status: false
-//       });
-//     }
-
-//     await User.findByIdAndDelete(studentProfile.userId);
-//     await Student.findByIdAndDelete(id);
-
-//     res.status(200).json({
-//       message: "Student deleted successfully",
-//       status: true
-//     });
-//   } catch (err) {
-//     console.error("Delete Student Error:", err);
-//     res.status(500).json({
-//       message: "Server error while deleting student",
-//       status: false
-//     });
-//   }
-// };
-
-// module.exports = { addOrUpdateStudent, getStudentDetails, deleteStudent, getAllStudentsList, getProfileCardData };
-
-
 const { default: mongoose } = require("mongoose");
 const User = require("../models/AuthSchema");
 const Student = require("../models/Student");
-const School = require("../models/SchoolSchema");
-const { sendEmail } = require("../utils/Email");
-const { signupTemplate } = require("../utils/templates/EmailTemplates");
+const Parent = require("../models/Parent");
 const { syncReferences } = require("../utils/Sync");
+
 
 const save = async (req, res) => {
   const session = await mongoose.startSession();
@@ -292,8 +15,8 @@ const save = async (req, res) => {
       name,
       dateOfBirth,
       gender,
-      classId : classes,
-      sectionId : sections,
+      classes,
+      sections,
       parentName,
       guardianName,
       parentEmail,
@@ -302,132 +25,208 @@ const save = async (req, res) => {
       motherName,
       contactNumber,
       address,
-      studentPhoto,
-      isActive,
+      photo,
+      status,
     } = req.body;
-    const { schoolId } = req.user;
-    
-    
 
-    if (!name || !dateOfBirth || !schoolId || !classId || !sectionId || !parentName || !parentEmail || !parentContactNumber) {
+    const { schoolId } = req.user || {};
+
+    if (!name || !dateOfBirth || !schoolId || !classes || !sections || !parentName || !parentContactNumber) {
+      await session.abortTransaction();
+      return res.status(400).json({ message: "Required fields missing", status: false });
+    }
+
+    // Normalize
+    const normalizedEmail = parentEmail?.trim().toLowerCase() || "";
+    const normalizedDob = new Date(dateOfBirth);
+    if (isNaN(normalizedDob.getTime())) throw new Error("Invalid dateOfBirth format");
+
+    const allowedGenders = ["Male", "Female", "Other"];
+    const normalizedGender = gender
+      ? gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase()
+      : null;
+    if (!allowedGenders.includes(normalizedGender)) {
       await session.abortTransaction();
       return res.status(400).json({
-        message: "Required fields missing",
+        message: `Invalid gender. Allowed: ${allowedGenders.join(", ")}`,
         status: false,
       });
     }
 
-    // Check if user exists or create
-    let user = await User.findOne({ email: parentEmail }).session(session);
+    const normalizeObjectId = (value) => {
+      if (!value) return null;
+      if (Array.isArray(value)) return value.map((id) => mongoose.Types.ObjectId(id));
+      return new mongoose.Types.ObjectId(value);
+    };
+    const classesObjId = normalizeObjectId(classes);
+    const sectionsObjId = normalizeObjectId(sections);
+
+    // Create or update student user
+    let user = await User.findOne({ email: normalizedEmail }).session(session);
     if (!user) {
-      const dobStr = new Date(dateOfBirth).toISOString().split("T")[0].replace(/-/g, "");
+      const dobStr = normalizedDob.toISOString().split("T")[0].replace(/-/g, "");
       const password = `${name.split(" ")[0]}@${dobStr}`;
-      user = new User({ name, dateOfBirth, schoolId, email: parentEmail, password, role: "student" });
+      user = new User({
+        name,
+        email: `student_${name}@school.com`,
+        password,
+        role: "student",
+        dateOfBirth: normalizedDob,
+        schoolId,
+      });
       await user.save({ session });
     }
 
+    // Create/update student document
     let student = await Student.findOne({ userId: user._id, schoolId }).session(session);
-
-    if (student) {
-      Object.assign(student, {
-        name,
-        dateOfBirth,
-        gender,
-        classId,
-        sectionId,
-        parentName,
-        guardianName,
-        parentEmail,
-        parentContactNumber,
-        parentOccupation,
-        motherName,
-        contactNumber,
-        address,
-        studentPhoto,
-        isActive,
-      });
-
-      await student.save({ session });
-      await syncReferences({ action: "save", targetModel: "Student", targetId: student._id, session });
-
-      await session.commitTransaction();
-      return res.status(200).json({ message: "Student updated successfully", data: student, status: true });
-    }
-
-    const newStudent = new Student({
-      userId: user._id,
-      schoolId,
+    const studentData = {
       name,
-      dateOfBirth,
-      gender,
-      classId,
-      sectionId,
+      dateOfBirth: normalizedDob,
+      gender: normalizedGender,
+      classes: classesObjId,
+      sections: sectionsObjId,
       parentName,
       guardianName,
-      parentEmail,
+      parentEmail: normalizedEmail,
       parentContactNumber,
       parentOccupation,
       motherName,
       contactNumber,
       address,
-      studentPhoto,
-      isActive,
-      studentId: `STU-${Date.now()}`,
-    });
+      photo,
+      schoolId,
+      userId: user._id,
+      enrollmentDate: new Date(),
+      status: status || "Active",
+    };
 
-    await newStudent.save({ session });
-    await syncReferences({ action: "save", targetModel: "Student", targetId: newStudent._id, session });
+    if (student) {
+      Object.assign(student, studentData);
+      await student.save({ session });
+    } else {
+      student = new Student({
+        ...studentData,
+        studentId: `STU-${Date.now()}`,
+      });
+      await student.save({ session });
+    }
+    await syncReferences({ action: "save", targetModel: "Student", targetId: student._id, session });
+
+    // Parent user creation
+    const parentEmailForUser = normalizedEmail || `parent_${Date.now()}@school.com`;
+    let parentUser = await User.findOne({
+      $or: [
+        { email: parentEmailForUser },
+        { contactNumber: parentContactNumber },
+      ],
+    }).session(session);
+
+    if (!parentUser) {
+      const password = `${parentName.split(" ")[0]}@${(parentContactNumber || "0000").toString().slice(0, 4)}`;
+      parentUser = new User({
+        name: parentName,
+        dateOfBirth: new Date(),
+        email: parentEmailForUser,
+        password,
+        role: "parent",
+        isActive: true,
+        schoolId,
+      });
+      await parentUser.save({ session });
+    }
+
+    // Create/update parent document
+    let parentDoc = await Parent.findOne({ userId: parentUser._id, schoolId }).session(session);
+    if (!parentDoc) {
+      parentDoc = new Parent({
+        userId: parentUser._id,
+        name: parentName,
+        parentId: `PARENT-${Date.now()}`,
+        schoolId,
+        occupation: parentOccupation || "N/A",
+        emergencyContact: parentContactNumber,
+        children: [student._id],
+      });
+    } else {
+      if (!parentDoc.children.includes(student._id)) {
+        parentDoc.children.push(student._id);
+      }
+    }
+    await parentDoc.save({ session });
+    await syncReferences({ action: "save", targetModel: "Parent", targetId: parentDoc._id, session });
 
     await session.commitTransaction();
-    res.status(201).json({ message: "Student added successfully", data: newStudent, status: true });
+
+    res.status(201).json({
+      message: "Student and Parent added/updated successfully",
+      data: { student, parent: parentDoc },
+      status: true,
+    });
   } catch (err) {
     await session.abortTransaction();
-    console.error("Save Student Error:", err);
-    res.status(500).json({ message: "Server error during student add/update", status: false });
+    console.error("Save Student Error:", err.stack || err);
+    res.status(500).json({ message: err.message || "Server error during student add/update", status: false });
   } finally {
     session.endSession();
   }
 };
-
 const getStudentDetails = async (req, res) => {
   const { id, studentId, name = "", parentContactNumber = "" } = req.body;
 
   if (![id, studentId, name, parentContactNumber].some(Boolean)) {
-    return res.status(400).json({ message: "At least one search field is required", status: false });
+    return res.status(400).json({
+      message: "At least one search field is required",
+      status: false,
+    });
   }
 
   const searchFields = {};
-  if (id && mongoose.Types.ObjectId.isValid(id)) searchFields._id = id;
+
+  if (id && mongoose.Types.ObjectId.isValid(id)) {
+    searchFields._id = new mongoose.Types.ObjectId(id.trim());
+  }
   if (studentId) searchFields.studentId = studentId;
   if (name) searchFields.name = { $regex: name, $options: "i" };
-  if (parentContactNumber) searchFields.parentContactNumber = { $regex: parentContactNumber, $options: "i" };
+  if (parentContactNumber)
+    searchFields.parentContactNumber = { $regex: parentContactNumber, $options: "i" };
 
   try {
-    const response = await Student.find(searchFields).populate("userId", "email contactNumber name");
+    const response = await Student.find(searchFields)
+      .populate("userId", "email contactNumber name")
+    // .populate("classes", "name")
+    // .populate("sections", "name");
 
-    if (response.length === 0) {
+    if (!response || response.length === 0) {
       return res.status(404).json({ data: [], message: "No student found", status: false });
-    } else if (response.length === 1) {
+    }
+
+    if (response.length === 1) {
       return res.status(200).json({ data: response[0], message: "Student found successfully", status: true });
     }
 
-    return res.status(200).json({ data: response, message: "Multiple students found successfully", status: true });
+    res.status(200).json({
+      data: response,
+      message: "Multiple students found successfully",
+      status: true,
+    });
   } catch (error) {
     console.error("Error fetching student details:", error);
-    return res.status(500).json({ message: "Server error while fetching student details", status: false });
+    res.status(500).json({ message: "Server error while fetching student details", status: false });
   }
 };
 
 const getAllStudentsList = async (req, res) => {
   try {
     const students = await Student.find({ schoolId: req.user.schoolId })
-      .populate("userId", "name email avatar contactNumber isActive");
+      .populate("userId", "name email avatar contactNumber status")
+      .populate("classes", "name")
+      .populate("sections", "name");
 
     if (!students || students.length === 0) {
       return res.status(200).json({ data: [], message: "No student found", status: false });
     }
 
-    const formattedStudents = students.map(student => ({
+    const formattedStudents = students.map((student) => ({
       studentId: student.studentId,
       name: student.name,
       email: student.userId?.email || null,
@@ -435,10 +234,10 @@ const getAllStudentsList = async (req, res) => {
       parentName: student.parentName,
       parentContactNumber: student.parentContactNumber,
       avatar: student.userId?.avatar || null,
-      isActive: student.isActive,
+      status: student.status,
       gender: student.gender,
-      classId: student.classId,
-      sectionId: student.sectionId,
+      className: student.classes?.name || null,
+      sectionName: student.sections?.name || null,
     }));
 
     res.status(200).json({
@@ -448,16 +247,19 @@ const getAllStudentsList = async (req, res) => {
     });
   } catch (err) {
     console.error("Get All Students Error:", err);
-    res.status(500).json({ message: "Server error while fetching student details", status: false });
+    res.status(500).json({
+      message: "Server error while fetching student details",
+      status: false,
+    });
   }
 };
-
 const getProfileCardData = async (req, res) => {
   try {
     const { key, value } = req.body.searchBy;
-
     const studentProfileData = await Student.findOne({ [key]: value })
-      .populate("userId", "name email avatar contactNumber isActive");
+      .populate("userId", "name email avatar contactNumber status")
+      .populate("classes", "name")
+      .populate("sections", "name");
 
     if (!studentProfileData) {
       return res.status(404).json({ message: "Student not found", status: false });
@@ -468,20 +270,26 @@ const getProfileCardData = async (req, res) => {
       id: studentProfileData.studentId,
       name: studentProfileData.name,
       email: studentProfileData.userId?.email || null,
-      contactNumber: studentProfileData.contactNumber || studentProfileData.userId?.contactNumber || null,
+      contactNumber:
+        studentProfileData.contactNumber ||
+        studentProfileData.userId?.contactNumber ||
+        null,
       parentName: studentProfileData.parentName,
       parentContactNumber: studentProfileData.parentContactNumber,
       avatar: studentProfileData.userId?.avatar || null,
-      classId: studentProfileData.classId,
-      sectionId: studentProfileData.sectionId,
+      className: studentProfileData.classes?.name || null,
+      sectionName: studentProfileData.sections?.name || null,
       gender: studentProfileData.gender,
-      isActive: studentProfileData.isActive,
+      status: studentProfileData.status,
     };
 
     res.status(200).json({ status: true, data: formattedStudent });
   } catch (err) {
     console.error("Get Profile Card Error:", err);
-    res.status(500).json({ message: "Server error while fetching student profile data", status: false });
+    res.status(500).json({
+      message: "Server error while fetching student profile data",
+      status: false,
+    });
   }
 };
 
@@ -498,7 +306,12 @@ const deleteStudent = async (req, res) => {
       return res.status(404).json({ message: "Student not found", status: false });
     }
 
-    await syncReferences({ action: "remove", targetModel: "Student", targetId: student._id, session });
+    await syncReferences({
+      action: "remove",
+      targetModel: "Student",
+      targetId: student._id,
+      session,
+    });
     await User.findByIdAndDelete(student.userId).session(session);
 
     await session.commitTransaction();
@@ -506,251 +319,18 @@ const deleteStudent = async (req, res) => {
   } catch (err) {
     await session.abortTransaction();
     console.error("Delete Student Error:", err);
-    res.status(500).json({ message: "Server error while deleting student", status: false });
+    res
+      .status(500)
+      .json({ message: "Server error while deleting student", status: false });
   } finally {
     session.endSession();
   }
 };
 
-module.exports = { save, getStudentDetails, deleteStudent, getAllStudentsList, getProfileCardData };
-
-
-
-// const { default: mongoose } = require("mongoose");
-// const User = require("../models/AuthSchema");
-// const Student = require("../models/Student");
-// const School = require("../models/SchoolSchema");
-// const { sendEmail } = require("../utils/Email");
-// const { signupTemplate } = require("../utils/templates/EmailTemplates");
-// const { syncReferences } = require("../utils/Sync");
-
-// const save = async (req, res) => {
-//   const session = await mongoose.startSession();
-//   session.startTransaction();
-
-//   try {
-//     const {
-//       _id,
-//       name,
-//       dateOfBirth,
-//       gender,
-//       classId,
-//       sectionId,
-//       parentName,
-//       guardianName,
-//       parentEmail,
-//       parentContactNumber,
-//       occupation,
-//       motherName,
-//       studentContactNumber,
-//       address,
-//       studentPhoto,
-//       isActive,
-//     } = req.body;
-
-//     const { schoolId } = req.user;
-
-//     if (!name || !dateOfBirth || !schoolId || !classId || !sectionId || !parentName || !parentEmail || !parentContactNumber) {
-//       await session.abortTransaction();
-//       return res.status(400).json({
-//         message: "Required fields missing",
-//         status: false,
-//       });
-//     }
-
-//     // Check if user exists or create
-//     let user = await User.findOne({ email: parentEmail }).session(session);
-//     if (!user) {
-//       const dobStr = new Date(dateOfBirth).toISOString().split("T")[0].replace(/-/g, "");
-//       const password = `${name.split(" ")[0]}@${dobStr}`;
-//       user = new User({ name, dateOfBirth, schoolId, email: parentEmail, password, role: "student" });
-//       await user.save({ session });
-//     }
-
-//     let student = await Student.findOne({ userId: user._id, schoolId }).session(session);
-
-//     if (student) {
-//       Object.assign(student, {
-//         name,
-//         dateOfBirth,
-//         gender,
-//         classId,
-//         sectionId,
-//         parentName,
-//         guardianName,
-//         parentEmail,
-//         parentContactNumber,
-//         occupation,
-//         motherName,
-//         studentContactNumber,
-//         address,
-//         studentPhoto,
-//         isActive,
-//       });
-
-//       await student.save({ session });
-//       await syncReferences({ action: "save", targetModel: "Student", targetId: student._id, session });
-
-//       await session.commitTransaction();
-//       return res.status(200).json({ message: "Student updated successfully", data: student, status: true });
-//     }
-
-//     const newStudent = new Student({
-//       userId: user._id,
-//       schoolId,
-//       name,
-//       dateOfBirth,
-//       gender,
-//       classId,
-//       sectionId,
-//       parentName,
-//       guardianName,
-//       parentEmail,
-//       parentContactNumber,
-//       occupation,
-//       motherName,
-//       studentContactNumber,
-//       address,
-//       studentPhoto,
-//       isActive,
-//       studentId: `STU-${Date.now()}`,
-//     });
-
-//     await newStudent.save({ session });
-//     await syncReferences({ action: "save", targetModel: "Student", targetId: newStudent._id, session });
-
-//     await session.commitTransaction();
-//     res.status(201).json({ message: "Student added successfully", data: newStudent, status: true });
-//   } catch (err) {
-//     await session.abortTransaction();
-//     console.error("Save Student Error:", err);
-//     res.status(500).json({ message: "Server error during student add/update", status: false });
-//   } finally {
-//     session.endSession();
-//   }
-// };
-
-// const getStudentDetails = async (req, res) => {
-//   const { id, studentId, name = "", parentContactNumber = "" } = req.body;
-
-//   if (![id, studentId, name, parentContactNumber].some(Boolean)) {
-//     return res.status(400).json({ message: "At least one search field is required", status: false });
-//   }
-
-//   const searchFields = {};
-//   if (id && mongoose.Types.ObjectId.isValid(id)) searchFields._id = id;
-//   if (studentId) searchFields.studentId = studentId;
-//   if (name) searchFields.name = { $regex: name, $options: "i" };
-//   if (parentContactNumber) searchFields.parentContactNumber = { $regex: parentContactNumber, $options: "i" };
-
-//   try {
-//     const response = await Student.find(searchFields).populate("userId", "email studentContactNumber name");
-
-//     if (response.length === 0) {
-//       return res.status(404).json({ data: [], message: "No student found", status: false });
-//     } else if (response.length === 1) {
-//       return res.status(200).json({ data: response[0], message: "Student found successfully", status: true });
-//     }
-
-//     return res.status(200).json({ data: response, message: "Multiple students found successfully", status: true });
-//   } catch (error) {
-//     console.error("Error fetching student details:", error);
-//     return res.status(500).json({ message: "Server error while fetching student details", status: false });
-//   }
-// };
-
-// const getAllStudentsList = async (req, res) => {
-//   try {
-//     const students = await Student.find({ schoolId: req.user.schoolId })
-//       .populate("userId", "name email avatar studentContactNumber isActive");
-
-//     if (!students || students.length === 0) {
-//       return res.status(200).json({ data: [], message: "No student found", status: false });
-//     }
-
-//     const formattedStudents = students.map(student => ({
-//       studentId: student.studentId,
-//       name: student.name,
-//       email: student.userId?.email || null,
-//       studentContactNumber: student.studentContactNumber || student.userId?.studentContactNumber || null,
-//       parentName: student.parentName,
-//       parentContactNumber: student.parentContactNumber,
-//       avatar: student.userId?.avatar || null,
-//       isActive: student.isActive,
-//       gender: student.gender,
-//       classId: student.classId,
-//       sectionId: student.sectionId,
-//     }));
-
-//     res.status(200).json({
-//       data: formattedStudents,
-//       message: `${students.length} student(s) found successfully`,
-//       status: true,
-//     });
-//   } catch (err) {
-//     console.error("Get All Students Error:", err);
-//     res.status(500).json({ message: "Server error while fetching student details", status: false });
-//   }
-// };
-
-// const getProfileCardData = async (req, res) => {
-//   try {
-//     const { key, value } = req.body.searchBy;
-
-//     const studentProfileData = await Student.findOne({ [key]: value })
-//       .populate("userId", "name email avatar studentContactNumber isActive");
-
-//     if (!studentProfileData) {
-//       return res.status(404).json({ message: "Student not found", status: false });
-//     }
-
-//     const formattedStudent = {
-//       _id: studentProfileData._id,
-//       id: studentProfileData.studentId,
-//       name: studentProfileData.name,
-//       email: studentProfileData.userId?.email || null,
-//       studentContactNumber: studentProfileData.studentContactNumber || studentProfileData.userId?.studentContactNumber || null,
-//       parentName: studentProfileData.parentName,
-//       parentContactNumber: studentProfileData.parentContactNumber,
-//       avatar: studentProfileData.userId?.avatar || null,
-//       classId: studentProfileData.classId,
-//       sectionId: studentProfileData.sectionId,
-//       gender: studentProfileData.gender,
-//       isActive: studentProfileData.isActive,
-//     };
-
-//     res.status(200).json({ status: true, data: formattedStudent });
-//   } catch (err) {
-//     console.error("Get Profile Card Error:", err);
-//     res.status(500).json({ message: "Server error while fetching student profile data", status: false });
-//   }
-// };
-
-// const deleteStudent = async (req, res) => {
-//   const session = await mongoose.startSession();
-//   session.startTransaction();
-
-//   try {
-//     const { id } = req.body;
-//     const student = await Student.findByIdAndDelete(id).session(session);
-
-//     if (!student) {
-//       await session.abortTransaction();
-//       return res.status(404).json({ message: "Student not found", status: false });
-//     }
-
-//     await syncReferences({ action: "remove", targetModel: "Student", targetId: student._id, session });
-//     await User.findByIdAndDelete(student.userId).session(session);
-
-//     await session.commitTransaction();
-//     res.status(200).json({ message: "Student deleted successfully", status: true });
-//   } catch (err) {
-//     await session.abortTransaction();
-//     console.error("Delete Student Error:", err);
-//     res.status(500).json({ message: "Server error while deleting student", status: false });
-//   } finally {
-//     session.endSession();
-//   }
-// };
-
-// module.exports = { save, getStudentDetails, deleteStudent, getAllStudentsList, getProfileCardData };
+module.exports = {
+  save,
+  getStudentDetails,
+  getAllStudentsList,
+  getProfileCardData,
+  deleteStudent,
+};

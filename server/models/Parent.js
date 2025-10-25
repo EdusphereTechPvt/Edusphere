@@ -8,6 +8,15 @@ const ParentProfileSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    name: {
+      type: String,
+      required: true,
+    },
+    parentId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
     schoolId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "School",
@@ -26,7 +35,7 @@ const ParentProfileSchema = new mongoose.Schema(
     children: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "StudentProfile",
+        ref: "Student",
       },
     ],
   },

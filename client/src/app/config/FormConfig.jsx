@@ -251,7 +251,7 @@ const formConfig = {
 
   student: {
     api: {
-      fetch: "/student/getStudent",
+      fetch: "/student/search",
       submit: "/student/save",
       page: {
         mode: {

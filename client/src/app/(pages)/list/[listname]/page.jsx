@@ -29,6 +29,8 @@ const Page = () => {
 
       let result = await getListDetails(listname);
       setFetchedData(result.data);
+      console.log(result.data);
+      
 
       let elements = await getElements(`list/${listname}`);
       elements = formatElement("table", elements);
@@ -132,8 +134,6 @@ const Page = () => {
             }}
           />
         </Box>
-        {console.log(profileCardData)}
-
         <AnimatePresence>
           {selected && (
             <motion.div

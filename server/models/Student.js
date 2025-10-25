@@ -18,63 +18,79 @@ const StudentProfileSchema = new mongoose.Schema(
       ref: "School",
       required: true,
     },
-    name: {
-      type: String,
+
+    classes: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Class",
       required: true,
     },
-    grade: {
-      type: String,
-      required: true,
-    },
-    section: {
-      type: String,
-      required: true,
-    },
-    gender: {
-      type: String,
-      enum: ["Male", "Female"],
-      required: true,
-    },
-    enrollmentDate: {
-      type: Date,
+    sections: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Section",
       required: true,
     },
 
-    previousSchool: {
+    name: {
       type: String,
+      required: true
+    },
+
+    dateOfBirth: {
+      type: Date,
+      required: true
+    },
+
+    gender: {
+      type: String, enum: ["Male", "Female", "Other"],
+      required: true
+    },
+
+
+    parentName: {
+      type: String,
+      required: true
     },
 
     guardianName: {
-      type: String,
-      required: true,
+      type: String
     },
 
-    relationshipToStudent: {
+    parentEmail: {
       type: String,
-      required: true,
+      required: true
     },
 
-    guardianContact: {
+    parentContactNumber: {
       type: String,
-      required: true,
+      required: true
     },
 
-    allergies: {
-      type: String,
+    parentOccupation: {
+      type: String
+    },
+    motherName: {
+      type: String
     },
 
-    medicalConditions: {
-      type: String,
+    contactNumber: {
+      type: String
     },
 
-    emergencyContacts: {
-      type: String,
-      required: true,
+    address: {
+      type: String
     },
+
+    photo: {
+      type: String
+    },
+    // qrId: { type: String },
+
+    enrollmentDate: { type: Date, default: Date.now },
     status: {
       type: String,
-      required: true,
       enum: ["Active", "On Hold", "Inactive"],
+      default: "Active",
+      required: true
     },
   },
   { timestamps: true }

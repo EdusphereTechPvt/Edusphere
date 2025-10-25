@@ -41,7 +41,7 @@ const save = async (req, res) => {
       await user.save({ session });
     }
 
-   
+
     let parent = await Parent.findOne({ userId: user._id, schoolId }).session(session);
 
     if (parent) {
@@ -60,8 +60,9 @@ const save = async (req, res) => {
       });
     }
 
-  
+
     const newParent = new Parent({
+      parentId: `PRT-${Date.now()}`,
       userId: user._id,
       schoolId,
       occupation,
@@ -159,6 +160,7 @@ const getAllParentsList = async (req, res) => {
 
     const formattedParents = parents.map((p) => ({
       _id: p._id,
+      parentId: p.parentId,
       name: p.userId?.name,
       email: p.userId?.email,
       occupation: p.occupation,
@@ -197,6 +199,7 @@ const getProfileCardData = async (req, res) => {
 
     const formattedParent = {
       _id: parent._id,
+      parentId: parent.parentId,
       name: parent.userId?.name,
       email: parent.userId?.email,
       occupation: parent.occupation,
