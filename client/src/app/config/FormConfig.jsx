@@ -147,11 +147,6 @@ const formConfig = {
             placeholder: "Select classes",
             items: [],
             isDistinct: true,
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "multiselect",
@@ -163,11 +158,6 @@ const formConfig = {
             isDistinct: true,
             dependancy: ["classes"],
             items: [],
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "multiselect",
@@ -180,11 +170,6 @@ const formConfig = {
             required: false,
             dependancy: ["classes"],
             items: [],
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
         ],
       },
@@ -332,6 +317,7 @@ const formConfig = {
             type: "date",
             name: "dateOfBirth",
             label: "Date of Birth",
+            placeholder: "Select Date of Birth",
             required: true,
           },
           {
@@ -782,11 +768,6 @@ const formConfig = {
             isDistinct: true,
             required: true,
             items: [],
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "multiselect",
@@ -799,11 +780,6 @@ const formConfig = {
             dependancy: ["classes"],
             isDistinct: true,
             items: [],
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "checkBox",
@@ -934,11 +910,6 @@ const formConfig = {
             required: false,
             items: [],
             isDistinct: true,
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "multiselect",
@@ -950,11 +921,6 @@ const formConfig = {
             required: true,
             items: [],
             isDistinct: true,
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "text",
@@ -1115,11 +1081,6 @@ const formConfig = {
             items: [],
             isDistinct: true,
             dependancy: ["classes"],
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "multiselect",
@@ -1131,11 +1092,6 @@ const formConfig = {
             required: true,
             items: [],
             isDistinct: true,
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "text",

@@ -60,7 +60,7 @@ export const listConfig = {
       { name: "gender", displayName: "Gender" },
       { name: "status", displayName: "Status" },
     ],
-    clickableFields: ["id"],
+    clickableFields: ["id", "name"],
   },
   teacher: {
     tableHeader: [
@@ -71,7 +71,7 @@ export const listConfig = {
       { name: "gender", displayName: "Gender" },
       { name: "status", displayName: "Status" },
     ],
-    clickableFields: ["id"],
+    clickableFields: ["id", "name"],
   },
   subject: {
     tableHeader: [
@@ -81,7 +81,7 @@ export const listConfig = {
       { name: "credits", displayName: "Credits" },
       { name: "status", displayName: "Status" },
     ],
-    // clickableFields:["id", "name"]
+    clickableFields: ["id", "name"],
   },
   class: {
     tableHeader: [
@@ -90,7 +90,7 @@ export const listConfig = {
       { name: "academicYear", displayName: "Year" },
       { name: "status", displayName: "Status" },
     ],
-    clickableFields: ["id"],
+    clickableFields: ["id", "name"],
   },
   section: {
     tableHeader: [
@@ -100,7 +100,7 @@ export const listConfig = {
       { name: "classTeacher[name]", displayName: "Class Teacher" },
       { name: "isActive", displayName: "Status" },
     ],
-    // clickableFields:["id", "name"]
+    clickableFields: ["id", "name"],
   },
   parent: {
     tableHeader: [
@@ -110,7 +110,7 @@ export const listConfig = {
       { name: "emergencyContact", displayName: "Phone" },
       { name: "occupation", displayName: "Occupation" },
     ],
-    clickableFields: ["id"],
+    clickableFields: ["id", "name"],
   },
   admin: {
     tableHeader: [
@@ -120,7 +120,7 @@ export const listConfig = {
       { name: "designation", displayName: "Designation" },
       { name: "isActive", displayName: "Status" },
     ],
-    clickableFields: ["id"],
+    clickableFields: ["id", "name"],
   },
 };
 
@@ -150,10 +150,11 @@ export const ProfileCardConfig = {
     },
 
     fields: [
-      { key: "attendance", label: "Attendance", type: "progress" },
-      { key: "status", label: "Employment Status", type: "chip" },
-      { key: "subject", label: "Subject", type: "text" },
+      { key: "Phone", label: "Contact No.", type: "text" },
+      { key: "Email", label: "Email Id", type: "text" },
+      { key: "Status", label: "Employment Status", type: "chip" },
       { key: "experience", label: "Experience", type: "text" },
+      { key: "qualification", label: "Qualification", type: "text" },
     ],
 
     quickLinks: [
@@ -168,10 +169,26 @@ export const ProfileCardConfig = {
     },
 
     fields: [
-      { key: "attendance", label: "Attendance", type: "progress" },
-      { key: "status", label: "Employment Status", type: "chip" },
-      { key: "subject", label: "Subject", type: "text" },
-      { key: "experience", label: "Experience", type: "text" },
+      { key: "sections", label: "Sections", type: "array" },
+      { key: "subjects", label: "Subjects", type: "array" },
+      { key: "Status", label: "Status", type: "chip" },
+    ],
+
+    quickLinks: [
+      { label: "Full Profile", icon: <AccountCircle />, action: () => {} },
+      { label: "Class Management", icon: <ClassIcon />, action: () => {} },
+      { label: "Student Reports", icon: <School />, action: () => {} },
+    ],
+  },
+  section: {
+    header: {
+      title: "Section Overview",
+    },
+
+    fields: [
+      { key: "sections", label: "Sections", type: "array" },
+      { key: "subjects", label: "Subjects", type: "array" },
+      { key: "Status", label: "Status", type: "chip" },
     ],
 
     quickLinks: [

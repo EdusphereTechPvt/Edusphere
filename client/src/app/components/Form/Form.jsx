@@ -19,6 +19,7 @@ import { validateField } from "@/app/utils/Validator";
 import { showToast } from "@/app/utils/Toast";
 import { formatLabel } from "@/app/utils/Format";
 import { dynamicUpdateConfig } from "@/app/utils/FormatConfig";
+import DateComponent from "../Date/date";
 
 export default function Form({ type, mode, id }) {
   const router = useRouter();
@@ -122,6 +123,20 @@ export default function Form({ type, mode, id }) {
     },
     [formData, config, mode, router]
   );
+
+  const getInputValue = (name, type) => {
+    const val = formData[name];
+    if (type === "number" && typeof val === "string" && val.toLowerCase().includes("class")) {
+      const num = Number(val.split(" ")[1]?.trim());
+    return isNaN(num) ? "" : num;      
+    }
+
+     if (type === "text" && typeof val === "string" && val.toLowerCase().includes("section")) {
+    return val.split(" ")[1]?.trim() || "";
+  }
+    
+    return val || ""
+  }
 
   const handleBlur = useCallback(
     (field) => () => {
@@ -265,7 +280,6 @@ export default function Form({ type, mode, id }) {
                 switch (type) {
                   case "text":
                   case "email":
-                  case "date":
                   case "number":
                     return (
                       <div
@@ -294,19 +308,15 @@ export default function Form({ type, mode, id }) {
                             type={type}
                             name={name}
                             placeholder={placeholder}
-                            value={
-                              formData[name] ||
-                              (formData[name] &&
-                                formData[name].split("T")[0]) ||
-                              ""
-                            }
+                            value={getInputValue(name, type)}
                             onChange={(e) => {
                               let value = e.target.value;
 
                               // type TExt
                               if (type === "text") {
                                 const pattern =
-                                  field?.pattern && new RegExp(field.pattern.value);
+                                  field?.pattern &&
+                                  new RegExp(field.pattern.value);
 
                                 if (pattern && value && !pattern.test(value)) {
                                   showToast(
@@ -474,6 +484,27 @@ export default function Form({ type, mode, id }) {
                           onSelect={(value) => handleChange(field.name, value)}
                           style={field.styles}
                           onBlur={handleBlur(field)}
+                        />
+                      </div>
+                    );
+                  case "date":
+                    return (
+                      <div
+                        key={i}
+                        className={`flex w-full flex-col ${
+                          i === section.fields.length - 1 && i % 2 === 0
+                            ? "sm:col-span-2"
+                            : ""
+                        }`}
+                      >
+                        <label className="mb-1 text-sm font-medium text-gray-700">
+                          {label} {required && "*"}
+                        </label>
+                        <DateComponent
+                          value={formData[name]}
+                          onChange={(value) => handleChange(name, value)}
+                          placeholder={placeholder || "Select date"}
+                          format="DD/MM/YYYY"
                         />
                       </div>
                     );
