@@ -6,8 +6,7 @@ import { showToast } from "@/app/utils/Toast.jsx";
 import { matchPassword, validateField } from "@/app/utils/Validator.jsx";
 import { authenticateUser } from "@/app/services/AuthService.jsx";
 import { useParams, useRouter } from "next/navigation.js";
-// import Loader from "@/app/components/Loader/Loader";
-// import LoaderConfig from "@/app/config/LoaderConfig";
+
 
 export default function AuthPage() {
   const router = useRouter();
@@ -17,7 +16,6 @@ export default function AuthPage() {
   const [state, setState] = useState({ terms: false, consent: false });
   const [error, setError] = useState({});
   const [disabled, setDisabled] = useState(true);
-  // const [loading, setLoading] = useState(true);
 
   const fieldsConfig = authconfig[mode]?.options?.[activeRole] || [];
 
@@ -31,11 +29,6 @@ export default function AuthPage() {
     else
       window.location.href = '/error/404';
 
-    //   const timer = setTimeout(() => {
-    //   setLoading(false);
-    // }, 1500);
-
-    // return () => clearTimeout(timer);
   }, [authType])
 
   useEffect(() => {
@@ -125,11 +118,7 @@ export default function AuthPage() {
   const handleOAuthSubmit = (provider) => {
     console.log("OAuth login with", provider);
   };
-
-  // if (loading) {
-    // return <Loader config={LoaderConfig.auth} />;
-  // }
-// 
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
       <div className="w-full max-w-lg bg-white rounded-3xl shadow-xl border border-gray-200 p-6 sm:p-8">

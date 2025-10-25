@@ -2,7 +2,7 @@
 
 import { PricingConfig } from "@/app/config/PricingConfig";
 import { Box, ButtonGroup, Grid } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
@@ -10,25 +10,11 @@ import Typography from "@mui/material/Typography";
 import CheckIcon from "@mui/icons-material/Check";
 import { TableComponent } from "@/app/components/Table/TableComponent";
 import { DynamicRenderer } from "@/app/utils/DynamicRender";
-import Loader from "@/app/components/Loader/Loader";
-import LoaderConfig from "@/app/config/LoaderConfig";
 
 const Subscription = () => {
   const config = PricingConfig;
   const [period, setPeriod] = useState("monthly");
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
-    return <Loader config={LoaderConfig.pricing} />;
-  }
   const handlePeriodChange = (newPeriod) => {
     if (newPeriod !== null) {
       setPeriod(newPeriod);
