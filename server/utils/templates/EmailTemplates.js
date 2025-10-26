@@ -140,7 +140,7 @@ export const resetPasswordTemplate = (name,token) => {
   `
 }
 
-export const studentSignupTemplate = (studentName, schoolName) => {
+export const studentSignupTemplate = (name , schoolName) => {
   const dobNote = `<p style="font-size:15px;line-height:1.6;color:#111827;">
         Please note: Your password is generated using your <strong>first name</strong> and <strong>date of birth</strong> in the format 
         <code>Firstname@YYYYMMDD</code>. 
@@ -164,7 +164,7 @@ export const studentSignupTemplate = (studentName, schoolName) => {
 
         <tr>
           <td style="padding:30px 40px;color:#111827;">
-            <p style="font-size:16px;">Hello <strong>${studentName}</strong>,</p>
+            <p style="font-size:16px;">Hello <strong>${name}</strong>,</p>
 
             <p style="font-size:15px;line-height:1.6;">
               You’ve been successfully added to the <strong>${schoolName}</strong> group as a <strong>Student</strong>!
