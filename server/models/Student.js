@@ -74,7 +74,7 @@ const StudentProfileSchema = new mongoose.Schema(
       default: Date.now,
     },
 
-    parentId: {
+    parent: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Parent",
       required: true,
