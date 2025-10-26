@@ -1144,15 +1144,28 @@
             "type": "string"
           },
           {
+            "name": "x-page",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "_id": {
+                "page": {
                   "example": "any"
                 },
                 "name": {
+                  "example": "any"
+                },
+                "studentEmail": {
                   "example": "any"
                 },
                 "dateOfBirth": {
@@ -1161,16 +1174,37 @@
                 "gender": {
                   "example": "any"
                 },
-                "classId": {
+                "classes": {
                   "example": "any"
                 },
-                "sectionId": {
+                "sections": {
+                  "example": "any"
+                },
+                "enrollmentDate": {
+                  "example": "any"
+                },
+                "contactNumber": {
+                  "example": "any"
+                },
+                "previousSchool": {
+                  "example": "any"
+                },
+                "isActive": {
+                  "example": "any"
+                },
+                "photo": {
+                  "example": "any"
+                },
+                "address": {
+                  "example": "any"
+                },
+                "parentPhoto": {
                   "example": "any"
                 },
                 "parentName": {
                   "example": "any"
                 },
-                "guardianName": {
+                "parentDOB": {
                   "example": "any"
                 },
                 "parentEmail": {
@@ -1179,22 +1213,19 @@
                 "parentContactNumber": {
                   "example": "any"
                 },
-                "occupation": {
+                "relation": {
                   "example": "any"
                 },
-                "motherName": {
+                "alternativeEmail": {
                   "example": "any"
                 },
-                "studentContactNumber": {
+                "alternativeContactNumber": {
                   "example": "any"
                 },
-                "address": {
+                "parentOccupation": {
                   "example": "any"
                 },
-                "studentPhoto": {
-                  "example": "any"
-                },
-                "isActive": {
+                "isParentActive": {
                   "example": "any"
                 }
               }
@@ -1202,9 +1233,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
           "201": {
             "description": "Created"
           },
@@ -1213,6 +1241,9 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -1260,7 +1291,10 @@
                 "name": {
                   "example": "any"
                 },
-                "parentContactNumber": {
+                "email": {
+                  "example": "any"
+                },
+                "contactNumber": {
                   "example": "any"
                 }
               }
@@ -1400,11 +1434,24 @@
             "type": "string"
           },
           {
+            "name": "x-page",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
+                "page": {
+                  "example": "any"
+                },
                 "id": {
                   "example": "any"
                 }
@@ -1418,6 +1465,9 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -2678,6 +2728,18 @@
                 "emergencyContact": {
                   "example": "any"
                 },
+                "parentDOB": {
+                  "example": "any"
+                },
+                "parentEmail": {
+                  "example": "any"
+                },
+                "alternativeEmail": {
+                  "example": "any"
+                },
+                "alternativeContactNumber": {
+                  "example": "any"
+                },
                 "children": {
                   "example": "any"
                 }
@@ -2828,24 +2890,11 @@
             "type": "string"
           },
           {
-            "name": "x-page",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "type": "string"
-          },
-          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "page": {
-                  "example": "any"
-                },
                 "searchBy": {
                   "example": "any"
                 }
@@ -2859,9 +2908,6 @@
           },
           "401": {
             "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"

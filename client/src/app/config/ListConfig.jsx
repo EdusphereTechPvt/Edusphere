@@ -58,7 +58,7 @@ export const listConfig = {
       { name: "className", displayName: "Class" },
       { name: "sectionName", displayName: "Section" },
       { name: "gender", displayName: "Gender" },
-      { name: "status", displayName: "Status" },
+      { name: "isActive", displayName: "Status" },
     ],
     clickableFields: ["id", "name"],
   },
@@ -132,8 +132,8 @@ export const ProfileCardConfig = {
 
     fields: [
       { key: "attendance", label: "Attendance", type: "progress" },
+      { key: "contactNumber", label: "Contact No.", type: "text" },
       { key: "isActive", label: "Status", type: "chip" },
-      { key: "parentName", label: "Parent/Guardian Name", type: "text" },
       { key: "studentContactNumber", label: "Phone Number", type: "text" },
     ],
 
