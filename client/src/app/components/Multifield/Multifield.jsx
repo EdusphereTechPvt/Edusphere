@@ -9,7 +9,7 @@ import DebouncedTextField from "./DebouncedTextField";
 
 const MultiFiled = ({
   fields: fieldConfig = [
-    { type: 'dropdown', key: 'category', placeholder: "New Category Name", items: [
+    { type: 'dropdown', key: 'category', placeholder: "New Category Name", label:"", items: [
       { id: "Event", value: "Event" },
       { id: "Class", value: "Class" },
       { id: "session", value: "Session" },
@@ -73,6 +73,7 @@ const MultiFiled = ({
           <Box key={`${fieldDef.key}-${idx}`} sx={{ width: { xs: "100%", sm: "35%" } }}>
             <Dropdown
               data={{
+                label:fieldDef.label || "",
                 placeholder: fieldDef.placeholder || "",
                 items: fieldDef.items || [],
               }}

@@ -19,6 +19,7 @@ import { validateField } from "@/app/utils/Validator";
 import { showToast } from "@/app/utils/Toast";
 import { formatLabel } from "@/app/utils/Format";
 import { dynamicUpdateConfig } from "@/app/utils/FormatConfig";
+import MultiFiled from "@/app/components/Multifield/Multifield";
 
 export default function Form({ type, mode, id }) {
   const router = useRouter();
@@ -477,7 +478,28 @@ export default function Form({ type, mode, id }) {
                         />
                       </div>
                     );
-                  default:
+                  case "multifield":
+                    return (
+                      <div
+                        key={i}
+                        className={`flex w-full flex-col ${
+                          i === section.fields.length - 1 && i % 2 === 0
+                            ? "sm:col-span-2"
+                            : ""
+                        }`}
+                      >
+                        <MultiFiled
+                          label={label}
+                          fields={field.items}
+                          minfields={field.minfields || 2}
+                          maxfields={field.maxfields }
+                          initialFieldCount={field.initialFieldCount || 2}
+                          debounceDelay={field.debounceDelay || 5000}
+                          onChange={(data)=> handleChange(name, data)}
+                        />
+                      </div>
+                    );
+                    default:
                     return null;
                 }
               })}
