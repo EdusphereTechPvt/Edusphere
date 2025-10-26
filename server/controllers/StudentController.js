@@ -856,13 +856,13 @@ const save = async (req, res) => {
 
     const defaultEmail = studentEmail
       ? studentEmail
-      : `${name.replace(/\s+/g, "").toLowerCase()}${dobObj.getFullYear()}${parentContactNumber.slice(
+      : `${name.replace(/\s+/g, "").toLowerCase()}${dobObj.getFullYear()}${String(parentContactNumber).slice(
           -5
         )}@school.com`;
 
     const parentUserEmail = parentEmail
       ? parentEmail
-      : `${parentName.replace(/\s+/g, "").toLowerCase()}${parentContactNumber.slice(
+      : `${parentName.replace(/\s+/g, "").toLowerCase()}${String(parentContactNumber).slice(
           -5
         )}@school.com`;
 
