@@ -648,6 +648,161 @@ const Student = require("../models/Student");
 const Parent = require("../models/Parent");
 const { syncReferences } = require("../utils/Sync");
 
+// const save = async (req, res) => {
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
+
+//   try {
+//     const {
+//       name,
+//       studentEmail,
+//       dateOfBirth,
+//       gender,
+//       classes,
+//       sections,
+//       enrollmentDate,
+//       contactNumber,
+//       previousSchool,
+//       isActive,
+//       photo,
+//       address,
+//       parentPhoto,
+//       parentName,
+//       parentDOB,
+//       parentEmail,
+//       parentContactNumber,
+//       relation,
+//       alternativeEmail,
+//       alternativeContactNumber,
+//       parentOccupation,
+//       isParentActive,
+//     } = req.body;
+
+//     const { schoolId } = req.user || {};
+
+//     if (!name || !dateOfBirth || !schoolId || !classes || !sections || !parentName || !parentContactNumber) {
+//       await session.abortTransaction();
+//       return res.status(400).json({ message: "Required fields missing", status: false });
+//     }
+
+//     const dobObj = new Date(dateOfBirth);
+//     if (isNaN(dobObj.getTime())) throw new Error("Invalid dateOfBirth format");
+
+
+//     const defaultEmail = studentEmail
+//       ? studentEmail
+//       : `${name.replace(/\s+/g, "").toLowerCase()}${dobObj.getFullYear()}${parentContactNumber.slice(-5)}@school.com`;
+
+
+//     let studentUser = await User.findOne({ email: defaultEmail }).session(session);
+//     if (!studentUser) {
+//       const dobStr = dobObj.toISOString().split("T")[0].replace(/-/g, "");
+//       const password = `${name.split(" ")[0]}@${dobStr}`;
+//       studentUser = new User({
+//         name,
+//         dateOfBirth: dobObj,
+//         email: defaultEmail,
+//         password,
+//         schoolId,
+//         role: "student",
+//         avatar: photo,
+//         isActive: isActive,
+//       });
+//       await studentUser.save({ session });
+//     }
+
+
+//     let student = await Student.findOne({ userId: studentUser._id, schoolId }).session(session);
+//     const studentData = {
+//       userId: studentUser._id,
+//       name,
+//       studentEmail: defaultEmail,
+//       dateOfBirth: dobObj,
+//       gender,
+//       classes,
+//       sections,
+//       contactNumber,
+//       address,
+//       previousSchool,
+//       photo,
+//       schoolId,
+//       parentId: `PRT-${Date.now()}`,
+//       enrollmentDate: enrollmentDate || new Date(),
+//       isActive: isActive || true,
+//     };
+
+//     if (student) {
+//       Object.assign(student, studentData);
+//       await student.save({ session });
+//     } else {
+//       student = new Student({
+//         ...studentData,
+//         studentId: `STU-${Date.now()}`,
+//       });
+//       await student.save({ session });
+//     }
+
+//     await syncReferences({ action: "save", targetModel: "Student", targetId: student._id, session });
+
+  
+//     const parentUserEmail =
+//       parentEmail || `${parentName.replace(/\s+/g, "").toLowerCase()}${parentContactNumber.slice(-5)}@school.com`;
+//     let parentUser = await User.findOne({ email: parentUserEmail }).session(session);
+
+//     if (!parentUser) {
+//       const dobStr = new Date(parentDOB).toISOString().split("T")[0].replace(/-/g, "");
+//       const password = `${parentName.split(" ")[0]}@${dobStr}`;
+//       parentUser = new User({
+//         name: parentName,
+//         dateOfBirth: new Date(parentDOB || Date.now()),
+//         email: parentUserEmail,
+//         password,
+//         role: "parent",
+//         schoolId,
+//         avatar: parentPhoto,
+//         isActive: isParentActive,
+//       });
+//       await parentUser.save({ session });
+//     }
+
+//     let parentDoc = await Parent.findOne({ userId: parentUser._id, schoolId }).session(session);
+//     if (!parentDoc) {
+//       parentDoc = new Parent({
+//         userId: parentUser._id,
+//         parentId: `PARENT-${Date.now()}`,
+//         name: parentName,
+//         photo: parentPhoto,
+//         schoolId,
+//         occupation: parentOccupation || "N/A",
+//         emergencyContact: parentContactNumber,
+//         email: parentEmail,
+//         alternativeEmail,
+//         alternativeContactNumber,
+//         relation,
+//         children: [student._id],
+//         isActive: isParentActive,
+//       });
+//       await parentDoc.save({ session });
+//     }
+
+//     await syncReferences({ action: "save", targetModel: "Parent", targetId: parentDoc._id, session });
+
+//     await session.commitTransaction();
+
+//     res.status(201).json({
+//       message: "Student and Parent added/updated successfully",
+//       data: { student },
+//       status: true,
+//     });
+//   } catch (err) {
+//     await session.abortTransaction();
+//     console.error("Save Student Error:", err.stack || err);
+//     res.status(500).json({ message: err.message || "Server error during student add/update", status: false });
+//   } finally {
+//     session.endSession();
+//   }
+// };
+
 const save = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -680,21 +835,95 @@ const save = async (req, res) => {
 
     const { schoolId } = req.user || {};
 
-    if (!name || !dateOfBirth || !schoolId || !classes || !sections || !parentName || !parentContactNumber) {
+
+    if (
+      !name ||
+      !dateOfBirth ||
+      !schoolId ||
+      !classes ||
+      !sections ||
+      !parentName ||
+      !parentContactNumber
+    ) {
       await session.abortTransaction();
-      return res.status(400).json({ message: "Required fields missing", status: false });
+      return res
+        .status(400)
+        .json({ message: "Required fields missing", status: false });
     }
 
     const dobObj = new Date(dateOfBirth);
     if (isNaN(dobObj.getTime())) throw new Error("Invalid dateOfBirth format");
 
-
     const defaultEmail = studentEmail
       ? studentEmail
-      : `${name.replace(/\s+/g, "").toLowerCase()}${dobObj.getFullYear()}${parentContactNumber.slice(-5)}@school.com`;
+      : `${name.replace(/\s+/g, "").toLowerCase()}${dobObj.getFullYear()}${parentContactNumber.slice(
+          -5
+        )}@school.com`;
 
+    const parentUserEmail = parentEmail
+      ? parentEmail
+      : `${parentName.replace(/\s+/g, "").toLowerCase()}${parentContactNumber.slice(
+          -5
+        )}@school.com`;
 
-    let studentUser = await User.findOne({ email: defaultEmail }).session(session);
+    let parentUser = await User.findOne({ email: parentUserEmail }).session(
+      session
+    );
+
+    if (!parentUser) {
+      const dobStr = parentDOB
+        ? new Date(parentDOB).toISOString().split("T")[0].replace(/-/g, "")
+        : Date.now();
+      const password = `${parentName.split(" ")[0]}@${dobStr}`;
+      parentUser = new User({
+        name: parentName,
+        dateOfBirth: new Date(parentDOB || Date.now()),
+        email: parentUserEmail,
+        password,
+        role: "parent",
+        schoolId,
+        avatar: parentPhoto,
+        isActive: isParentActive,
+      });
+      await parentUser.save({ session });
+    }
+
+    let parentDoc = await Parent.findOne({
+      userId: parentUser._id,
+      schoolId,
+    }).session(session);
+
+    if (!parentDoc) {
+      parentDoc = new Parent({
+        userId: parentUser._id,
+        parentId: `PARENT-${Date.now()}`,
+        name: parentName,
+        photo: parentPhoto,
+        schoolId,
+        occupation: parentOccupation || "N/A",
+        emergencyContact: parentContactNumber,
+        email: parentUserEmail,
+        alternativeEmail,
+        alternativeContactNumber,
+        relation,
+        children: [], 
+        isActive: isParentActive,
+      });
+      await parentDoc.save({ session });
+    }
+
+    await syncReferences({
+      action: "save",
+      targetModel: "Parent",
+      targetId: parentDoc._id,
+      session,
+    });
+
+    // ✅ 2️⃣ Now create/find StudentUser
+    let studentUser = await User.findOne({ email: defaultEmail }).session(
+      session
+    );
+
     if (!studentUser) {
       const dobStr = dobObj.toISOString().split("T")[0].replace(/-/g, "");
       const password = `${name.split(" ")[0]}@${dobStr}`;
@@ -711,8 +940,12 @@ const save = async (req, res) => {
       await studentUser.save({ session });
     }
 
+    
+    let student = await Student.findOne({
+      userId: studentUser._id,
+      schoolId,
+    }).session(session);
 
-    let student = await Student.findOne({ userId: studentUser._id, schoolId }).session(session);
     const studentData = {
       userId: studentUser._id,
       name,
@@ -726,9 +959,9 @@ const save = async (req, res) => {
       previousSchool,
       photo,
       schoolId,
-      parentId: `PRT-${Date.now()}`,
+      parent: parentDoc._id, 
       enrollmentDate: enrollmentDate || new Date(),
-      isActive: isActive || true,
+      isActive: isActive ?? true,
     };
 
     if (student) {
@@ -742,50 +975,18 @@ const save = async (req, res) => {
       await student.save({ session });
     }
 
-    await syncReferences({ action: "save", targetModel: "Student", targetId: student._id, session });
+    await syncReferences({
+      action: "save",
+      targetModel: "Student",
+      targetId: student._id,
+      session,
+    });
 
   
-    const parentUserEmail =
-      parentEmail || `${parentName.replace(/\s+/g, "").toLowerCase()}${parentContactNumber.slice(-5)}@school.com`;
-    let parentUser = await User.findOne({ email: parentUserEmail }).session(session);
-
-    if (!parentUser) {
-      const dobStr = new Date(parentDOB).toISOString().split("T")[0].replace(/-/g, "");
-      const password = `${parentName.split(" ")[0]}@${dobStr}`;
-      parentUser = new User({
-        name: parentName,
-        dateOfBirth: new Date(parentDOB || Date.now()),
-        email: parentUserEmail,
-        password,
-        role: "parent",
-        schoolId,
-        avatar: parentPhoto,
-        isActive: isParentActive,
-      });
-      await parentUser.save({ session });
-    }
-
-    let parentDoc = await Parent.findOne({ userId: parentUser._id, schoolId }).session(session);
-    if (!parentDoc) {
-      parentDoc = new Parent({
-        userId: parentUser._id,
-        parentId: `PARENT-${Date.now()}`,
-        name: parentName,
-        photo: parentPhoto,
-        schoolId,
-        occupation: parentOccupation || "N/A",
-        emergencyContact: parentContactNumber,
-        email: parentEmail,
-        alternativeEmail,
-        alternativeContactNumber,
-        relation,
-        children: [student._id],
-        isActive: isParentActive,
-      });
+    if (!parentDoc.children.includes(student._id)) {
+      parentDoc.children.push(student._id);
       await parentDoc.save({ session });
     }
-
-    await syncReferences({ action: "save", targetModel: "Parent", targetId: parentDoc._id, session });
 
     await session.commitTransaction();
 
@@ -797,12 +998,14 @@ const save = async (req, res) => {
   } catch (err) {
     await session.abortTransaction();
     console.error("Save Student Error:", err.stack || err);
-    res.status(500).json({ message: err.message || "Server error during student add/update", status: false });
+    res.status(500).json({
+      message: err.message || "Server error during student add/update",
+      status: false,
+    });
   } finally {
     session.endSession();
   }
 };
-
 
 const getStudentDetails = async (req, res) => {
   const { id, studentId, name = "", email = "", contactNumber = "" } = req.body;
