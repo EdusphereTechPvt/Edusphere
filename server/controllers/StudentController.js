@@ -179,6 +179,108 @@ const save = async (req, res) => {
     session.endSession();
   }
 };
+const getStudentDetails = async (req, res) => {
+  const { id, studentId, name = "", email = "", contactNumber = "" } = req.body;
+
+  if (![id, studentId, name, email, contactNumber].some(Boolean)) {
+    return res.status(400).json({
+      message: "At least one search field is required",
+      status: false,
+    });
+  }
+
+  const searchFields = {};
+  if (id && mongoose.Types.ObjectId.isValid(id)) searchFields._id = id;
+  if (studentId) searchFields.studentId = studentId;
+  if (name) searchFields.name = { $regex: name, $options: "i" };
+  if (email) searchFields.studentEmail = { $regex: email, $options: "i" };
+  if (contactNumber) searchFields.contactNumber = { $regex: contactNumber, $options: "i" };
+
+  try {
+    const response = await Student.find(searchFields)
+      .populate("userId", "email name avatar isActive dateOfBirth")
+      .populate("classes", "name")
+      .populate("sections", "name")
+      .populate("schoolId", "name")
+      .populate({
+        path: "parent",
+        populate: {
+          path: "userId",
+          select: "email name avatar isActive dateOfBirth",
+        },
+      });
+
+    if (!response || response.length === 0) {
+      return res.status(404).json({
+        data: [],
+        total: 0,
+        message: "No student found",
+        status: false,
+      });
+    }
+
+    const total = response.length;
+
+    const formattedData = response.map((student) => {
+      const parent = student.parent;
+      const parentUser = parent?.userId;
+
+      const parentInfo = parent
+        ? {
+            parentId: parent._id,
+            parentName: parent.name,
+            parentEmail: parent.email,
+            parentContactNumber: parent.emergencyContact,
+            parentDOB: parentUser?.dateOfBirth || null,
+            parentPhoto: parent.photo,
+            relation: parent.relation,
+            parentOccupation: parent.occupation,
+            alternativeEmail: parent.alternativeEmail,
+            alternativeContactNumber: parent.alternativeContactNumber,
+            isParentActive: parent.isActive,
+          }
+        : null;
+
+      return {
+        studentId: student.studentId,
+        name: student.name,
+        studentEmail: student.studentEmail,
+        dateOfBirth: student.dateOfBirth,
+        gender: student.gender,
+        classes: student.classes
+          ? { id: student.classes._id, name: student.classes.name }
+          : null,
+        sections: student.sections
+          ? { id: student.sections._id, name: student.sections.name }
+          : null,
+        enrollmentDate: student.enrollmentDate,
+        contactNumber: student.contactNumber,
+        previousSchool: student.previousSchool,
+        address: student.address,
+        photo: student.photo,
+        isActive: student.isActive,
+        school: student.schoolId?.name || null,
+        parent: parentInfo,
+      };
+    });
+
+    res.status(200).json({
+      total,
+      data: formattedData,
+      message:
+        total === 1
+          ? "Student found successfully"
+          : `${total} student(s) found successfully`,
+      status: true,
+    });
+  } catch (error) {
+    console.error("Error fetching student details:", error);
+    res.status(500).json({
+      message: "Server error while fetching student details",
+      status: false,
+    });
+  }
+};
 
 
 const getAllStudentsList = async (req, res) => {
