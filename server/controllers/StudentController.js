@@ -341,6 +341,307 @@
 // };
 
 
+// const { default: mongoose } = require("mongoose");
+// const User = require("../models/AuthSchema");
+// const Student = require("../models/Student");
+// const Parent = require("../models/Parent");
+// const { syncReferences } = require("../utils/Sync");
+
+// const save = async (req, res) => {
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
+
+//   try {
+//     const {
+//       name,
+//       studentEmail,
+//       dateOfBirth,
+//       gender,
+//       classes,
+//       sections,
+//       enrollmentDate,
+//       contactNumber,
+//       previousSchool,
+//       isActive,
+//       photo,
+//       address,
+
+//       parentPhoto,
+//       parentName,
+//       parentDOB,
+//       parentEmail,
+//       parentContactNumber,
+//       relation,
+//       alternativeEmail,
+//       alternativeContactNumber,
+//       parentOccupation,
+//       isParentActive
+//     } = req.body;
+
+//     const { schoolId } = req.user || {};
+
+//     if (!name || !studentEmail || !dateOfBirth || !schoolId || !classes || !sections || !parentName || !parentContactNumber) {
+//       await session.abortTransaction();
+//       return res.status(400).json({ message: "Required fields missing", status: false });
+//     }
+
+
+//     //is this necessary? i changes the model same as teacher so it no longer neeeded
+//     const allowedGenders = ["Male", "Female", "Other"];
+//     if (!allowedGenders.includes(gender)) {
+//       await session.abortTransaction();
+//       return res.status(400).json({ message: `Invalid gender. Allowed: ${allowedGenders.join(", ")}`, status: false });
+//     }
+
+
+
+//     const dobObj = new Date(dateOfBirth);
+//     if (isNaN(dobObj.getTime())) throw new Error("Invalid dateOfBirth format");
+//     //  const dobStr = new Date(dateOfBirth).toISOString().split("T")[0].replace(/-/g, ""); do this as it in teacher and teacher working fine with new dtae fields i checked it
+
+//     // studentEmail is not necesaay fileds so give it a defualt email like studentName+YYYY+parentNo.last 5 digit  a custom we will create by defualt wo hi rahega 
+//     let studentUser = await User.findOne({ email: studentEmail }).session(session);
+//     if (!studentUser) {
+//       const dobStr = dobObj.toISOString().split("T")[0].replace(/-/g, "");
+//       const password = `${name.split(" ")[0]}@${dobStr}`;
+//       studentUser = new User({
+//         name,
+//         dateOfBirth: dobObj,
+//         email: studentEmail,
+//         password,
+//         schoolId,
+//         role: "student",
+//         avatar: photo,
+//         isActive: isActive
+//       });
+//       await studentUser.save({ session });
+//     }
+
+
+//     let student = await Student.findOne({ userId: studentUser._id, schoolId }).session(session);
+//     const studentData = {
+//       userId: studentUser._id,
+//       name,
+//       studentEmail,
+//       dateOfBirth: dobObj,
+//       gender,
+//       classes,
+//       sections,
+//       contactNumber,
+//       address,
+//       previousSchool,
+//       photo,
+//       schoolId,
+//       enrollmentDate: enrollmentDate || new Date(),
+//       // parent id
+//       isActive: isActive || "Active",
+//     };
+
+//     if (student) {
+//       Object.assign(student, studentData);
+//       await student.save({ session });
+//     } else {
+//       student = new Student({
+//         ...studentData,
+//         studentId: `STU-${Date.now()}`,
+//       });
+//       await student.save({ session });
+//     }
+//     await syncReferences({ action: "save", targetModel: "Student", targetId: student._id, session });
+
+//     // use name + mobile 5 didgit and dob instead of this custom
+//     const parentUserEmail = parentEmail || `parent_${Date.now()}@school.com`;
+//     let parentUser = await User.findOne({ email: parentUserEmail }).session(session);
+
+//     if (!parentUser) {
+//       const password = `${parentName.split(" ")[0]}@${new Date(parentDOB)}`; //it should be name@YYYYMMDD
+//       parentUser = new User({
+//         name: parentName,
+//         dateOfBirth: new Date(parentDOB || Date.now()),
+//         email: parentUserEmail,
+//         password,
+//         role: "parent",
+//         schoolId,
+//         avatar: parentPhoto,
+//         isActive: isParentActive,
+//       });
+//       await parentUser.save({ session });
+//     }
+
+//     let parentDoc = await Parent.findOne({ userId: parentUser._id, schoolId }).session(session);
+//     if (!parentDoc) {
+//       parentDoc = new Parent({
+//         userId: parentUser._id,
+//         parentId: `PARENT-${Date.now()}`,
+//         name: parentName,
+//         photo: parentPhoto,
+//         schoolId,
+//         occupation: parentOccupation || "N/A",
+//         emergencyContact: parentContactNumber,
+//         email: parentEmail,
+//         alternativeEmail,
+//         alternativeContactNumber,
+//         relation: relation,
+//         children: [student._id],
+//         isActive: isParentActive
+//       });
+//       await parentDoc.save({ session });
+//     }
+
+//     await syncReferences({ action: "save", targetModel: "Parent", targetId: parentDoc._id, session });
+
+//     await session.commitTransaction();
+
+//     res.status(201).json({
+//       message: "Student and Parent added/updated successfully",
+//       data: { student },
+//       status: true,
+//     });
+//   } catch (err) {
+//     await session.abortTransaction();
+//     console.error("Save Student Error:", err.stack || err);
+//     res.status(500).json({ message: err.message || "Server error during student add/update", status: false });
+//   } finally {
+//     session.endSession();
+//   }
+// };
+
+// const getStudentDetails = async (req, res) => {
+//   const { id, studentId, name = "" } = req.body;
+
+//   if (![id, studentId, name].some(Boolean)) {
+//     return res.status(400).json({ message: "At least one search field is required", status: false });
+//   }
+
+//   const searchFields = {};
+//   if (id && mongoose.Types.ObjectId.isValid(id)) searchFields._id = id;
+//   if (studentId) searchFields.studentId = studentId;
+//   if (name) searchFields.name = { $regex: name, $options: "i" };
+
+//   // add email and contact no. too like in teacher
+//   try {
+//     const response = await Student.find(searchFields)
+//       .populate("userId", "email contactNumber name")
+//       .populate("classes", "name")
+//       .populate("sections", "name");
+
+//     if (!response || response.length === 0) {
+//       return res.status(404).json({ data: [], message: "No student found", status: false });
+//     }
+
+//     res.status(200).json({
+//       data: response.length === 1 ? response[0] : response,
+//       message: response.length === 1 ? "Student found successfully" : "Multiple students found successfully",
+//       status: true,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching student details:", error);
+//     res.status(500).json({ message: "Server error while fetching student details", status: false });
+//   }
+// };
+
+// const getAllStudentsList = async (req, res) => {
+//   try {
+//     const students = await Student.find({ schoolId: req.user.schoolId })
+//       .populate("userId", "name email avatar contactNumber isActive")
+//       .populate("classes", "name")//i thiki these two are not needed as it will give me classses {id: name:} but we accpet only id so try it once then remove it after checking
+//       .populate("sections", "name");
+
+//     if (!students || students.length === 0) {
+//       return res.status(200).json({ data: [], message: "No student found", status: false });
+//     }
+
+//     const formattedStudents = students.map((student) => ({
+//       studentId: student.studentId,
+//       name: student.name,
+//       email: student.studentEmail,
+//       contactNumber: student.contactNumber || student.userId?.contactNumber || null,
+//       avatar: student.userId?.avatar || null,
+//       isActive: student.isActive,
+//       gender: student.gender,
+//       className: student.classes?.name || null,
+//       sectionName: student.sections?.name || null,
+//     }));
+
+//     res.status(200).json({ data: formattedStudents, message: `${students.length} student(s) found successfully`, status: true });
+//   } catch (err) {
+//     console.error("Get All Students Error:", err);
+//     res.status(500).json({ message: "Server error while fetching student details", status: false });
+//   }
+// };
+
+// const getProfileCardData = async (req, res) => {
+//   try {
+//     const { key, value } = req.body.searchBy;
+//     const student = await Student.findOne({ [key]: value })
+//       .populate("userId", "name email avatar contactNumber status")
+//       .populate("classes", "name")
+//       .populate("sections", "name");
+
+//     if (!student) return res.status(404).json({ message: "Student not found", status: false });
+
+//     const formattedStudent = {
+//       _id: student._id,
+//       id: student.studentId,
+//       name: student.name,
+//       email: student.studentEmail,
+//       contactNumber: student.contactNumber || student.userId?.contactNumber || null,
+//       avatar: student.userId?.avatar || null,
+//       className: student.classes?.name || null,
+//       sectionName: student.sections?.name || null,
+//       gender: student.gender,
+//       status: student.status,
+//     };
+//     // add attendance and feestatus in future
+//     res.status(200).json({ status: true, data: formattedStudent });
+//   } catch (err) {
+//     console.error("Get Profile Card Error:", err);
+//     res.status(500).json({ message: "Server error while fetching student profile data", status: false });
+//   }
+// };
+
+// const deleteStudent = async (req, res) => {
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
+
+//   try {
+//     const { id } = req.body;
+//     const student = await Student.findById(id).session(session);
+
+//     if (!student) {
+//       await session.abortTransaction();
+//       return res.status(404).json({ message: "Student not found", status: false });
+//     }
+
+//     const parent = await Parent.findOne({ children: student._id }).session(session);
+//     if (parent) {
+//       await Parent.findByIdAndDelete(parent._id).session(session);//dlete parent only if there is only one student
+//       await User.findByIdAndDelete(parent.userId).session(session);
+//     }
+
+//     await Student.findByIdAndDelete(id).session(session);
+//     await User.findByIdAndDelete(student.userId).session(session);
+//     await syncReferences({ action: "remove", targetModel: "Student", targetId: student._id, session });
+
+//     await session.commitTransaction();
+//     res.status(200).json({ message: "Student and associated parent deleted successfully", status: true });
+//   } catch (err) {
+//     await session.abortTransaction();
+//     console.error("Delete Student Error:", err);
+//     res.status(500).json({ message: "Server error while deleting student", status: false });
+//   } finally {
+//     session.endSession();
+//   }
+// };
+
+// module.exports = {
+//   save,
+//   getStudentDetails,
+//   getAllStudentsList,
+//   getProfileCardData,
+//   deleteStudent,
+// };
+
 const { default: mongoose } = require("mongoose");
 const User = require("../models/AuthSchema");
 const Student = require("../models/Student");
@@ -365,7 +666,6 @@ const save = async (req, res) => {
       isActive,
       photo,
       address,
-
       parentPhoto,
       parentName,
       parentDOB,
@@ -375,44 +675,38 @@ const save = async (req, res) => {
       alternativeEmail,
       alternativeContactNumber,
       parentOccupation,
-      isParentActive
+      isParentActive,
     } = req.body;
 
     const { schoolId } = req.user || {};
 
-    if (!name || !studentEmail || !dateOfBirth || !schoolId || !classes || !sections || !parentName || !parentContactNumber) {
+    if (!name || !dateOfBirth || !schoolId || !classes || !sections || !parentName || !parentContactNumber) {
       await session.abortTransaction();
       return res.status(400).json({ message: "Required fields missing", status: false });
     }
 
-
-    //is this necessary? i changes the model same as teacher so it no longer neeeded
-    const allowedGenders = ["Male", "Female", "Other"];
-    if (!allowedGenders.includes(gender)) {
-      await session.abortTransaction();
-      return res.status(400).json({ message: `Invalid gender. Allowed: ${allowedGenders.join(", ")}`, status: false });
-    }
-
-
-
     const dobObj = new Date(dateOfBirth);
     if (isNaN(dobObj.getTime())) throw new Error("Invalid dateOfBirth format");
-    //  const dobStr = new Date(dateOfBirth).toISOString().split("T")[0].replace(/-/g, ""); do this as it in teacher and teacher working fine with new dtae fields i checked it
 
-    // studentEmail is not necesaay fileds so give it a defualt email like studentName+YYYY+parentNo.last 5 digit  a custom we will create by defualt wo hi rahega 
-    let studentUser = await User.findOne({ email: studentEmail }).session(session);
+
+    const defaultEmail = studentEmail
+      ? studentEmail
+      : `${name.replace(/\s+/g, "").toLowerCase()}${dobObj.getFullYear()}${parentContactNumber.slice(-5)}@school.com`;
+
+
+    let studentUser = await User.findOne({ email: defaultEmail }).session(session);
     if (!studentUser) {
       const dobStr = dobObj.toISOString().split("T")[0].replace(/-/g, "");
       const password = `${name.split(" ")[0]}@${dobStr}`;
       studentUser = new User({
         name,
         dateOfBirth: dobObj,
-        email: studentEmail,
+        email: defaultEmail,
         password,
         schoolId,
         role: "student",
         avatar: photo,
-        isActive: isActive
+        isActive: isActive,
       });
       await studentUser.save({ session });
     }
@@ -422,7 +716,7 @@ const save = async (req, res) => {
     const studentData = {
       userId: studentUser._id,
       name,
-      studentEmail,
+      studentEmail: defaultEmail,
       dateOfBirth: dobObj,
       gender,
       classes,
@@ -432,9 +726,9 @@ const save = async (req, res) => {
       previousSchool,
       photo,
       schoolId,
+      parentId: `PRT-${Date.now()}`,
       enrollmentDate: enrollmentDate || new Date(),
-      // parent id
-      isActive: isActive || "Active",
+      isActive: isActive || true,
     };
 
     if (student) {
@@ -447,14 +741,17 @@ const save = async (req, res) => {
       });
       await student.save({ session });
     }
+
     await syncReferences({ action: "save", targetModel: "Student", targetId: student._id, session });
 
-    // use name + mobile 5 didgit and dob instead of this custom
-    const parentUserEmail = parentEmail || `parent_${Date.now()}@school.com`;
+  
+    const parentUserEmail =
+      parentEmail || `${parentName.replace(/\s+/g, "").toLowerCase()}${parentContactNumber.slice(-5)}@school.com`;
     let parentUser = await User.findOne({ email: parentUserEmail }).session(session);
 
     if (!parentUser) {
-      const password = `${parentName.split(" ")[0]}@${new Date(parentDOB)}`; //it should be name@YYYYMMDD
+      const dobStr = new Date(parentDOB).toISOString().split("T")[0].replace(/-/g, "");
+      const password = `${parentName.split(" ")[0]}@${dobStr}`;
       parentUser = new User({
         name: parentName,
         dateOfBirth: new Date(parentDOB || Date.now()),
@@ -481,9 +778,9 @@ const save = async (req, res) => {
         email: parentEmail,
         alternativeEmail,
         alternativeContactNumber,
-        relation: relation,
+        relation,
         children: [student._id],
-        isActive: isParentActive
+        isActive: isParentActive,
       });
       await parentDoc.save({ session });
     }
@@ -506,10 +803,11 @@ const save = async (req, res) => {
   }
 };
 
-const getStudentDetails = async (req, res) => {
-  const { id, studentId, name = "" } = req.body;
 
-  if (![id, studentId, name].some(Boolean)) {
+const getStudentDetails = async (req, res) => {
+  const { id, studentId, name = "", email = "", contactNumber = "" } = req.body;
+
+  if (![id, studentId, name, email, contactNumber].some(Boolean)) {
     return res.status(400).json({ message: "At least one search field is required", status: false });
   }
 
@@ -517,8 +815,9 @@ const getStudentDetails = async (req, res) => {
   if (id && mongoose.Types.ObjectId.isValid(id)) searchFields._id = id;
   if (studentId) searchFields.studentId = studentId;
   if (name) searchFields.name = { $regex: name, $options: "i" };
+  if (email) searchFields.studentEmail = { $regex: email, $options: "i" };
+  if (contactNumber) searchFields.contactNumber = { $regex: contactNumber, $options: "i" };
 
-  // add email and contact no. too like in teacher
   try {
     const response = await Student.find(searchFields)
       .populate("userId", "email contactNumber name")
@@ -540,11 +839,12 @@ const getStudentDetails = async (req, res) => {
   }
 };
 
+
 const getAllStudentsList = async (req, res) => {
   try {
     const students = await Student.find({ schoolId: req.user.schoolId })
       .populate("userId", "name email avatar contactNumber isActive")
-      .populate("classes", "name")//i thiki these two are not needed as it will give me classses {id: name:} but we accpet only id so try it once then remove it after checking
+      .populate("classes", "name")
       .populate("sections", "name");
 
     if (!students || students.length === 0) {
@@ -563,7 +863,11 @@ const getAllStudentsList = async (req, res) => {
       sectionName: student.sections?.name || null,
     }));
 
-    res.status(200).json({ data: formattedStudents, message: `${students.length} student(s) found successfully`, status: true });
+    res.status(200).json({
+      data: formattedStudents,
+      message: `${students.length} student(s) found successfully`,
+      status: true,
+    });
   } catch (err) {
     console.error("Get All Students Error:", err);
     res.status(500).json({ message: "Server error while fetching student details", status: false });
@@ -574,7 +878,7 @@ const getProfileCardData = async (req, res) => {
   try {
     const { key, value } = req.body.searchBy;
     const student = await Student.findOne({ [key]: value })
-      .populate("userId", "name email avatar contactNumber status")
+      .populate("userId", "name email avatar contactNumber isActive")
       .populate("classes", "name")
       .populate("sections", "name");
 
@@ -590,15 +894,17 @@ const getProfileCardData = async (req, res) => {
       className: student.classes?.name || null,
       sectionName: student.sections?.name || null,
       gender: student.gender,
-      status: student.status,
+      isActive: student.isActive,
     };
-    // add attendance and feestatus in future
+
+    
     res.status(200).json({ status: true, data: formattedStudent });
   } catch (err) {
     console.error("Get Profile Card Error:", err);
     res.status(500).json({ message: "Server error while fetching student profile data", status: false });
   }
 };
+
 
 const deleteStudent = async (req, res) => {
   const session = await mongoose.startSession();
@@ -615,8 +921,17 @@ const deleteStudent = async (req, res) => {
 
     const parent = await Parent.findOne({ children: student._id }).session(session);
     if (parent) {
-      await Parent.findByIdAndDelete(parent._id).session(session);//dlete parent only if there is only one student
-      await User.findByIdAndDelete(parent.userId).session(session);
+      
+      if (parent.children.length === 1) {
+        await Parent.findByIdAndDelete(parent._id).session(session);
+        await User.findByIdAndDelete(parent.userId).session(session);
+      } else {
+      
+        parent.children = parent.children.filter(
+          (childId) => childId.toString() !== student._id.toString()
+        );
+        await parent.save({ session });
+      }
     }
 
     await Student.findByIdAndDelete(id).session(session);
