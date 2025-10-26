@@ -1165,7 +1165,7 @@ const formConfig = {
               {
                 type: "dropdown",
                 name: "subject",
-                key :"subject",
+                key: "subject",
                 label: "",
                 placeholder: "e.g., Maths",
                 items: [
@@ -1179,7 +1179,7 @@ const formConfig = {
               {
                 type: "dropdown",
                 name: "teacher",
-                key:"teacher",
+                key: "teacher",
                 label: "",
                 placeholder: "e.g., Mr. Ashu",
                 items: [
@@ -1191,23 +1191,12 @@ const formConfig = {
                 required: true,
               },
               {
-                type: "datetime",
-                name: "starttime",
-                key:"starttime",
-                label: "Start time",
-                placeholder: "e.g., 9:00 AM",
-                isDistinct: true,
-                required: false,
-              },
-              {
-                type: "datetime",
-                name: "endtime",
-                key:"endtime",
-                label: "End time",
-                placeholder: "e.g., 10:00 AM",
-                isDistinct: true,
-                required: false,
-              },
+                type: 'input',
+                key: 'timeRange',
+                label: "Class Timing",
+                placeholder: "09:00 - 17:00",
+                pattern: "^[0-1][0-9]:[0-5][0-9]\\s*-\\s*[0-1][0-9]:[0-5][0-9]$",
+              }
             ],
           },
         ]

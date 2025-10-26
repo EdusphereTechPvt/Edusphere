@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Dropdown from "../Dropdown/Dropdown";
 import { Box, TextField, IconButton, Button, Typography } from "@mui/material";
 import DateTimePicker from "../DateTimePicker/DateTimePicker";
-import { Add, Delete } from "@mui/icons-material";
+import { Add, Delete, Pattern } from "@mui/icons-material";
 import DebouncedTextField from "./DebouncedTextField";
 
 const MultiFiled = ({
@@ -14,7 +14,7 @@ const MultiFiled = ({
       { id: "Class", value: "Class" },
       { id: "session", value: "Session" },
     ] },
-    { type: 'input', key: 'amount', label: "Amount", placeholder: "1000" },
+    { type: 'input', key: 'amount', label: "Amount", placeholder: "1000"  ,  pattern: "^\\d+$"},
     { type: 'datetime', key: 'date', label: "Date & Time" },
   ],
   label,
@@ -89,7 +89,7 @@ const MultiFiled = ({
           <Box key={`${fieldDef.key}-${idx}`} sx={{ width: { xs: "100%", sm: "25%" } }}>
             <DebouncedTextField
               label={fieldDef.label || ""}
-              placeholder={fieldDef.placeholder || inputData.placeholder}
+              placeholder={fieldDef.placeholder || ""}
               fullWidth
               size="small"
               variant="outlined"
@@ -98,6 +98,7 @@ const MultiFiled = ({
                 handleFieldChange(idx, fieldDef.key, value)
               }
               debounceDelay={debounceDelay}
+              pattern={fieldDef.pattern}
             />
           </Box>
         );
