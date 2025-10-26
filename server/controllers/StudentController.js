@@ -287,8 +287,8 @@ const getAllStudentsList = async (req, res) => {
   try {
     const students = await Student.find({ schoolId: req.user.schoolId })
       .populate("userId", "name email avatar contactNumber isActive")
-      .populate("classes", "name")
-      .populate("sections", "name");
+      // .populate("classes", "name")
+      // .populate("sections", "name");
 
     if (!students || students.length === 0) {
       return res.status(200).json({ data: [], message: "No student found", status: false });

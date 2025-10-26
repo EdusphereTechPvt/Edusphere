@@ -99,6 +99,7 @@ const Page = () => {
       <Box
         sx={{
           display: "flex",
+          alignItems: "center",
           flexDirection: { xs: "column", md: "row" },
           gap: "3rem",
         }}
@@ -121,6 +122,7 @@ const Page = () => {
                 ...JSON.parse(rowData),
                 ...prev,
               }));
+              
               setSelected({ header, value });
             }}
             pagination={true} // use boolean
@@ -141,7 +143,7 @@ const Page = () => {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "100%", opacity: 0 }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
-              className="flex-1 flex justify-center items-center order-1 md:order-2"
+              className="flex justify-center items-center order-1 md:order-2"
             >
               <ProfileCard
                 role={listname}

@@ -199,7 +199,7 @@ const ProfileCard = ({ role, data, updateFlag, setUpdateFlag }) => {
         sx={{
           maxWidth: 450,
           borderRadius: 3,
-          height: "100%",
+          height: "auto",
           boxShadow: "none",
           border: "1px solid #D3D4D9",
         }}
