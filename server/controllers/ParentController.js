@@ -3,6 +3,8 @@ const User = require("../models/AuthSchema");
 const Parent = require("../models/Parent");
 const School = require("../models/SchoolSchema");
 const { syncReferences } = require("../utils/Sync");
+const { sendEmail } = require("../utils/Email");
+const { parentSignupTemplate} = require("../utils/templates/EmailTemplates");
 
 const save = async (req, res) => {
   const session = await mongoose.startSession();
@@ -57,6 +59,16 @@ const save = async (req, res) => {
       await syncReferences({ action: "save", targetModel: "Parent", targetId: parent._id, session });
 
       await session.commitTransaction();
+
+    
+     await sendEmail(
+       parentEmail,
+       `Hey ${parentName}, Welcome to Edusphere! 👪`,
+       parentSignupTemplate(parentName, school.name),
+       false 
+     );
+     
+
       return res.status(200).json({
         message: "Parent profile updated successfully",
         data: parent,

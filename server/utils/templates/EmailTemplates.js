@@ -139,3 +139,108 @@ export const resetPasswordTemplate = (name,token) => {
 </html>
   `
 }
+
+export const studentSignupTemplate = (name , schoolName) => {
+  const dobNote = `<p style="font-size:15px;line-height:1.6;color:#111827;">
+        Please note: Your password is generated using your <strong>first name</strong> and <strong>date of birth</strong> in the format 
+        <code>Firstname@YYYYMMDD</code>. 
+      </p>`;
+
+  return `
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+      <title>Welcome to Edusphere</title>
+    </head>
+    <body style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background-color:#f4f7fb;">
+      <table align="center" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.1);margin-top:40px;">
+        <tr>
+          <td align="center" style="background-color:#3b82f6;padding:30px 20px;">
+            <h1 style="color:#ffffff;margin:0;font-size:28px;">Welcome to Edusphere 🎓</h1>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:30px 40px;color:#111827;">
+            <p style="font-size:16px;">Hello <strong>${name}</strong>,</p>
+
+            <p style="font-size:15px;line-height:1.6;">
+              You’ve been successfully added to the <strong>${schoolName}</strong> group as a <strong>Student</strong>!
+            </p>
+
+            ${dobNote}
+
+            <div style="text-align:center;margin:30px 0;">
+              <a href="${process.env.FRONTEND_URL}/dashboard" 
+                 style="background-color:#3b82f6;color:#ffffff;text-decoration:none;
+                        padding:12px 28px;border-radius:6px;font-weight:bold;
+                        font-size:16px;display:inline-block;">
+                Go to Dashboard 🚀
+              </a>
+            </div>
+
+            <p style="font-size:12px;color:#9ca3af;text-align:center;">
+              © 2025 Edusphere. All rights reserved.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>
+  `;
+};
+
+export const parentSignupTemplate = (parentName, schoolName) => {
+  const dobNote = `<p style="font-size:15px;line-height:1.6;color:#111827;">
+        Please note: Your password is generated using your <strong>first name</strong> and <strong>date of birth</strong> in the format 
+        <code>Firstname@YYYYMMDD</code>. 
+      </p>`;
+
+  return `
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+      <title>Welcome to Edusphere</title>
+    </head>
+    <body style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background-color:#f4f7fb;">
+      <table align="center" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.1);margin-top:40px;">
+        <tr>
+          <td align="center" style="background-color:#10b981;padding:30px 20px;">
+            <h1 style="color:#ffffff;margin:0;font-size:28px;">Welcome to Edusphere 👪</h1>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:30px 40px;color:#111827;">
+            <p style="font-size:16px;">Hello <strong>${parentName}</strong>,</p>
+
+            <p style="font-size:15px;line-height:1.6;">
+              You’ve been successfully added to the <strong>${schoolName}</strong> group as a <strong>Parent</strong>!
+            </p>
+
+            ${dobNote}
+
+            <div style="text-align:center;margin:30px 0;">
+              <a href="${process.env.FRONTEND_URL}/dashboard" 
+                 style="background-color:#10b981;color:#ffffff;text-decoration:none;
+                        padding:12px 28px;border-radius:6px;font-weight:bold;
+                        font-size:16px;display:inline-block;">
+                Go to Dashboard 🚀
+              </a>
+            </div>
+
+            <p style="font-size:12px;color:#9ca3af;text-align:center;">
+              © 2025 Edusphere. All rights reserved.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>
+  `;
+};
+
