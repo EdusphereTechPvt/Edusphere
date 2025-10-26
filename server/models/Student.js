@@ -15,9 +15,27 @@ const StudentProfileSchema = new mongoose.Schema(
       sparse: true,
     },
 
-    schoolId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "School",
+    name: {
+      type: String,
+      required: true,
+    },
+
+    studentEmail: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
+    },
+
+    dateOfBirth: {
+      type: Date,
+      required: true,
+    },
+
+    gender: {
+      type: String,
       required: true,
     },
 
@@ -32,45 +50,23 @@ const StudentProfileSchema = new mongoose.Schema(
       ref: "Section",
       required: true,
     },
-
-    name: {
-      type: String,
-      required: true,
-    },
-
-    studentEmail: {
-  type: String,
-  required: true,
-  unique: true,
-},
-
-    dateOfBirth: {
-      type: Date,
-      required: true,
-    },
-
-    gender: {
-      type: String,
-      enum: ["Male", "Female", "Other"],
-      required: true,
-    },
-
-    parentId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Parent",
-      required: true,
-    },
-
     contactNumber: {
       type: String,
     },
-
     address: {
       type: String,
     },
-
+    previousSchool: {
+      typr: String,
+    },
     photo: {
       type: String,
+    },
+
+    schoolId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "School",
+      required: true,
     },
 
     enrollmentDate: {
@@ -78,12 +74,16 @@ const StudentProfileSchema = new mongoose.Schema(
       default: Date.now,
     },
 
-    status: {
-      type: String,
-      enum: ["Active", "On Hold", "Inactive"],
-      default: "Active",
+    parentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Parent",
       required: true,
     },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
+
   },
   { timestamps: true }
 );

@@ -14,6 +14,10 @@ const save = async (req, res) => {
       email,
       occupation,
       emergencyContact,
+      parentDOB,
+      parentEmail,
+      alternativeEmail,
+      alternativeContactNumber,
       children = [],
     } = req.body;
 

@@ -69,6 +69,18 @@ const formConfig = {
             label: "Date of Birth",
             placeholder: "Enter Date of Birth",
             required: true,
+            format: "YYYY-MM-DD",
+            required: true,
+            min: new Date(
+              today.getFullYear() - 60,
+              today.getMonth(),
+              today.getDate()
+            ), //max age 60
+            max: new Date(
+              today.getFullYear() - 20,
+              today.getMonth(),
+              today.getDate()
+            ), //min age 20
           },
           {
             type: "dropdown",
@@ -133,6 +145,7 @@ const formConfig = {
             label: "Joining Date",
             placeholder: "Select Date of Joining",
             required: true,
+            format: "YYYY-MM-DD",
           },
         ],
       },
@@ -327,7 +340,7 @@ const formConfig = {
               today.getDate()
             ), //max age 20
             max: new Date(
-              today.getFullYear() - 5,
+              today.getFullYear() - 3,
               today.getMonth(),
               today.getDate()
             ), //min age 5
@@ -368,16 +381,12 @@ const formConfig = {
             isDistinct: true,
           },
           {
-            type: "dropdown",
-            name: "status",
-            label: "Status",
-            placeholder: "Select Student Status",
+            type: "date",
+            name: "enrollmentDate",
+            label: "Student Enrollment Date",
+            placeholder: "Student Enrollment Date",
             required: true,
-            items: [
-              { id: "Active", value: "Active" },
-              { id: "Inactive", value: "Inactive" },
-              { id: "On Hold", value: "On Hold" },
-            ],
+            format: "YYYY-MM-DD",
           },
           {
             type: "text",
@@ -388,6 +397,18 @@ const formConfig = {
               value: "^[A-Za-z\\s]*$",
               message:
                 "Previous School Name can only contain letters and spaces",
+            },
+          },
+        ],
+      },
+      {
+        fields: [
+          {
+            type: "checkBox",
+            name: "isActive",
+            values: [{ name: "isActive", text: "Active" }],
+            styles: {
+              className: "font-bold text-black",
             },
           },
         ],
@@ -485,10 +506,22 @@ const formConfig = {
           },
           {
             type: "number",
-            name: " ",
+            name: "alternativeContactNumber",
             label: "Parent/Guardian Alternative Contact Number",
             placeholder: "Enter parent/guardian's contact number",
             maxLength: 10,
+          },
+        ],
+      },
+      {
+        fields: [
+          {
+            type: "checkBox",
+            name: "isParentActive",
+            values: [{ name: "isActive", text: "Active" }],
+            styles: {
+              className: "font-bold text-black",
+            },
           },
         ],
       },
@@ -670,6 +703,7 @@ const formConfig = {
             type: "date",
             name: "preferredDate",
             label: "Preferred Demo Date",
+            format: "YYYY-MM-DD",
           },
         ],
       },

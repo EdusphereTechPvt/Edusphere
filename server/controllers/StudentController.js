@@ -359,16 +359,23 @@ const save = async (req, res) => {
       gender,
       classes,
       sections,
+      enrollmentDate,
       contactNumber,
-      address,
+      previousSchool,
+      isActive,
       photo,
-      status,
+      address,
+
+      parentPhoto,
       parentName,
       parentDOB,
       parentEmail,
       parentContactNumber,
       relation,
+      alternativeEmail,
+      alternativeContactNumber,
       parentOccupation,
+      isParentActive
     } = req.body;
 
     const { schoolId } = req.user || {};
@@ -378,36 +385,42 @@ const save = async (req, res) => {
       return res.status(400).json({ message: "Required fields missing", status: false });
     }
 
-  
+
+    //is this necessary? i changes the model same as teacher so it no longer neeeded
     const allowedGenders = ["Male", "Female", "Other"];
     if (!allowedGenders.includes(gender)) {
       await session.abortTransaction();
       return res.status(400).json({ message: `Invalid gender. Allowed: ${allowedGenders.join(", ")}`, status: false });
     }
 
-    
+
+
     const dobObj = new Date(dateOfBirth);
     if (isNaN(dobObj.getTime())) throw new Error("Invalid dateOfBirth format");
+    //  const dobStr = new Date(dateOfBirth).toISOString().split("T")[0].replace(/-/g, ""); do this as it in teacher and teacher working fine with new dtae fields i checked it
 
-  
+    // studentEmail is not necesaay fileds so give it a defualt email like studentName+YYYY+parentNo.last 5 digit  a custom we will create by defualt wo hi rahega 
     let studentUser = await User.findOne({ email: studentEmail }).session(session);
     if (!studentUser) {
       const dobStr = dobObj.toISOString().split("T")[0].replace(/-/g, "");
       const password = `${name.split(" ")[0]}@${dobStr}`;
       studentUser = new User({
         name,
+        dateOfBirth: dobObj,
         email: studentEmail,
         password,
-        role: "student",
-        dateOfBirth: dobObj,
         schoolId,
+        role: "student",
+        avatar: photo,
+        isActive: isActive
       });
       await studentUser.save({ session });
     }
 
-  
+
     let student = await Student.findOne({ userId: studentUser._id, schoolId }).session(session);
     const studentData = {
+      userId: studentUser._id,
       name,
       studentEmail,
       dateOfBirth: dobObj,
@@ -416,11 +429,12 @@ const save = async (req, res) => {
       sections,
       contactNumber,
       address,
+      previousSchool,
       photo,
       schoolId,
-      userId: studentUser._id,
-      enrollmentDate: new Date(),
-      status: status || "Active",
+      enrollmentDate: enrollmentDate || new Date(),
+      // parent id
+      isActive: isActive || "Active",
     };
 
     if (student) {
@@ -435,20 +449,21 @@ const save = async (req, res) => {
     }
     await syncReferences({ action: "save", targetModel: "Student", targetId: student._id, session });
 
-  
+    // use name + mobile 5 didgit and dob instead of this custom
     const parentUserEmail = parentEmail || `parent_${Date.now()}@school.com`;
     let parentUser = await User.findOne({ email: parentUserEmail }).session(session);
 
     if (!parentUser) {
-      const password = `${parentName.split(" ")[0]}@${(parentContactNumber || "0000").toString().slice(0, 4)}`;
+      const password = `${parentName.split(" ")[0]}@${new Date(parentDOB)}`; //it should be name@YYYYMMDD
       parentUser = new User({
         name: parentName,
         dateOfBirth: new Date(parentDOB || Date.now()),
         email: parentUserEmail,
         password,
         role: "parent",
-        isActive: true,
         schoolId,
+        avatar: parentPhoto,
+        isActive: isParentActive,
       });
       await parentUser.save({ session });
     }
@@ -457,12 +472,18 @@ const save = async (req, res) => {
     if (!parentDoc) {
       parentDoc = new Parent({
         userId: parentUser._id,
-        name: parentName,
         parentId: `PARENT-${Date.now()}`,
+        name: parentName,
+        photo: parentPhoto,
         schoolId,
         occupation: parentOccupation || "N/A",
         emergencyContact: parentContactNumber,
+        email: parentEmail,
+        alternativeEmail,
+        alternativeContactNumber,
+        relation: relation,
         children: [student._id],
+        isActive: isParentActive
       });
       await parentDoc.save({ session });
     }
@@ -497,6 +518,7 @@ const getStudentDetails = async (req, res) => {
   if (studentId) searchFields.studentId = studentId;
   if (name) searchFields.name = { $regex: name, $options: "i" };
 
+  // add email and contact no. too like in teacher
   try {
     const response = await Student.find(searchFields)
       .populate("userId", "email contactNumber name")
@@ -521,8 +543,8 @@ const getStudentDetails = async (req, res) => {
 const getAllStudentsList = async (req, res) => {
   try {
     const students = await Student.find({ schoolId: req.user.schoolId })
-      .populate("userId", "name email avatar contactNumber status")
-      .populate("classes", "name")
+      .populate("userId", "name email avatar contactNumber isActive")
+      .populate("classes", "name")//i thiki these two are not needed as it will give me classses {id: name:} but we accpet only id so try it once then remove it after checking
       .populate("sections", "name");
 
     if (!students || students.length === 0) {
@@ -535,7 +557,7 @@ const getAllStudentsList = async (req, res) => {
       email: student.studentEmail,
       contactNumber: student.contactNumber || student.userId?.contactNumber || null,
       avatar: student.userId?.avatar || null,
-      status: student.status,
+      isActive: student.isActive,
       gender: student.gender,
       className: student.classes?.name || null,
       sectionName: student.sections?.name || null,
@@ -570,7 +592,7 @@ const getProfileCardData = async (req, res) => {
       gender: student.gender,
       status: student.status,
     };
-
+    // add attendance and feestatus in future
     res.status(200).json({ status: true, data: formattedStudent });
   } catch (err) {
     console.error("Get Profile Card Error:", err);
@@ -593,7 +615,7 @@ const deleteStudent = async (req, res) => {
 
     const parent = await Parent.findOne({ children: student._id }).session(session);
     if (parent) {
-      await Parent.findByIdAndDelete(parent._id).session(session);
+      await Parent.findByIdAndDelete(parent._id).session(session);//dlete parent only if there is only one student
       await User.findByIdAndDelete(parent.userId).session(session);
     }
 
