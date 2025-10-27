@@ -20,9 +20,8 @@ const StudentProfileSchema = new mongoose.Schema(
       required: true,
     },
 
-    studentEmail: {
+    email: {
       type: String,
-      required: true,
       unique: true,
       lowercase: true,
       trim: true,
@@ -57,7 +56,7 @@ const StudentProfileSchema = new mongoose.Schema(
       type: String,
     },
     previousSchool: {
-      typr: String,
+      type: String,
     },
     photo: {
       type: String,

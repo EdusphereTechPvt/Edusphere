@@ -51,31 +51,33 @@ const addOrUpdateClass = async (req, res) => {
 
       await classData.save({ session });
 
-      const newRefs = [...subjects, ...sections].filter(
-        ref => ![...oldSubjects, ...oldSections].includes(ref.toString())
-      );
-      for (const refId of newRefs) {
-        await syncReferences({
-          action: "save",
-          targetModel: "Class",
-          targetId: classData._id,
-          refId,
-          session,
-        });
-      }
-
-      const removedRefs = [...oldSubjects, ...oldSections].filter(
-        ref => ![...subjects, ...sections].includes(ref.toString())
-      );
-      for (const refId of removedRefs) {
-        await syncReferences({
-          action: "remove",
-          targetModel: "Class",
-          targetId: classData._id,
-          refId,
-          session,
-        });
-      }
+      await syncReferences({
+            action: "save",
+            targetModel: "Class",
+            targetId: classData._id,
+            filters: {
+              Subject: { _id: subjects },
+              Section: { _id: sections },
+            },
+            session,
+          });
+      
+          const removedIds = [...oldSubjects, ...oldSections].filter(
+            (id) => ![subjects, sections].includes(id)
+          );
+      
+          for (const removedId of removedIds) {
+            await syncReferences({
+              action: "remove",
+              targetModel: "Class",
+              targetId: classData._id,
+              filters: {
+                Subject: { _id: removedId },
+                Section: { _id: removedId },
+              },
+              session,
+            });
+          }
     } else {
       // Create new class
       classData = new Class({
@@ -92,16 +94,16 @@ const addOrUpdateClass = async (req, res) => {
 
       await classData.save({ session });
 
-      // Sync all references
-      for (const refId of [...subjects, ...sections]) {
-        await syncReferences({
-          action: "save",
-          targetModel: "Class",
-          targetId: classData._id,
-          refId,
-          session,
-        });
-      }
+      await syncReferences({
+        action: "save",
+        targetModel: "Class",
+        targetId: classData._id,
+        filters: {
+          Subject: { _id: subjects },
+          Section: { _id: sections },
+        },
+        session,
+      });
     }
 
     await session.commitTransaction();

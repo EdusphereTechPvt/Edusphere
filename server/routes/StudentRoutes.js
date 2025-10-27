@@ -9,6 +9,6 @@ router.post("/save", AuthGuard, RoleGuard(), save);
 router.post("/search",AuthGuard, RoleGuard(), getStudentDetails);
 router.post("/getAll/",AuthGuard, RoleGuard(), getAllStudentsList);
 router.post("/getProfileCardData", getProfileCardData)
-router.delete("/delete/:id", AuthGuard, RoleGuard(), deleteStudent);
+router.post("/delete", AuthGuard, RoleGuard(), deleteStudent);
 
 module.exports = router;

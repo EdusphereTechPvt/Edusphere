@@ -57,8 +57,8 @@ const save = async (req, res) => {
     let subject = await Subject.findOne({ _id, schoolId }).session(session);
 
     if (subject) {
-      const oldClasses = subject.classes.map(id => id.toString());
-      const oldTeachers = subject.teacherIds.map(id => id.toString());
+      const oldClasses = subject.classes.map((id) => id.toString());
+      const oldTeachers = subject.teacherIds.map((id) => id.toString());
 
       Object.assign(subject, {
         subjectId,
@@ -73,15 +73,31 @@ const save = async (req, res) => {
 
       await subject.save({ session });
 
-      for (const id of [...classes, ...teacherIds]) {
-        await syncReferences({ action: "save", targetModel: "Subject", targetId: subject._id, session });
-      }
+      await syncReferences({
+        action: "save",
+        targetModel: "Subject",
+        targetId: subject._id,
+        filters: {
+          Class: { _id: classes },
+          Teacher: { _id: teacherIds },
+        },
+        session,
+      });
 
       const removedIds = [...oldClasses, ...oldTeachers].filter(
-        id => ![...classes, ...teacherIds].includes(id)
+        (id) => ![...classes, ...teacherIds].includes(id)
       );
-      for (const id of removedIds) {
-        await syncReferences({ action: "remove", targetModel: "Subject", targetId: subject._id, session });
+      for (const removedId of removedIds) {
+        await syncReferences({
+          action: "remove",
+          targetModel: "Subject",
+          targetId: subject._id,
+          filters: {
+            Class: { _id: removedId },
+            Teacher: { _id: removedId },
+          },
+          session,
+        });
       }
 
       await session.commitTransaction();
@@ -97,7 +113,9 @@ const save = async (req, res) => {
       name: name.trim(),
       code:
         code?.trim() ||
-        `${name.replace(/\s+/g, "").toUpperCase()}-${Math.floor(Math.random() * 10000)}`,
+        `${name.replace(/\s+/g, "").toUpperCase()}-${Math.floor(
+          Math.random() * 10000
+        )}`,
       description,
       classes,
       teacherIds,
@@ -108,7 +126,16 @@ const save = async (req, res) => {
 
     await newSubject.save({ session });
 
-    await syncReferences({ action: "save", targetModel: "Subject", targetId: newSubject._id, session });
+    await syncReferences({
+      action: "save",
+      targetModel: "Subject",
+      targetId: newSubject._id,
+      filters: {
+        Class: { _id: classes },
+        Teacher: { _id: teacherIds },
+      },
+      session,
+    });
 
     await session.commitTransaction();
     res.status(201).json({
@@ -230,7 +257,12 @@ const deleteSubject = async (req, res) => {
       });
     }
 
-    await syncReferences({ action: "remove", targetModel: "Subject", targetId: subject._id, session });
+    await syncReferences({
+      action: "remove",
+      targetModel: "Subject",
+      targetId: subject._id,
+      session,
+    });
 
     await session.commitTransaction();
     res.status(200).json({
