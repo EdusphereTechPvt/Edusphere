@@ -1,8 +1,11 @@
-const mongoose = require("mongoose");
+const { default: mongoose } = require("mongoose");
 const User = require("../models/AuthSchema");
 const Admin = require("../models/Admin");
 const School = require("../models/SchoolSchema");
+const { sendEmail } = require("../utils/Email");
+const { signupTemplate } = require("../utils/templates/EmailTemplates");
 const { syncReferences } = require("../utils/Sync");
+
 
 const save = async (req, res) => {
   const session = await mongoose.startSession();
@@ -13,11 +16,13 @@ const save = async (req, res) => {
       _id,
       name,
       email,
-      dateOfBirth,
-      designation,
+      phone,
+      photo,
       department,
+      designation,
       contactNumber,
       dateOfJoining,
+      isActive,
     } = req.body;
 
     const { schoolId } = req.user;
@@ -25,21 +30,18 @@ const save = async (req, res) => {
     if (!name || !email || !schoolId) {
       await session.abortTransaction();
       return res.status(400).json({
-        message: "Name, Email, and School ID are required",
+        message: "Full Name, Email, and School ID are required",
         status: false,
       });
     }
 
     let user = await User.findOne({ email }).session(session);
+
     if (!user) {
-      const dobStr = dateOfBirth
-        ? new Date(dateOfBirth).toISOString().split("T")[0].replace(/-/g, "")
-        : "00000000";
-      const password = `${name.split(" ")[0]}@${dobStr}`;
+      const password = `${name.split(" ")[0]}@${new Date().getFullYear()}`;
       user = new User({
         name,
         email,
-        dateOfBirth,
         schoolId,
         password,
         role: "admin",
@@ -51,10 +53,15 @@ const save = async (req, res) => {
 
     if (admin) {
       Object.assign(admin, {
-        designation,
+        name,
+        email,
+        phone,
+        photo,
         department,
+        designation,
         contactNumber,
         dateOfJoining,
+        isActive,
       });
 
       await admin.save({ session });
@@ -70,10 +77,16 @@ const save = async (req, res) => {
     const newAdmin = new Admin({
       userId: user._id,
       schoolId,
-      designation,
+      name,
+      email,
+      phone,
+      photo,
       department,
+      designation,
       contactNumber,
       dateOfJoining,
+      isActive,
+      adminId: `EMP-${Date.now()}`,
     });
 
     await newAdmin.save({ session });
@@ -86,7 +99,7 @@ const save = async (req, res) => {
     });
   } catch (err) {
     await session.abortTransaction();
-    console.error("Admin save error:", err);
+    console.error("Admin Save Error:", err);
     res.status(500).json({
       message: "Server error during admin add/update",
       status: false,
@@ -98,9 +111,9 @@ const save = async (req, res) => {
 
 
 const getAdminDetails = async (req, res) => {
-  const { id, employeeId, name = "", email = "" } = req.body;
+  const { id, adminId, name = "", email = "", phone = "" } = req.body;
 
-  if (![id, employeeId, name, email].some(Boolean)) {
+  if (![id, adminId, name, email, phone].some(Boolean)) {
     return res.status(400).json({
       message: "At least one search field is required",
       status: false,
@@ -110,23 +123,19 @@ const getAdminDetails = async (req, res) => {
   const searchFields = {};
 
   if (id && mongoose.Types.ObjectId.isValid(id)) searchFields._id = id;
-  if (employeeId) searchFields.employeeId = employeeId;
+  if (adminId) searchFields.adminId = adminId;
   if (name) searchFields.name = { $regex: name, $options: "i" };
   if (email) searchFields.email = { $regex: email, $options: "i" };
+  if (phone) searchFields.phone = { $regex: phone, $options: "i" };
 
   try {
-    const response = await Admin.find(searchFields).populate(
-      "userId",
-      "name email dateOfBirth role avatar isActive"
-    );
+    const response = await Admin.find(searchFields).populate("userId", "name email avatar role isActive");
 
-    if (response.length === 0) {
-      return res.status(404).json({
-        data: [],
-        message: "No admin found",
-        status: false,
-      });
-    } else if (response.length === 1) {
+    if (!response.length) {
+      return res.status(404).json({ data: [], message: "No admin found", status: false });
+    }
+
+    if (response.length === 1) {
       return res.status(200).json({
         data: response[0],
         message: "Admin found successfully",
@@ -139,9 +148,9 @@ const getAdminDetails = async (req, res) => {
       message: "Multiple admins found successfully",
       status: true,
     });
-  } catch (err) {
-    console.error("Get Admin Error:", err);
-    res.status(500).json({
+  } catch (error) {
+    console.error("Error fetching admin details:", error);
+    return res.status(500).json({
       message: "Server error while fetching admin details",
       status: false,
     });
@@ -151,10 +160,9 @@ const getAdminDetails = async (req, res) => {
 
 const getAllAdminsList = async (req, res) => {
   try {
-    const admins = await Admin.find({ schoolId: req.user.schoolId }).populate(
-      "userId",
-      "name email dateOfBirth role avatar isActive"
-    );
+    const admins = await Admin.find({
+      schoolId: req.user.schoolId,
+    }).populate("userId", "name email avatar role isActive");
 
     if (!admins || admins.length === 0) {
       return res.status(200).json({
@@ -168,11 +176,12 @@ const getAllAdminsList = async (req, res) => {
       adminId: admin.adminId,
       name: admin.userId?.name,
       email: admin.userId?.email,
-      contactNumber: admin.contactNumber,
-      designation: admin.designation,
-      department: admin.department,
+      phone: admin.phone,
+      photo: admin.photo,
       role: admin.userId?.role,
       isActive: admin.userId?.isActive,
+      designation: admin.designation,
+      department: admin.department,
     }));
 
     res.status(200).json({
@@ -183,7 +192,7 @@ const getAllAdminsList = async (req, res) => {
   } catch (err) {
     console.error("Get All Admins Error:", err);
     res.status(500).json({
-      message: "Server error while fetching admin list",
+      message: "Server error while fetching admin details",
       status: false,
     });
   }
@@ -192,36 +201,28 @@ const getAllAdminsList = async (req, res) => {
 
 const getProfileCardData = async (req, res) => {
   try {
-    let keyName = req.body.searchBy.key;
-    let keyValue = req.body.searchBy.value;
+    const keyName = req.body.searchBy.key;
+    const keyValue = req.body.searchBy.value;
 
-    const adminProfile = await Admin.findOne({ [keyName]: keyValue }).populate(
-      "userId",
-      "name email dateOfBirth role avatar isActive"
-    );
+    let adminProfileData = await Admin.findOne({ [keyName]: keyValue })
+      .populate("userId", "name email avatar role isActive");
 
-    if (!adminProfile) {
-      return res.status(404).json({
-        status: false,
-        message: "Admin not found",
-      });
+    if (!adminProfileData) {
+      return res.status(404).json({ message: "Admin not found", status: false });
     }
 
     const formattedAdmin = {
-      _id: adminProfile._id,
-      id: adminProfile.employeeId,
-      name: adminProfile.userId?.name,
-      avatar: adminProfile.userId?.avatar,
-      designation: adminProfile.designation,
-      department: adminProfile.department,
+      _id: adminProfileData._id,
+      id: adminProfileData.adminId,
+      name: adminProfileData.userId?.name,
+      avatar: adminProfileData.userId?.avatar,
+      designation: adminProfileData.designation,
+      department: adminProfileData.department,
     };
 
-    res.status(200).json({
-      status: true,
-      data: formattedAdmin,
-    });
+    res.status(200).json({ status: true, data: formattedAdmin });
   } catch (err) {
-    console.error("Get Admin Profile Error:", err);
+    console.error("Get Admin Error:", err);
     res.status(500).json({
       message: "Server error while fetching admin profile",
       status: false,
@@ -236,8 +237,8 @@ const deleteAdmin = async (req, res) => {
 
   try {
     const { id } = req.body;
-
     const admin = await Admin.findByIdAndDelete(id).session(session);
+
     if (!admin) {
       await session.abortTransaction();
       return res.status(404).json({ message: "Admin not found", status: false });
@@ -259,7 +260,8 @@ const deleteAdmin = async (req, res) => {
 module.exports = {
   save,
   getAdminDetails,
+  deleteAdmin,
   getAllAdminsList,
   getProfileCardData,
-  deleteAdmin,
 };
+
