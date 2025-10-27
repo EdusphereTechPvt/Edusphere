@@ -76,6 +76,7 @@ export const manageConfig = {
             backgroundColor: "#fff",
             px: 2,
             py: 1.5,
+            width: 1000,
           },
         },
       },

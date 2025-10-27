@@ -10,7 +10,7 @@ import { manageConfig } from "../../config/ListConfig";
 import GenericCard from "@/app/components/CardComponent/GenericCard";
 import { useRouter } from "next/navigation";
 import { TableComponent } from "@/app/components/Table/TableComponent";
-import { formatTable } from "@/app/utils/Format";
+import { formatElement, formatTable } from "@/app/utils/Format";
 import { getElements } from "@/app/services/ElementAccessService";
 
 const Manage = () => {
@@ -117,7 +117,8 @@ const Manage = () => {
         ))}
       </div>
 
-      {manageConfig.sections.map((section, index) => {
+      <div>
+        {manageConfig.sections.map((section, index) => {
         if (section.type === "chart" && section.chartType === "bar") {
           return (
             <Box key={index} sx={section.styles.Box.inlineStyle}>
@@ -185,7 +186,6 @@ const Manage = () => {
           );
         }
       })}
-
       <div className="flex items-center gap-4 flex-wrap my-12">
         {manageConfig.sections[2].items.map((item, index) => (
           <div key={index} className="flex-1 w-full">
@@ -200,6 +200,8 @@ const Manage = () => {
             />
           </div>
         ))}
+      </div>
+
       </div>
 
       {manageConfig.sections[3].type === "table" && (
