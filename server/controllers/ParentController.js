@@ -217,6 +217,7 @@ const getProfileCardData = async (req, res) => {
     const formattedParent = {
       _id: parent._id,
       parentId: parent.parentId,
+      avatar: parent.photo || "",
       name: parent.userId?.name,
       email: parent.userId?.email,
       occupation: parent.occupation,

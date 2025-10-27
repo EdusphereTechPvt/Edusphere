@@ -29,8 +29,6 @@ const Page = () => {
 
       let result = await getListDetails(listname);
       setFetchedData(result.data);
-      console.log(result.data);
-      
 
       let elements = await getElements(`list/${listname}`);
       elements = formatElement("table", elements);
@@ -48,7 +46,7 @@ const Page = () => {
       );
       let profileCardData = await getProfileCardData(listname, {
         key: column[0].map,
-        value: selected.rowData.ID,
+        value: selected.value,
       });
       setProfileCardData((prev) => ({
         ...prev,
@@ -118,11 +116,17 @@ const Page = () => {
               Name: { color: "#1d7ddd" },
             }}
             onClick={(header, value, rowData) => {
-              setProfileCardData((prev) => ({
-                ...JSON.parse(rowData),
-                ...prev,
-              }));
-              
+              const RowData = JSON.parse(rowData);
+              setProfileCardData((prev) => {
+                const updatedData = { ...prev, ...RowData };
+                Object.entries(RowData).forEach(([key, value]) => {
+                  if (value === null || value === undefined || value === "") {
+                    delete updatedData[key];
+                  }
+                });
+                return updatedData;
+              });
+
               setSelected({ header, value, rowData });
             }}
             pagination={true} // use boolean
