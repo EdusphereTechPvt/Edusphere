@@ -48,41 +48,59 @@ export default function Form({ type, mode, id }) {
       if (Array.isArray(val)) return val.length > 0;
       if (val instanceof File) return true;
       if (typeof val === "boolean") return true;
-      if (typeof val === "object" && val?.startsWith && val.startsWith("data:image")) return true;
+      if (
+        typeof val === "object" &&
+        val?.startsWith &&
+        val.startsWith("data:image")
+      )
+        return true;
       return true;
     });
     setDisabled(hasErrors || !allRequiredFilled);
   }, [error, formData, requiredFieldNames]);
 
-  useEffect(() => {
-    const fetchDistinct = async () => {
-      for (const section of sections || []) {
-        for (const field of section.fields) {
-          if (field.isDistinct) {
-            const depsSatisfied =
-              !field.dependancy ||
-              field.dependancy.every((dep) => formData[dep]?.length > 0);
-            if (depsSatisfied) {
-              const options = await fetchDistinctValues(
-                field,
-                formData,
-                config?.api?.page?.mode?.[mode],
-                mode
-              );
-              dynamicUpdateConfig(config, {
-                fieldName: "items",
-                matchKey: "name",
-                matchValue: field.name,
-                newData: options.distinctValues || [],
-              });
-              setConfig({ ...config });
+  const dependentFields = useMemo(() => {
+    return (
+      sections
+        ?.flatMap((s) =>
+          s.fields.filter((f) => f.dependancy).flatMap((f) => f.dependancy)
+        )
+        .filter(Boolean) || []
+    );
+  }, [sections]);
+
+  useEffect(
+    () => {
+      const fetchDistinct = async () => {
+        for (const section of sections || []) {
+          for (const field of section.fields) {
+            if (field.isDistinct) {
+              const depsSatisfied =
+                !field.dependancy ||
+                field.dependancy.every((dep) => formData[dep]?.length > 0);
+              if (depsSatisfied) {
+                const options = await fetchDistinctValues(
+                  field,
+                  formData,
+                  config?.api?.page?.mode?.[mode],
+                  mode
+                );
+                dynamicUpdateConfig(config, {
+                  fieldName: "items",
+                  matchKey: "name",
+                  matchValue: field.name,
+                  newData: options.distinctValues || [],
+                });
+                setConfig({ ...config });
+              }
             }
           }
         }
-      }
-    };
-    fetchDistinct();
-  }, [formData]);
+      };
+      fetchDistinct();
+    },
+    dependentFields.map((d) => formData[d])
+  );
 
   useEffect(() => {
     const getInitialData = async () => {
@@ -346,9 +364,9 @@ export default function Form({ type, mode, id }) {
                                   return;
                                 }
                                 if (field?.maxLength) {
-                                  value = formatLabel(
-                                    value.slice(0, field.maxLength)
-                                  ).trim();
+                                  value = value
+                                    .slice(0, field.maxLength)
+                                    .trim();
                                 }
                                 value = value.replace(/^\s+/, "");
                               }

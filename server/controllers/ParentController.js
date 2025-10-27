@@ -177,6 +177,7 @@ const getAllParentsList = async (req, res) => {
     const formattedParents = parents.map((p) => ({
       _id: p._id,
       parentId: p.parentId,
+      avatar: p.photo,
       name: p.userId?.name,
       email: p.userId?.email,
       occupation: p.occupation,

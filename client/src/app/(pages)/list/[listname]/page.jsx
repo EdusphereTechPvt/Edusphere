@@ -48,7 +48,7 @@ const Page = () => {
       );
       let profileCardData = await getProfileCardData(listname, {
         key: column[0].map,
-        value: selected.value,
+        value: selected.rowData.ID,
       });
       setProfileCardData((prev) => ({
         ...prev,
@@ -123,7 +123,7 @@ const Page = () => {
                 ...prev,
               }));
               
-              setSelected({ header, value });
+              setSelected({ header, value, rowData });
             }}
             pagination={true} // use boolean
             clickableFields={listConfig[listname]?.clickableFields}

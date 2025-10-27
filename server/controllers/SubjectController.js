@@ -29,7 +29,7 @@ const save = async (req, res) => {
     }
 
     const existingByName = await Subject.findOne({
-      name: name.trim(),
+      name: { $regex: `^${name.trim()}$`, $options: "i" },
       schoolId,
       _id: { $ne: _id },
     }).session(session);

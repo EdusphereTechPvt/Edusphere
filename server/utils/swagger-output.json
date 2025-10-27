@@ -1165,7 +1165,7 @@
                 "name": {
                   "example": "any"
                 },
-                "studentEmail": {
+                "email": {
                   "example": "any"
                 },
                 "dateOfBirth": {
@@ -1233,8 +1233,8 @@
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "200": {
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request"
@@ -1418,16 +1418,10 @@
         ]
       }
     },
-    "/student/delete/{id}": {
-      "delete": {
+    "/student/delete": {
+      "post": {
         "description": "",
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
           {
             "name": "authorization",
             "in": "header",

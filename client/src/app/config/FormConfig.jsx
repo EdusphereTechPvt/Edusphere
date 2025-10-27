@@ -537,7 +537,7 @@ const formConfig = {
           },
           {
             type: "email",
-            name: "studentEmail",
+            name: "email",
             label: "Student Email",
             placeholder: "Enter Student's email",
           },
@@ -995,7 +995,7 @@ const formConfig = {
             name: "academicYear",
             label: "Academic Year",
             placeholder: "e.g., 2025-2026",
-            required: false,
+            required: true,
             pattern: {
               value: "^\\d{0,4}(-\\d{0,4})?$",
               message: "Academic Year must be in the format YYYY-YYYY",
@@ -1023,7 +1023,7 @@ const formConfig = {
             fieldName: "name",
             collectionName: "subject",
             placeholder: "Select the Subjects to be included",
-            required: true,
+            required: false,
             items: [],
             isDistinct: true,
           },

@@ -92,6 +92,7 @@ const save = async (req, res) => {
         name: parentName,
         photo: parentPhoto,
         schoolId,
+        dateOfBirth: dobStr,
         occupation: parentOccupation || "N/A",
         emergencyContact: parentContactNumber,
         email: parentEmail,
