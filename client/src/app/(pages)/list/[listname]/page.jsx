@@ -112,7 +112,11 @@ const Page = () => {
             headers={headers}
             data={data}
             columnStyles={{
-              Id: { fontWeight: "bold" },
+              ID: {
+                fontWeight: "bold",
+                color: "#555",
+                "&:hover": { color: "#000" },
+              },
               Name: { color: "#1d7ddd" },
             }}
             onClick={(header, value, rowData) => {

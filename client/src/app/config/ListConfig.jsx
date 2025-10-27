@@ -60,7 +60,7 @@ export const listConfig = {
       { name: "gender", displayName: "Gender" },
       { name: "isActive", displayName: "Status" },
     ],
-    clickableFields: ["id", "name"],
+    clickableFields: ["id"],
   },
   teacher: {
     tableHeader: [
@@ -71,7 +71,7 @@ export const listConfig = {
       { name: "gender", displayName: "Gender" },
       { name: "status", displayName: "Status" },
     ],
-    clickableFields: ["id", "name"],
+    clickableFields: ["id"],
   },
   subject: {
     tableHeader: [
@@ -81,7 +81,7 @@ export const listConfig = {
       { name: "credits", displayName: "Credits" },
       { name: "status", displayName: "Status" },
     ],
-    clickableFields: ["id", "name"],
+    clickableFields: ["id"],
   },
   class: {
     tableHeader: [
@@ -90,7 +90,7 @@ export const listConfig = {
       { name: "academicYear", displayName: "Year" },
       { name: "status", displayName: "Status" },
     ],
-    clickableFields: ["id", "name"],
+    clickableFields: ["id"],
   },
   section: {
     tableHeader: [
@@ -100,7 +100,7 @@ export const listConfig = {
       { name: "classTeacher[name]", displayName: "Class Teacher" },
       { name: "isActive", displayName: "Status" },
     ],
-    clickableFields: ["id", "name"],
+    clickableFields: ["id"],
   },
   parent: {
     tableHeader: [
@@ -110,7 +110,7 @@ export const listConfig = {
       { name: "emergencyContact", displayName: "Phone" },
       { name: "occupation", displayName: "Occupation" },
     ],
-    clickableFields: ["id", "name"],
+    clickableFields: ["id"],
   },
   admin: {
     tableHeader: [
@@ -120,7 +120,7 @@ export const listConfig = {
       { name: "designation", displayName: "Designation" },
       { name: "isActive", displayName: "Status" },
     ],
-    clickableFields: ["id", "name"],
+    clickableFields: ["id"],
   },
 };
 
@@ -203,6 +203,7 @@ export const ProfileCardConfig = {
     },
     fields: [
       { key: "email", label: "Email", type: "Text" },
+      { key: "childrenCount", label: "Children Count", type: "Text" },
       { key: "occupation", label: "Occupation", type: "Text" },
       { key: "emergencyContact", label: "Phone No.", type: "Text" },
     ],

@@ -501,7 +501,7 @@ const getAllParentsList = async (req, res) => {
       parentId: parent.parentId,
       name: parent.userId?.name,
       email: parent.userId?.email,
-      avatar: p.photo,
+      avatar: parent.photo,
       occupation: parent.occupation,
       relation: parent.relation,
       emergencyContact: parent.emergencyContact,
