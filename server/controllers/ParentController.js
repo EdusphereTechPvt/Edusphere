@@ -453,8 +453,8 @@ const getParentDetails = async (req, res) => {
 
   try {
     const response = await Parent.find(searchFields)
-      .populate("userId", "name email avatar isActive")
-      .populate("children", "name studentId classes sections");
+      // .populate("userId", "name email avatar isActive")
+      // .populate("children", "name studentId classes sections _id");
 
     if (!response.length) {
       return res.status(404).json({ data: [], message: "No parent found", status: false });

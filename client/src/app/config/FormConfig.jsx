@@ -1525,6 +1525,25 @@ const formConfig = {
           },
           {
             type: "date",
+            name: "dateOfBirth",
+            label: "Date of Birth",
+            placeholder: "Enter Date of Birth",
+            required: true,
+            format: "YYYY-MM-DD",
+            required: true,
+            min: new Date(
+              today.getFullYear() - 80,
+              today.getMonth(),
+              today.getDate()
+            ), //max age 80
+            max: new Date(
+              today.getFullYear() - 20,
+              today.getMonth(),
+              today.getDate()
+            ), //min age 20
+          },
+          {
+            type: "date",
             name: "dateOfJoining",
             label: "Date of Joining",
             placeholder: "Select date of joining",
