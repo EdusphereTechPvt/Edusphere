@@ -81,7 +81,7 @@ export const listConfig = {
       { name: "credits", displayName: "Credits" },
       { name: "status", displayName: "Status" },
     ],
-    clickableFields: ["id"],
+    // clickableFields: ["id"],
   },
   class: {
     tableHeader: [
@@ -95,12 +95,12 @@ export const listConfig = {
   section: {
     tableHeader: [
       { map: "sectionId", displayName: "ID" },
+      { name: "name", displayName: "Name" },
       { name: "class[name]", displayName: "Class" },
-      { name: "name", displayName: "Section" },
       { name: "classTeacher[name]", displayName: "Class Teacher" },
       { name: "isActive", displayName: "Status" },
     ],
-    clickableFields: ["id"],
+    // clickableFields: ["id"],
   },
   parent: {
     tableHeader: [
@@ -186,7 +186,7 @@ export const ProfileCardConfig = {
     },
 
     fields: [
-      { key: "sections", label: "Sections", type: "array" },
+      { key: "capacity", label: "Capacity", type: "text" },
       { key: "subjects", label: "Subjects", type: "array" },
       { key: "Status", label: "Status", type: "chip" },
     ],

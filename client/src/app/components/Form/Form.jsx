@@ -145,24 +145,12 @@ export default function Form({ type, mode, id }) {
 
   const getInputValue = (name, type) => {
     const val = formData[name];
-    if (
-      type === "number" &&
-      typeof val === "string" &&
-      val.toLowerCase().includes("class")
-    ) {
-      const num = Number(val.split(" ")[1]?.trim());
-      return isNaN(num) ? "" : num;
-    }
-
-    if (
-      type === "text" &&
-      typeof val === "string" &&
-      val.toLowerCase().includes("section")
-    ) {
-      return val.split(" ")[1]?.trim() || "";
-    }
-
-    return val || "";
+    if (!val) return "";
+    const [firstVal, secondVal] = String(val).toLowerCase().split(" ");
+    if (type === "number" && firstVal === "class") return +secondVal || "";
+    if (type === "text" && name === "name" && firstVal === "section")
+      return formatLabel(secondVal) || "";
+    return val;
   };
 
   const handleBlur = useCallback(
