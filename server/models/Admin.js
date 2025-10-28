@@ -16,8 +16,13 @@ const AdminProfileSchema = new mongoose.Schema(
     adminId: {
       type: String,
       unique: true,
-      sparse:true,
+      sparse: true,
       default: () => `EMP-${Date.now()}`
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
     },
     designation: {
       type: String,
@@ -26,6 +31,10 @@ const AdminProfileSchema = new mongoose.Schema(
     department: {
       type: String,
     },
+    dateOfBirth: {
+      type: Date,
+      required: true,
+    },
     contactNumber: {
       type: String,
       minlength: 10,
@@ -33,9 +42,9 @@ const AdminProfileSchema = new mongoose.Schema(
     },
     dateOfJoining: {
       type: Date,
-    }, 
-    
-     photo: {
+    },
+
+    photo: {
       type: String, // URL or base64
       default: null
     },

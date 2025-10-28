@@ -22,6 +22,7 @@ const save = async (req, res) => {
       designation,
       contactNumber,
       dateOfJoining,
+      dateOfBirth,
       isActive,
     } = req.body;
 
@@ -42,6 +43,7 @@ const save = async (req, res) => {
       user = new User({
         name,
         email,
+        dateOfBirth,
         schoolId,
         password,
         role: "admin",
@@ -62,6 +64,7 @@ const save = async (req, res) => {
         contactNumber,
         dateOfJoining,
         isActive,
+        dateOfBirth
       });
 
       await admin.save({ session });
@@ -81,11 +84,12 @@ const save = async (req, res) => {
       email,
       phone,
       photo,
-      department,
-      designation,
+      department: department ?? "N/A",
+      designation: designation ?? "N/A",
       contactNumber,
       dateOfJoining,
       isActive,
+      dateOfBirth,
       adminId: `EMP-${Date.now()}`,
     });
 
@@ -129,7 +133,9 @@ const getAdminDetails = async (req, res) => {
   if (phone) searchFields.phone = { $regex: phone, $options: "i" };
 
   try {
-    const response = await Admin.find(searchFields).populate("userId", "name email avatar role isActive");
+    const response = await Admin.find(searchFields)
+
+
 
     if (!response.length) {
       return res.status(404).json({ data: [], message: "No admin found", status: false });
@@ -177,7 +183,7 @@ const getAllAdminsList = async (req, res) => {
       name: admin.userId?.name,
       email: admin.userId?.email,
       phone: admin.phone,
-      photo: admin.photo,
+      avatar: admin.photo,
       role: admin.userId?.role,
       isActive: admin.userId?.isActive,
       designation: admin.designation,
