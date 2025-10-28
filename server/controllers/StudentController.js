@@ -286,6 +286,104 @@ const save = async (req, res) => {
   }
 };
 
+// const getStudentDetails = async (req, res) => {
+//   const { id, studentId, name = "", email = "", contactNumber = "" } = req.body;
+
+//   if (![id, studentId, name, email, contactNumber].some(Boolean)) {
+//     return res.status(400).json({
+//       message: "At least one search field is required",
+//       status: false,
+//     });
+//   }
+
+//   const searchFields = {};
+//   if (id && mongoose.Types.ObjectId.isValid(id)) searchFields._id = id;
+//   if (studentId) searchFields.studentId = studentId;
+//   if (name) searchFields.name = { $regex: name, $options: "i" };
+//   if (email) searchFields.email = { $regex: email, $options: "i" };
+//   if (contactNumber)
+//     searchFields.contactNumber = { $regex: contactNumber, $options: "i" };
+
+//   try {
+//     const response = await Student.find(searchFields)
+//       .populate("userId", "email name avatar isActive dateOfBirth")
+//       .populate("schoolId", "name")
+//       .populate({
+//         path: "parent",
+//         populate: {
+//           path: "userId",
+//           select: "email name avatar isActive dateOfBirth",
+//         },
+//       });
+
+//     if (!response || response.length === 0) {
+//       return res.status(404).json({
+//         data: [],
+//         total: 0,
+//         message: "No student found",
+//         status: false,
+//       });
+//     }
+
+//     const total = response.length;
+
+//     const formattedData = response.map((student) => {
+//       const parent = student.parent;
+//       const parentUser = parent?.userId;
+
+//       const parentInfo = parent
+//         ? {
+//             parentId: parent._id,
+//             parentName: parent.name,
+//             parentEmail: parent.email,
+//             parentContactNumber: parent.emergencyContact,
+//             parentDOB: parentUser?.dateOfBirth || null,
+//             parentPhoto: parent.photo,
+//             relation: parent.relation,
+//             parentOccupation: parent.occupation,
+//             alternativeEmail: parent.alternativeEmail,
+//             alternativeContactNumber: parent.alternativeContactNumber,
+//             isParentActive: parent.isActive,
+//           }
+//         : null;
+
+//       return {
+//         studentId: student.studentId,
+//         name: student.name,
+//         email: student.email,
+//         dateOfBirth: student.dateOfBirth,
+//         gender: student.gender,
+//         classes: student.classes,
+//         sections: student.sections,
+//         enrollmentDate: student.enrollmentDate,
+//         contactNumber: student.contactNumber,
+//         previousSchool: student.previousSchool || "",
+//         address: student.address,
+//         photo: student.photo,
+//         isActive: student.isActive,
+//         school: student.schoolId?.name || null,
+//         ...parentInfo,
+//       };
+//     });
+
+//     res.status(200).json({
+//       total,
+//       data: total === 1 ? formattedData[0] : formattedData,
+//       message:
+//         total === 1
+//           ? "Student found successfully"
+//           : `${total} student(s) found successfully`,
+//       status: true,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching student details:", error);
+//     res.status(500).json({
+//       message: "Server error while fetching student details",
+//       status: false,
+//     });
+//   }
+// };
+
 const getStudentDetails = async (req, res) => {
   const { id, studentId, name = "", email = "", contactNumber = "" } = req.body;
 
@@ -331,22 +429,6 @@ const getStudentDetails = async (req, res) => {
       const parent = student.parent;
       const parentUser = parent?.userId;
 
-      const parentInfo = parent
-        ? {
-            parentId: parent._id,
-            parentName: parent.name,
-            parentEmail: parent.email,
-            parentContactNumber: parent.emergencyContact,
-            parentDOB: parentUser?.dateOfBirth || null,
-            parentPhoto: parent.photo,
-            relation: parent.relation,
-            parentOccupation: parent.occupation,
-            alternativeEmail: parent.alternativeEmail,
-            alternativeContactNumber: parent.alternativeContactNumber,
-            isParentActive: parent.isActive,
-          }
-        : null;
-
       return {
         studentId: student.studentId,
         name: student.name,
@@ -362,7 +444,19 @@ const getStudentDetails = async (req, res) => {
         photo: student.photo,
         isActive: student.isActive,
         school: student.schoolId?.name || null,
-        ...parentInfo,
+
+        
+        parentId: parent?._id || null,
+        parentName: parent?.name || "",
+        parentEmail: parent?.email || "",
+        parentDOB: parentUser?.dateOfBirth || "",
+        parentContactNumber: parent?.emergencyContact || "",
+        parentPhoto: parent?.photo || "",
+        parentOccupation: parent?.occupation || "",
+        relation: parent?.relation || "",
+        alternativeEmail: parent?.alternativeEmail || "",
+        alternativeContactNumber: parent?.alternativeContactNumber || "",
+        isParentActive: parent?.isActive || false,
       };
     });
 
@@ -383,6 +477,7 @@ const getStudentDetails = async (req, res) => {
     });
   }
 };
+
 
 const getAllStudentsList = async (req, res) => {
   try {
@@ -464,22 +559,91 @@ const getProfileCardData = async (req, res) => {
   }
 };
 
+// const deleteStudent = async (req, res) => {
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
+
+//   try {
+//     const { id } = req.body;
+//     const student = await Student.findByIdAndDelete(id)
+//       .populate("parent")
+//       .session(session);
+
+//     if (!student) {
+//       await session.abortTransaction();
+//       return res
+//         .status(404)
+//         .json({ message: "Student not found", status: false });
+//     }
+
+//     await syncReferences({
+//       action: "remove",
+//       targetModel: "Student",
+//       targetId: student._id,
+//       session,
+//     });
+
+//     if (student.parent.children && student.parent.children.length === 1) {
+//       await Parent.findByIdAndDelete(student.parent._id).session(session);
+//       await User.findByIdAndDelete(student.parent.userId).session(session);
+//     }
+
+//     await User.findByIdAndDelete(student.userId).session(session);
+
+//     await session.commitTransaction();
+//     res.status(200).json({
+//       message: "Student and associated parent deleted successfully",
+//       status: true,
+//     });
+//   } catch (err) {
+//     await session.abortTransaction();
+//     console.error("Delete Student Error:", err);
+//     res
+//       .status(500)
+//       .json({ message: "Server error while deleting student", status: false });
+//   } finally {
+//     session.endSession();
+//   }
+// };
+
 const deleteStudent = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
     const { id } = req.body;
-    const student = await Student.findByIdAndDelete(id)
+
+    
+    const student = await Student.findById(id)
       .populate("parent")
       .session(session);
 
     if (!student) {
       await session.abortTransaction();
-      return res
-        .status(404)
-        .json({ message: "Student not found", status: false });
+      return res.status(404).json({ message: "Student not found", status: false });
     }
+
+    const parent = student.parent;
+
+   
+    if (parent) {
+      await Parent.findByIdAndUpdate(
+        parent._id,
+        { $pull: { children: student._id } },
+        { session }
+      );
+
+      
+      const updatedParent = await Parent.findById(parent._id).session(session);
+      if (updatedParent && updatedParent.children.length === 0) {
+        await User.findByIdAndDelete(updatedParent.userId).session(session);
+        await Parent.findByIdAndDelete(updatedParent._id).session(session);
+      }
+    }
+
+    
+    await User.findByIdAndDelete(student.userId).session(session);
+    await Student.findByIdAndDelete(student._id).session(session);
 
     await syncReferences({
       action: "remove",
@@ -488,28 +652,23 @@ const deleteStudent = async (req, res) => {
       session,
     });
 
-    if (student.parent.children && student.parent.children.length === 1) {
-      await Parent.findByIdAndDelete(student.parent._id).session(session);
-      await User.findByIdAndDelete(student.parent.userId).session(session);
-    }
-
-    await User.findByIdAndDelete(student.userId).session(session);
-
     await session.commitTransaction();
     res.status(200).json({
-      message: "Student and associated parent deleted successfully",
+      message: "Student deleted successfully",
       status: true,
     });
   } catch (err) {
     await session.abortTransaction();
     console.error("Delete Student Error:", err);
-    res
-      .status(500)
-      .json({ message: "Server error while deleting student", status: false });
+    res.status(500).json({
+      message: "Server error while deleting student",
+      status: false,
+    });
   } finally {
     session.endSession();
   }
 };
+
 
 module.exports = {
   save,

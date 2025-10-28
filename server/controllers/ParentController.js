@@ -568,13 +568,38 @@ const deleteParent = async (req, res) => {
 
   try {
     const { id } = req.body;
-    const parent = await Parent.findByIdAndDelete(id).session(session);
+
+    const parent = await Parent.findById(id)
+      .populate("children")
+      .session(session);
 
     if (!parent) {
       await session.abortTransaction();
-      return res.status(404).json({ message: "Parent not found", status: false });
+      return res.status(404).json({
+        message: "Parent not found",
+        status: false,
+      });
     }
 
+    
+    if (parent.children && parent.children.length > 0) {
+      for (const child of parent.children) {
+        await syncReferences({
+          action: "remove",
+          targetModel: "Student",
+          targetId: child._id,
+          session,
+        });
+
+        
+        const student = await Student.findByIdAndDelete(child._id).session(session);
+        if (student?.userId) {
+          await User.findByIdAndDelete(student.userId).session(session);
+        }
+      }
+    }
+
+  
     await syncReferences({
       action: "remove",
       targetModel: "Parent",
@@ -582,21 +607,28 @@ const deleteParent = async (req, res) => {
       session,
     });
 
+    
     await User.findByIdAndDelete(parent.userId).session(session);
 
+    await Parent.findByIdAndDelete(parent._id).session(session);
+
     await session.commitTransaction();
-    res.status(200).json({ message: "Parent deleted successfully", status: true });
+    res.status(200).json({
+      message: "Parent and all associated children deleted successfully",
+      status: true,
+    });
   } catch (err) {
     await session.abortTransaction();
     console.error("Delete Parent Error:", err);
     res.status(500).json({
-      message: "Server error while deleting parent",
+      message: "Server error while deleting parent and their children",
       status: false,
     });
   } finally {
     session.endSession();
   }
 };
+
 
 module.exports = {
   save,
