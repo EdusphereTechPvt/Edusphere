@@ -66,6 +66,13 @@ const save = async (req, res) => {
     let parentUser = await User.findOne({ email: parentEmail }).session(
       session
     );
+      if (parentUser) {
+      await session.abortTransaction();
+      return res.status(400).json({
+        message: "Parent with this email already exists.",
+        status: false,
+      });
+    }
     let parentDoc;
 
     const school = await School.findOne({ _id: schoolId }).session(session);
@@ -112,6 +119,14 @@ const save = async (req, res) => {
     let student = await User.findOne({ email }).session(session);
 
     if (!student) {
+        const existingStudent = await Student.findOne({ email }).session(session);
+  if (existingStudent) {
+    await session.abortTransaction();
+    return res.status(400).json({
+      message: "A student with this email already exists.",
+      status: false,
+    });
+  }
       const studentEmail =
         email ||
         `${name

@@ -321,7 +321,15 @@ const save = async (req, res) => {
         status: false,
       });
     }
-
+    
+    let existingUser = await User.findOne({ email }).session(session);
+if (existingUser && !_id) {
+  await session.abortTransaction();
+  return res.status(400).json({
+    message: "User with this email already exists",
+    status: false,
+  });
+}
     
     let user = await User.findOne({ email }).session(session);
 
@@ -334,7 +342,7 @@ const save = async (req, res) => {
         email,
         password,
         dateOfBirth,
-        schoolId: schoolFromToken,
+        schoolId,
         role: "parent",
       });
       await user.save({ session });

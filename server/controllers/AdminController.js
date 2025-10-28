@@ -36,6 +36,15 @@ const save = async (req, res) => {
       });
     }
 
+    const existingUser = await User.findOne({ email }).session(session);
+    if (existingUser && !_id) {
+      await session.abortTransaction();
+      return res.status(400).json({
+        message: "A user with this email already exists.",
+        status: false,
+      });
+    }
+
     let user = await User.findOne({ email }).session(session);
 
     if (!user) {
