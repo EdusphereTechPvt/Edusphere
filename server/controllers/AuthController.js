@@ -12,8 +12,8 @@ const {
   signRefreshToken,
   verifyRefreshToken,
   verifyAccessToken,
-} = require("../utils/tokenUtils");
-const InviteToken = require("../models/InviteToken");
+} = require("../utils/tokenUtils");                    
+const InviteToken = require("../models/InviteToken"); 
 const { sendEmail } = require("../utils/Email");
 const { signupTemplate } = require("../utils/templates/EmailTemplates");
 

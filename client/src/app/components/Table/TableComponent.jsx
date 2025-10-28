@@ -288,13 +288,12 @@ export const TableComponent = ({
                             (field) =>
                               field.toLowerCase() === header.toLowerCase()
                           );
-
                           return (
                             <TableCell
                               key={colIndex}
                               onClick={
                                 isClickable
-                                  ? () => handleCellClick(header, cellValue)
+                                  ? () => handleCellClick(header, cellValue, JSON.stringify(row))
                                   : undefined
                               }
                               sx={{

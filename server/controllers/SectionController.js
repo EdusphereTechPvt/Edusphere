@@ -36,6 +36,7 @@ const save = async (req, res) => {
 
       const oldTeachers = section.teachers || [];
       const oldStudents = section.students || [];
+      const oldClasses = section.classes ? [section.classes.toString()] : [];
 
       Object.assign(section, {
         name,
@@ -50,16 +51,33 @@ const save = async (req, res) => {
 
       await section.save({ session });
 
-      for (const id of [...students, ...teachers]) {
-        await syncReferences({ action: "save", targetModel: "Section", targetId: section._id, session });
-      }
+      await syncReferences({
+        action: "save",
+        targetModel: "Section",
+        targetId: section._id,
+        filters: {
+          Teacher: { _id: oldTeachers },
+          Student: { _id: oldStudents },
+          Class: { _id: [classes]  },
+        },
+        session,
+      });
 
-      const removedIds = [...oldStudents, ...oldTeachers].filter(
-        id => ![...students, ...teachers].includes(id)
+      const removedIds = [...oldStudents, ...oldTeachers, ...oldClasses].filter(
+        (id) => ![...students, ...teachers, classes].includes(id)
       );
-
-      for (const id of removedIds) {
-        await syncReferences({ action: "remove", targetModel: "Section", targetId: section._id, session });
+      for (const removedId of removedIds) {
+        await syncReferences({
+          action: "remove",
+          targetModel: "Section",
+          targetId: section._id,
+          filters: {
+            Teacher: { _id: removedId },
+            Student: { _id: removedId },
+            Class: { _id: removedId },
+          },
+          session,
+        });
       }
 
       await session.commitTransaction();
@@ -85,7 +103,17 @@ const save = async (req, res) => {
 
     await newSection.save({ session });
 
-    await syncReferences({ action: "save", targetModel: "Section", targetId: newSection._id, session });
+    await syncReferences({
+            action: "save",
+            targetModel: "Section",
+            targetId: newSection._id,
+            filters: {
+              Class: { _id: classes },
+              Teacher: { _id: teachers },
+              Student: { _id: students },
+            },
+            session,
+          });
 
     await session.commitTransaction();
 

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
 import {
   FormControl,
@@ -9,22 +9,30 @@ import {
   OutlinedInput,
 } from "@mui/material";
 
-const Dropdown = ({value, data, resetFlag, style = {}, onSelect, onBlur }) => {
+const Dropdown = ({ value, data, resetFlag, style = {}, onSelect, onBlur }) => {
   const [selectedValue, setSelectedValue] = useState("");
 
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setSelectedValue(value);
-    onSelect?.(value);
+  const handleItemClick = (itemId) => {
+    const newValue = itemId === selectedValue ? "" : itemId;
+    setSelectedValue(newValue);
+    onSelect?.(newValue);
   };
 
-  useEffect(()=>{
-    setSelectedValue("")
-  },[resetFlag])
+  useEffect(() => {
+    setSelectedValue("");
+    onSelect?.("");
+  }, [resetFlag]);
+
+  useEffect(() => {
+    setSelectedValue(value || "");
+  }, [value]);
+
   return (
-    <Box className={`${style.className}`} sx={{ ...style.inlineStyle }}>
+    <Box className={`${style.className || ""}`} sx={{ ...style.inlineStyle }}>
       {data.label && (
-        <Box className="text-sm font-medium mb-[0.33rem] text-gray-700">{data.label} {data.required && "*"}</Box>
+        <Box className="text-sm font-medium mb-[0.33rem] text-gray-700">
+          {data.label} {data.required && "*"}
+        </Box>
       )}
 
       <FormControl
@@ -37,12 +45,10 @@ const Dropdown = ({value, data, resetFlag, style = {}, onSelect, onBlur }) => {
 
         <Select
           labelId="dropdown-label"
-          value={selectedValue || value || ""}
-          onChange={handleChange}
+          value={selectedValue}
           onBlur={() => onBlur?.(selectedValue)}
           label={data.placeholder}
-                
-          sx={{ borderRadius: "0.35rem", ...style,}}
+          sx={{ borderRadius: "0.35rem", ...style }}
           MenuProps={{
             PaperProps: {
               sx: {
@@ -54,21 +60,25 @@ const Dropdown = ({value, data, resetFlag, style = {}, onSelect, onBlur }) => {
           }}
         >
           {data?.items?.map((item) => (
-            <MenuItem key={item.id} value={item.id}
-            sx={{
+            <MenuItem
+              key={item.id}
+              value={item.id}
+              onClick={() => handleItemClick(item.id)}
+              sx={{
+                "&:hover": {
+                  backgroundColor: "var(--color-secondary)",
+                },
+                "&.Mui-selected": {
+                  backgroundColor: "var(--color-primary)",
+                  color: "#fff",
                   "&:hover": {
-                    backgroundColor: "var(--color-secondary)",
-                  },
-                  "&.Mui-selected": {
                     backgroundColor: "var(--color-primary)",
-                    color: "#fff",
-                    "&:hover": {
-                      backgroundColor: "var(--color-primary)",
-                    },
                   },
-                  borderRadius: "0.45rem",
-                  mx: "0.25rem",
-                }}>
+                },
+                borderRadius: "0.45rem",
+                mx: "0.25rem",
+              }}
+            >
               {item.value}
             </MenuItem>
           ))}
