@@ -5,13 +5,13 @@ import {getAuth, GoogleAuthProvider} from "firebase/auth"
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDCtsIEGyIFesbReEk_HorLbaYVWBy-hdM",
-  authDomain: "edusphere-3567f.firebaseapp.com",
-  projectId: "edusphere-3567f",
-  storageBucket: "edusphere-3567f.firebasestorage.app",
-  messagingSenderId: "880603470668",
-  appId: "1:880603470668:web:4d76877eaaaea7b8cc4de9",
-  measurementId: "G-YK00XBT0W6"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_APIKEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTHDOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECTID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGEBUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGINGSENDINGID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APPID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MESUREMENTID
 };
 
 
