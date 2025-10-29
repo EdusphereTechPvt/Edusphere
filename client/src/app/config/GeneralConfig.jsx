@@ -230,7 +230,7 @@ const generalConfig = {
         background: "linear-gradient(135deg, #1a237e 0%, #283593 50%, #303f9f 100%)",
         color: "white",
         py: { xs: 4, md: 6 },
-        px: { xs: 2, md: 0 },
+        px: 2,
         mt: "auto",
       },
     },
@@ -459,8 +459,7 @@ const generalConfig = {
       styles: {
         container: {
           borderTop: "1px solid rgba(255, 255, 255, 0.2)",
-          py: 3,
-          mt: 4
+          pt: 3,
         },
         copyright: {
           color: "#e3f2fd",

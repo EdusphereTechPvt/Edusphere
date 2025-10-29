@@ -19,6 +19,7 @@ import { validateField } from "@/app/utils/Validator";
 import { showToast } from "@/app/utils/Toast";
 import { formatLabel } from "@/app/utils/Format";
 import { dynamicUpdateConfig } from "@/app/utils/FormatConfig";
+import DateComponent from "../Date/date";
 
 export default function Form({ type, mode, id }) {
   const router = useRouter();
@@ -47,40 +48,59 @@ export default function Form({ type, mode, id }) {
       if (Array.isArray(val)) return val.length > 0;
       if (val instanceof File) return true;
       if (typeof val === "boolean") return true;
+      if (
+        typeof val === "object" &&
+        val?.startsWith &&
+        val.startsWith("data:image")
+      )
+        return true;
       return true;
     });
     setDisabled(hasErrors || !allRequiredFilled);
   }, [error, formData, requiredFieldNames]);
 
-  useEffect(() => {
-    const fetchDistinct = async () => {
-      for (const section of sections || []) {
-        for (const field of section.fields) {
-          if (field.isDistinct) {
-            const depsSatisfied =
-              !field.dependancy ||
-              field.dependancy.every((dep) => formData[dep]?.length > 0);
-            if (depsSatisfied) {
-              const options = await fetchDistinctValues(
-                field,
-                formData,
-                config?.api?.page?.mode?.[mode],
-                mode
-              );
-              dynamicUpdateConfig(config, {
-                fieldName: "items",
-                matchKey: "name",
-                matchValue: field.name,
-                newData: options.distinctValues || [],
-              });
-              setConfig({ ...config });
+  const dependentFields = useMemo(() => {
+    return (
+      sections
+        ?.flatMap((s) =>
+          s.fields.filter((f) => f.dependancy).flatMap((f) => f.dependancy)
+        )
+        .filter(Boolean) || []
+    );
+  }, [sections]);
+
+  useEffect(
+    () => {
+      const fetchDistinct = async () => {
+        for (const section of sections || []) {
+          for (const field of section.fields) {
+            if (field.isDistinct) {
+              const depsSatisfied =
+                !field.dependancy ||
+                field.dependancy.every((dep) => formData[dep]?.length > 0);
+              if (depsSatisfied) {
+                const options = await fetchDistinctValues(
+                  field,
+                  formData,
+                  config?.api?.page?.mode?.[mode],
+                  mode
+                );
+                dynamicUpdateConfig(config, {
+                  fieldName: "items",
+                  matchKey: "name",
+                  matchValue: field.name,
+                  newData: options.distinctValues || [],
+                });
+                setConfig({ ...config });
+              }
             }
           }
         }
-      }
-    };
-    fetchDistinct();
-  }, [formData]);
+      };
+      fetchDistinct();
+    },
+    dependentFields.map((d) => formData[d])
+  );
 
   useEffect(() => {
     const getInitialData = async () => {
@@ -123,6 +143,16 @@ export default function Form({ type, mode, id }) {
     [formData, config, mode, router]
   );
 
+  const getInputValue = (name, type) => {
+    const val = formData[name];
+    if (!val) return "";
+    const [firstVal, secondVal] = String(val).toLowerCase().split(" ");
+    if (type === "number" && firstVal === "class") return +secondVal || "";
+    if (type === "text" && name === "name" && firstVal === "section")
+      return formatLabel(secondVal) || "";
+    return val;
+  };
+
   const handleBlur = useCallback(
     (field) => () => {
       const validate = validateField(field, formData[field.name]);
@@ -132,22 +162,24 @@ export default function Form({ type, mode, id }) {
   );
 
   const photoUploader = ({ name, label, placeholder }, i) => (
-    <div key={i} className="col-span-1 sm:col-span-2">
-      <label className="block mb-2 text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <div className="flex items-center gap-4">
-        <div className="flex flex-col items-center">
-          <div className="lg:w-40 lg:h-40 w-28 h-28 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-            {formData[name] ? (
-              <img
-                src={URL.createObjectURL(formData[name])}
-                alt="Uploaded"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <Person sx={{ fontSize: { xs: 95, lg: 140 }, color: "gray" }} />
-            )}
+    <div key={i} className="flex flex-col w-full">
+      <div className="flex items-center justify-center gap-4">
+        <div className="flex flex-wrap gap-4 justify-between sm:justify-center">
+          <div className="text-center">
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              {label}
+            </label>
+            <div className="lg:w-40 lg:h-40 w-28 h-28 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+              {formData[name] ? (
+                <img
+                  src={formData[name]}
+                  alt="Uploaded"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Person sx={{ fontSize: { xs: 95, lg: 140 }, color: "gray" }} />
+              )}
+            </div>
           </div>
           {formData[name] && (
             <span className="text-xs mt-1 flex items-center text-gray-700">
@@ -165,7 +197,15 @@ export default function Form({ type, mode, id }) {
             type="file"
             accept="image/*"
             className="hidden"
-            onChange={(e) => handleChange(name, e.target.files[0])}
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                handleChange(name, reader.result);
+              };
+              reader.readAsDataURL(file);
+            }}
           />
         </label>
       </div>
@@ -265,7 +305,6 @@ export default function Form({ type, mode, id }) {
                 switch (type) {
                   case "text":
                   case "email":
-                  case "date":
                   case "number":
                     return (
                       <div
@@ -294,19 +333,15 @@ export default function Form({ type, mode, id }) {
                             type={type}
                             name={name}
                             placeholder={placeholder}
-                            value={
-                              formData[name] ||
-                              (formData[name] &&
-                                formData[name].split("T")[0]) ||
-                              ""
-                            }
+                            value={getInputValue(name, type)}
                             onChange={(e) => {
                               let value = e.target.value;
 
                               // type TExt
                               if (type === "text") {
                                 const pattern =
-                                  field?.pattern && new RegExp(field.pattern.value);
+                                  field?.pattern &&
+                                  new RegExp(field.pattern.value);
 
                                 if (pattern && value && !pattern.test(value)) {
                                   showToast(
@@ -317,9 +352,9 @@ export default function Form({ type, mode, id }) {
                                   return;
                                 }
                                 if (field?.maxLength) {
-                                  value = formatLabel(
-                                    value.slice(0, field.maxLength)
-                                  ).trim();
+                                  value = value
+                                    .slice(0, field.maxLength)
+                                    .trim();
                                 }
                                 value = value.replace(/^\s+/, "");
                               }
@@ -372,14 +407,16 @@ export default function Form({ type, mode, id }) {
                       </div>
                     );
                   case "file":
-                    if (name === "photo") return photoUploader(field, i);
-                    if (name === "file") return fileUploader(field, i);
+                    if (name.toLowerCase().includes("photo"))
+                      return photoUploader(field, i);
+                    if (name.toLowerCase().includes("file"))
+                      return fileUploader(field, i);
                     return null;
                   case "textArea":
                     return (
                       <div key={i} className="col-span-1 sm:col-span-2">
                         <label className="block mb-1 font-medium text-gray-700">
-                          {label}
+                          {label} {required && "*"}
                         </label>
                         <textarea
                           name={name}
@@ -474,6 +511,29 @@ export default function Form({ type, mode, id }) {
                           onSelect={(value) => handleChange(field.name, value)}
                           style={field.styles}
                           onBlur={handleBlur(field)}
+                        />
+                      </div>
+                    );
+                  case "date":
+                    return (
+                      <div
+                        key={i}
+                        className={`flex w-full flex-col ${
+                          i === section.fields.length - 1 && i % 2 === 0
+                            ? "sm:col-span-2"
+                            : ""
+                        }`}
+                      >
+                        <label className="mb-1 text-sm font-medium text-gray-700">
+                          {label} {required && "*"}
+                        </label>
+                        <DateComponent
+                          value={formData[name] || ""}
+                          onChange={(value) => handleChange(name, value)}
+                          placeholder={placeholder || "Select date"}
+                          format={field?.format}
+                          minDate={field?.min}
+                          maxDate={field?.max}
                         />
                       </div>
                     );

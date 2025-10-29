@@ -1,3 +1,4 @@
+const today = new Date();
 const formConfig = {
   teacher: {
     api: {
@@ -68,6 +69,18 @@ const formConfig = {
             label: "Date of Birth",
             placeholder: "Enter Date of Birth",
             required: true,
+            format: "YYYY-MM-DD",
+            required: true,
+            min: new Date(
+              today.getFullYear() - 60,
+              today.getMonth(),
+              today.getDate()
+            ), //max age 60
+            max: new Date(
+              today.getFullYear() - 20,
+              today.getMonth(),
+              today.getDate()
+            ), //min age 20
           },
           {
             type: "dropdown",
@@ -92,7 +105,7 @@ const formConfig = {
             label: "Contact Number",
             placeholder: "Enter contact number",
             required: true,
-            minLength: 10,
+            maxLength: 10,
           },
           {
             type: "email",
@@ -120,9 +133,9 @@ const formConfig = {
             required: true,
           },
           {
-            type: "text",
+            type: "number",
             name: "experienceYears",
-            label: "Experience",
+            label: "Experience (In Years)",
             placeholder: "Select Experience",
             required: true,
           },
@@ -132,6 +145,7 @@ const formConfig = {
             label: "Joining Date",
             placeholder: "Select Date of Joining",
             required: true,
+            format: "YYYY-MM-DD",
           },
         ],
       },
@@ -147,11 +161,6 @@ const formConfig = {
             placeholder: "Select classes",
             items: [],
             isDistinct: true,
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "multiselect",
@@ -163,11 +172,6 @@ const formConfig = {
             isDistinct: true,
             dependancy: ["classes"],
             items: [],
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "multiselect",
@@ -177,13 +181,9 @@ const formConfig = {
             label: "Assigned Subjects",
             placeholder: "Select subjects",
             isDistinct: true,
+            required: false,
             dependancy: ["classes"],
             items: [],
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
         ],
       },
@@ -265,8 +265,14 @@ const formConfig = {
 
   student: {
     api: {
-      fetch: "/student/getStudent",
+      fetch: "/student/search",
       submit: "/student/save",
+      page: {
+        mode: {
+          add: "/form/student/add",
+          edit: "/form/student/edit",
+        },
+      },
     },
     info: [
       {
@@ -278,6 +284,14 @@ const formConfig = {
             "text-xl sm:text-2xl md:text-3xl font-bold text-[var(--color-text)]",
           inlineStyle: {},
         },
+        mode: {
+          add: {
+            value: "Add New Student",
+          },
+          edit: {
+            value: "Edit Student",
+          },
+        },
       },
       {
         type: "desc",
@@ -287,6 +301,15 @@ const formConfig = {
           className: "text-[var(--color-text-secondary)] mb-2",
           inlineStyle: {},
         },
+        mode: {
+          add: {
+            value:
+              "Fill in the destails below to create a new student profile.",
+          },
+          edit: {
+            value: "Fill in the destails below to edit student profile.",
+          },
+        },
       },
     ],
     sections: [
@@ -295,15 +318,33 @@ const formConfig = {
         fields: [
           {
             type: "text",
-            name: "studentName",
+            name: "name",
             label: "Student Name",
             placeholder: "Enter student's full name",
+            required: true,
             pattern: {
               value: "^[A-Za-z\\s]*$",
               message: "Student Name can only contain letters and spaces",
             },
           },
-          { type: "date", name: "dateOfBirth", label: "Date of Birth" },
+          {
+            type: "date",
+            name: "dateOfBirth",
+            label: "Date of Birth",
+            placeholder: "Select Date of Birth",
+            format: "YYYY-MM-DD",
+            required: true,
+            min: new Date(
+              today.getFullYear() - 20,
+              today.getMonth(),
+              today.getDate()
+            ), //max age 20
+            max: new Date(
+              today.getFullYear() - 3,
+              today.getMonth(),
+              today.getDate()
+            ), //min age 5
+          },
           {
             type: "dropdown",
             name: "gender",
@@ -311,18 +352,176 @@ const formConfig = {
             placeholder: "Select gender",
             required: true,
             items: [
-              { id: "male", value: "Male" },
-              { id: "female", value: "Female" },
-              { id: "other", value: "Other" },
+              { id: "Male", value: "Male" },
+              { id: "Female", value: "Female" },
+              { id: "Other", value: "Other" },
             ],
           },
           {
             type: "dropdown",
-            name: "class",
+            name: "classes",
+            fieldName: "name",
+            collectionName: "class",
             label: "Class",
             placeholder: "Select class",
             required: true,
             items: [],
+            isDistinct: true,
+          },
+          {
+            type: "dropdown",
+            name: "sections",
+            fieldName: "name",
+            collectionName: "section",
+            label: "Section",
+            placeholder: "Select Section",
+            required: true,
+            dependancy: ["classes"],
+            items: [],
+            isDistinct: true,
+          },
+          {
+            type: "date",
+            name: "enrollmentDate",
+            label: "Student Enrollment Date",
+            placeholder: "Student Enrollment Date",
+            required: true,
+            format: "YYYY-MM-DD",
+          },
+          {
+            type: "text",
+            name: "previousSchool",
+            label: "Previous School Name (optional)",
+            placeholder: "Enter student's full name",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message:
+                "Previous School Name can only contain letters and spaces",
+            },
+          },
+        ],
+      },
+      {
+        fields: [
+          {
+            type: "checkBox",
+            name: "isActive",
+            values: [{ name: "isActive", text: "Active" }],
+            styles: {
+              className: "font-bold text-black",
+            },
+          },
+        ],
+      },
+      {
+        title: "",
+        fields: [
+          {
+            type: "file",
+            name: "photo",
+            label: "Student Photo",
+            placeholder: "Upload Photo",
+          },
+          {
+            type: "file",
+            name: "parentPhoto",
+            label: "Parent/Guardian Photo",
+            placeholder: "Upload Photo",
+          },
+        ],
+      },
+      {
+        title: "Parent/Guardian Informations",
+        fields: [
+          {
+            type: "text",
+            name: "parentName",
+            label: "Parent/Guardian Name",
+            placeholder: "Enter parent's full name",
+            required: true,
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Parent Name can only contain letters and spaces",
+            },
+          },
+          {
+            type: "date",
+            name: "parentDOB",
+            label: "Parent/Guardian Date of Birth",
+            placeholder: "Enter Parents Date of Birth",
+            required: true,
+            format: "YYYY-MM-DD",
+            min: new Date(
+              today.getFullYear() - 80,
+              today.getMonth(),
+              today.getDate()
+            ), // max age 80
+            max: new Date(
+              today.getFullYear() - 18,
+              today.getMonth(),
+              today.getDate()
+            ), //min age 18
+          },
+          {
+            type: "email",
+            name: "parentEmail",
+            label: "Parent/Guardian Email",
+            required: true,
+            placeholder: "Enter parent/guardian's email",
+          },
+          {
+            type: "number",
+            name: "parentContactNumber",
+            label: "Parent/Guardian Contact Number",
+            placeholder: "Enter parent/guardian's contact number",
+            required: true,
+            maxLength: 10,
+          },
+          {
+            type: "text",
+            name: "relation",
+            label: "Relation to Student",
+            placeholder: "Enter Relation",
+            required: true,
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Relation can only contain letters and spaces",
+            },
+          },
+          {
+            type: "text",
+            name: "parentOccupation",
+            label: "Occupation",
+            placeholder: "Enter parent/guardian's occupation",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Occupation can only contain letters and spaces",
+            },
+          },
+          {
+            type: "email",
+            name: "alternativeEmail",
+            label: "Parent/Guardian Alternative Email",
+            placeholder: "Enter parent/guardian's email",
+          },
+          {
+            type: "number",
+            name: "alternativeContactNumber",
+            label: "Parent/Guardian Alternative Contact Number",
+            placeholder: "Enter parent/guardian's contact number",
+            maxLength: 10,
+          },
+        ],
+      },
+      {
+        fields: [
+          {
+            type: "checkBox",
+            name: "isParentActive",
+            values: [{ name: "isActive", text: "Active" }],
+            styles: {
+              className: "font-bold text-black",
+            },
           },
         ],
       },
@@ -332,33 +531,30 @@ const formConfig = {
           {
             type: "number",
             name: "contactNumber",
-            label: "Parent/Guardian Contact Number",
+            label: "Student Contact Number",
             placeholder: "Enter contact number",
             maxLength: 10,
           },
           {
-            type: "text",
+            type: "email",
+            name: "email",
+            label: "Student Email",
+            placeholder: "Enter Student's email",
+          },
+          {
+            type: "textArea",
             name: "address",
             label: "Address",
+            required: true,
             placeholder: "Enter student's address",
           },
         ],
       },
-      {
-        title: "Student Profile",
-        fields: [
-          {
-            type: "file",
-            name: "photo",
-            label: "Student Photo",
-            placeholder: "Upload Photo",
-          },
-        ],
-      },
-      {
-        title: "Identification",
-        fields: [{ type: "qr", name: "qrId", label: "Generate QR ID" }],
-      },
+
+      // {
+      //   title: "Identification",
+      //   fields: [{ type: "qr", name: "qrId", label: "Generate QR ID" }],
+      // },
       {
         title: "Actions",
         position: "bottom",
@@ -373,7 +569,15 @@ const formConfig = {
             type: "button",
             variant: "contained",
             text: "Save Student",
-            action: "save",
+            action: "submit",
+            mode: {
+              add: {
+                text: "Save Student",
+              },
+              edit: {
+                text: "Update Student",
+              },
+            },
           },
         ],
       },
@@ -499,6 +703,7 @@ const formConfig = {
             type: "date",
             name: "preferredDate",
             label: "Preferred Demo Date",
+            format: "YYYY-MM-DD",
           },
         ],
       },
@@ -646,7 +851,8 @@ const formConfig = {
             placeholder: "e.g., MATH101",
             pattern: {
               value: "^[A-Za-z0-9s]*$",
-              message: "Subject Code can only contain letters, numbers, and spaces",
+              message:
+                "Subject Code can only contain letters, numbers, and spaces",
             },
             required: false,
           },
@@ -665,13 +871,8 @@ const formConfig = {
             collectionName: "class",
             placeholder: "Enter the classes associated with the subject",
             isDistinct: true,
-            required: false,
+            required: true,
             items: [],
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "multiselect",
@@ -681,13 +882,9 @@ const formConfig = {
             collectionName: "teacher",
             placeholder: "Enter the teachers associated with the subject",
             required: false,
+            dependancy: ["classes"],
             isDistinct: true,
             items: [],
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "checkBox",
@@ -798,12 +995,11 @@ const formConfig = {
             name: "academicYear",
             label: "Academic Year",
             placeholder: "e.g., 2025-2026",
-            required: false,
+            required: true,
             pattern: {
               value: "^\\d{0,4}(-\\d{0,4})?$",
               message: "Academic Year must be in the format YYYY-YYYY",
             },
-            
           },
           {
             type: "multiselect",
@@ -813,17 +1009,12 @@ const formConfig = {
             collectionName: "section",
             filter: {
               add: { classes: null },
-              edit: { classes: `$_id` },
+              // edit: { classes: `$_id` },
             },
             placeholder: "Select the sections to include",
             required: false,
             items: [],
             isDistinct: true,
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "multiselect",
@@ -832,14 +1023,9 @@ const formConfig = {
             fieldName: "name",
             collectionName: "subject",
             placeholder: "Select the Subjects to be included",
-            required: true,
+            required: false,
             items: [],
             isDistinct: true,
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "text",
@@ -1000,11 +1186,6 @@ const formConfig = {
             items: [],
             isDistinct: true,
             dependancy: ["classes"],
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "multiselect",
@@ -1016,11 +1197,6 @@ const formConfig = {
             required: true,
             items: [],
             isDistinct: true,
-            styles: {
-              selectStyle: {
-                minHeight: "2.5rem",
-              },
-            },
           },
           {
             type: "text",
@@ -1054,16 +1230,402 @@ const formConfig = {
           },
           {
             type: "button",
-            text: "Save Subject",
+            text: "Save Section",
             variant: "contained",
             action: "submit",
             mode: {
               add: {
-                text: "Save Subject",
+                text: "Save Section",
               },
               edit: {
-                text: "Update Subject",
+                text: "Update Section",
               },
+            },
+          },
+        ],
+      },
+    ],
+  },
+  parent: {
+    api: {
+      fetch: "/parent/search",
+      submit: "/parent/save",
+      page: {
+        mode: {
+          add: "/form/parent/add",
+          edit: "/form/parent/edit",
+        },
+      },
+    },
+    info: [
+      {
+        type: "title",
+        value: "Add New Parent/Guardian",
+        tag: "h1",
+        styles: {
+          className:
+            "text-xl sm:text-2xl md:text-3xl font-bold text-[var(--color-text)]",
+          inlineStyle: {},
+        },
+        mode: {
+          add: { value: "Add New Parent/Guardian" },
+          edit: { value: "Edit Parent/Guardian" },
+        },
+      },
+      {
+        type: "desc",
+        value:
+          "Fill in the details below to create a new Parent/Guardian profile.",
+        tag: "p",
+        styles: {
+          className: "text-[var(--color-text-secondary)] mb-2",
+          inlineStyle: {},
+        },
+        mode: {
+          add: {
+            value:
+              "Fill in the details below to create a new parent/guardian profile.",
+          },
+          edit: {
+            value: "Fill in the details below to edit parent/guardian profile.",
+          },
+        },
+      },
+    ],
+    sections: [
+      {
+        title: "Parent/Guardian Information",
+        fields: [
+          {
+            type: "text",
+            name: "name",
+            label: "Parent/Guardian Name",
+            placeholder: "Enter Parent/Guardian's full name",
+            required: true,
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Name can only contain letters and spaces",
+            },
+          },
+          {
+            type: "email",
+            name: "email",
+            label: "Email",
+            placeholder: "Enter parent/guardian's email",
+            required: true,
+          },
+          {
+            type: "date",
+            name: "dateOfBirth",
+            label: "Date of Birth",
+            placeholder: "Select date of birth",
+            format: "YYYY-MM-DD",
+            required: true,
+            min: new Date(
+              today.getFullYear() - 80,
+              today.getMonth(),
+              today.getDate()
+            ), // max age 80
+            max: new Date(
+              today.getFullYear() - 18,
+              today.getMonth(),
+              today.getDate()
+            ), //min age 18
+          },
+          {
+            type: "number",
+            name: "emergencyContact",
+            label: "Contact Number",
+            placeholder: "Enter contact number",
+            required: true,
+            maxLength: 10,
+          },
+        ],
+      },
+      {
+        title: "Parent/Guardian Profile",
+        fields: [
+          {
+            type: "file",
+            name: "photo",
+            label: "Parent/Guardian Photo",
+          },
+        ],
+      },
+      {
+        title: "Children Details",
+        fields: [
+          {
+            type: "multiselect",
+            name: "children",
+            label: "Children",
+            fieldName: "name",
+            collectionName: "student",
+            placeholder: "Select the Child",
+            required: true,
+            items: [],
+            isDistinct: true,
+          },
+        ],
+      },
+      {
+        title: "",
+        fields: [
+          {
+            type: "text",
+            name: "relation",
+            label: "Relation to Children",
+            placeholder: "Enter Relation",
+            required: true,
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Relation can only contain letters and spaces",
+            },
+          },
+        ],
+      },
+      {
+        title: "Additionl Information",
+        fields: [
+          {
+            type: "text",
+            name: "occupation",
+            label: "Occupation",
+            placeholder: "Enter parent/guardian's occupation",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Occupation can only contain letters and spaces",
+            },
+          },
+          {
+            type: "email",
+            name: "alternativeEmail",
+            label: "Parent/Guardian Alternative Email",
+            placeholder: "Enter parent/guardian's email",
+          },
+          {
+            type: "number",
+            name: "alternativeContactNumber",
+            label: "Parent/Guardian Alternative Contact Number",
+            placeholder: "Enter parent/guardian's contact number",
+            maxLength: 10,
+          },
+        ],
+      },
+      {
+        title: "",
+        fields: [
+          {
+            type: "checkBox",
+            name: "isActive",
+            values: [{ name: "isActive", text: "Active" }],
+            styles: {
+              className: "font-bold text-black",
+            },
+          },
+        ],
+      },
+      {
+        title: "Actions",
+        position: "bottom",
+        fields: [
+          {
+            type: "button",
+            variant: "outlined",
+            text: "Cancel",
+            action: "cancel",
+          },
+          {
+            type: "button",
+            variant: "contained",
+            text: "Save Parent",
+            action: "submit",
+            mode: {
+              add: { text: "Save Parent/Guardian" },
+              edit: { text: "Update Parent/Guardian" },
+            },
+          },
+        ],
+      },
+    ],
+  },
+  admin: {
+    api: {
+      fetch: "/admin/search",
+      submit: "/admin/save",
+      page: {
+        mode: {
+          add: "/form/admin/add",
+          edit: "/form/admin/edit",
+        },
+      },
+    },
+    info: [
+      {
+        type: "title",
+        value: "Add New Admin",
+        tag: "h1",
+        styles: {
+          className:
+            "text-xl sm:text-2xl md:text-3xl font-bold text-[var(--color-text)]",
+          inlineStyle: {},
+        },
+        mode: {
+          add: { value: "Add New Admin" },
+          edit: { value: "Edit Admin" },
+        },
+      },
+      {
+        type: "desc",
+        value: "Fill in the details below to create a new admin profile.",
+        tag: "p",
+        styles: {
+          className: "text-[var(--color-text-secondary)] mb-2",
+          inlineStyle: {},
+        },
+        mode: {
+          add: {
+            value: "Fill in the details below to create a new admin profile.",
+          },
+          edit: {
+            value: "Fill in the details below to edit admin profile.",
+          },
+        },
+      },
+    ],
+    sections: [
+      {
+        title: "Admin Information",
+        fields: [
+          {
+            type: "text",
+            name: "name",
+            label: "Admin Name",
+            placeholder: "Enter admin's full name",
+            required: true,
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Name can only contain letters and spaces",
+            },
+          },
+          {
+            type: "email",
+            name: "email",
+            label: "Email",
+            placeholder: "Enter admin's email",
+            required: true,
+          },
+          {
+            type: "number",
+            name: "contactNumber",
+            label: "Contact Number",
+            placeholder: "Enter contact number",
+            required: true,
+            maxLength: 10,
+          },
+          {
+            type: "date",
+            name: "dateOfBirth",
+            label: "Date of Birth",
+            placeholder: "Enter Date of Birth",
+            required: true,
+            format: "YYYY-MM-DD",
+            required: true,
+            min: new Date(
+              today.getFullYear() - 80,
+              today.getMonth(),
+              today.getDate()
+            ), //max age 80
+            max: new Date(
+              today.getFullYear() - 20,
+              today.getMonth(),
+              today.getDate()
+            ), //min age 20
+          },
+          {
+            type: "date",
+            name: "dateOfJoining",
+            label: "Date of Joining",
+            placeholder: "Select date of joining",
+            format: "YYYY-MM-DD",
+            required: true,
+          },
+        ],
+      },
+      {
+        title: "Admin Profile",
+        fields: [
+          {
+            type: "file",
+            name: "photo",
+            label: "Admin Photo",
+            placeholder: "Upload photo",
+          },
+        ],
+      },
+      {
+        title: "Other Information",
+        fields: [
+          {
+            type: "text",
+            name: "designation",
+            label: "Designation",
+            placeholder: "Enter designation",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Designation can only contain letters and spaces",
+            },
+          },
+          {
+            type: "text",
+            name: "department",
+            label: "Department",
+            placeholder: "Enter department name",
+            pattern: {
+              value: "^[A-Za-z\\s]*$",
+              message: "Department can only contain letters and spaces",
+            },
+          },
+          {
+            type: "number",
+            name: "phone",
+            label: "Alternative Contact Number",
+            placeholder: "Enter alternate contact number",
+            maxLength: 10,
+          },
+        ],
+      },
+      {
+        title: "",
+        fields: [
+          {
+            type: "checkBox",
+            name: "isActive",
+            values: [{ name: "isActive", text: "Active" }],
+            styles: {
+              className: "font-bold text-black",
+            },
+          },
+        ],
+      },
+      {
+        title: "Actions",
+        position: "bottom",
+        fields: [
+          {
+            type: "button",
+            variant: "outlined",
+            text: "Cancel",
+            action: "cancel",
+          },
+          {
+            type: "button",
+            variant: "contained",
+            text: "Save Admin",
+            action: "submit",
+            mode: {
+              add: { text: "Save Admin" },
+              edit: { text: "Update Admin" },
             },
           },
         ],

@@ -1,40 +1,58 @@
 const RequestDemo = require("../models/RequestDemoSchema");
+const { sendEmail } = require("../utils/Email");
 
 const addRequestDemo = async (req, res) => {
   try {
     const { name, schoolName, email, phone, schoolSize, preferredDate, features, reference, message } = req.body;
 
     if (!email || !schoolName) {
-      return res.status(400).json({ 
-        message: "Email and School Name are required", 
-        status: false 
+      return res.status(400).json({
+        message: "Email and School Name are required",
+        status: false
       });
     }
 
-    const newDemo = new RequestDemo({ 
-      name, 
-      schoolName, 
-      email, 
-      phone, 
-      schoolSize, 
-      preferredDate, 
-      features, 
-      reference, 
-      message 
+    const newDemo = new RequestDemo({
+      name,
+      schoolName,
+      email,
+      phone,
+      schoolSize,
+      preferredDate,
+      features,
+      reference,
+      message
     });
 
     await newDemo.save();
-    res.status(201).json({ 
-      message: "Demo request added successfully", 
-      data: newDemo, 
-      status: true 
+    if (newDemo) {
+      await sendEmail(
+        email,
+        `Alert! New Demo Request Received for ${schoolName}`,
+        demoRequestTemplate(name,
+          schoolName,
+          email,
+          phone,
+          schoolSize,
+          preferredDate,
+          features,
+          reference,
+          message),
+        false
+      );
+    }
+
+    res.status(201).json({
+      message: "Demo request added successfully",
+      data: newDemo,
+      status: true
     });
 
   } catch (err) {
     console.error("RequestDemo Add Error:", err);
-    res.status(500).json({ 
-      message: "Server error during demo add", 
-      status: false 
+    res.status(500).json({
+      message: "Server error during demo add",
+      status: false
     });
   }
 };
@@ -44,9 +62,9 @@ const getRequestDemoDetails = async (req, res) => {
   const { name = "", schoolName = "", email = "", phone = "" } = req.body;
 
   if (![name, schoolName, email, phone].some(Boolean)) {
-    return res.status(400).json({ 
-      message: "At least one search field is required", 
-      status: false 
+    return res.status(400).json({
+      message: "At least one search field is required",
+      status: false
     });
   }
 
@@ -61,29 +79,29 @@ const getRequestDemoDetails = async (req, res) => {
 
     if (response.length === 0) {
       return res.status(404).json({
-        data: [], 
-        message: "No demo request found", 
-        status: false 
+        data: [],
+        message: "No demo request found",
+        status: false
       });
     } else if (response.length === 1) {
       return res.status(200).json({
-        data: response[0], 
-        message: "Demo request found successfully", 
-        status: true 
+        data: response[0],
+        message: "Demo request found successfully",
+        status: true
       });
     }
 
     return res.status(200).json({
-      data: response, 
-      message: "Multiple demo requests found successfully", 
-      status: true 
+      data: response,
+      message: "Multiple demo requests found successfully",
+      status: true
     });
 
   } catch (error) {
     console.error("Error fetching demo details:", error);
-    return res.status(500).json({ 
-      message: "Server error while fetching demo details", 
-      status: false 
+    return res.status(500).json({
+      message: "Server error while fetching demo details",
+      status: false
     });
   }
 };
@@ -95,28 +113,28 @@ const deleteRequestDemo = async (req, res) => {
     const demo = await RequestDemo.findByIdAndDelete(id);
 
     if (!demo) {
-      return res.status(404).json({ 
-        message: "Demo request not found", 
-        status: false 
+      return res.status(404).json({
+        message: "Demo request not found",
+        status: false
       });
     }
 
-    res.status(200).json({ 
-      message: "Demo request deleted successfully", 
-      status: true 
+    res.status(200).json({
+      message: "Demo request deleted successfully",
+      status: true
     });
 
   } catch (err) {
     console.error("Delete demo request error:", err);
-    res.status(500).json({ 
-      message: "Server error while deleting demo request", 
-      status: false 
+    res.status(500).json({
+      message: "Server error while deleting demo request",
+      status: false
     });
   }
 };
 
-module.exports = { 
-  addRequestDemo, 
-  getRequestDemoDetails, 
-  deleteRequestDemo 
+module.exports = {
+  addRequestDemo,
+  getRequestDemoDetails,
+  deleteRequestDemo
 };
