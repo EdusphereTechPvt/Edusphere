@@ -2736,10 +2736,22 @@
                 "page": {
                   "example": "any"
                 },
+                "_id": {
+                  "example": "any"
+                },
                 "name": {
                   "example": "any"
                 },
                 "email": {
+                  "example": "any"
+                },
+                "alternativeEmail": {
+                  "example": "any"
+                },
+                "dateOfBirth": {
+                  "example": "any"
+                },
+                "photo": {
                   "example": "any"
                 },
                 "occupation": {
@@ -2748,19 +2760,16 @@
                 "emergencyContact": {
                   "example": "any"
                 },
-                "parentDOB": {
-                  "example": "any"
-                },
-                "parentEmail": {
-                  "example": "any"
-                },
-                "alternativeEmail": {
-                  "example": "any"
-                },
                 "alternativeContactNumber": {
                   "example": "any"
                 },
+                "relation": {
+                  "example": "any"
+                },
                 "children": {
+                  "example": "any"
+                },
+                "isActive": {
                   "example": "any"
                 }
               }
@@ -2820,10 +2829,16 @@
                 "id": {
                   "example": "any"
                 },
+                "parentId": {
+                  "example": "any"
+                },
                 "name": {
                   "example": "any"
                 },
                 "email": {
+                  "example": "any"
+                },
+                "emergencyContact": {
                   "example": "any"
                 }
               }
@@ -3029,19 +3044,28 @@
                 "email": {
                   "example": "any"
                 },
-                "dateOfBirth": {
+                "phone": {
                   "example": "any"
                 },
-                "designation": {
+                "photo": {
                   "example": "any"
                 },
                 "department": {
+                  "example": "any"
+                },
+                "designation": {
                   "example": "any"
                 },
                 "contactNumber": {
                   "example": "any"
                 },
                 "dateOfJoining": {
+                  "example": "any"
+                },
+                "dateOfBirth": {
+                  "example": "any"
+                },
+                "isActive": {
                   "example": "any"
                 }
               }
@@ -3101,13 +3125,16 @@
                 "id": {
                   "example": "any"
                 },
-                "employeeId": {
+                "adminId": {
                   "example": "any"
                 },
                 "name": {
                   "example": "any"
                 },
                 "email": {
+                  "example": "any"
+                },
+                "phone": {
                   "example": "any"
                 }
               }
@@ -3194,24 +3221,11 @@
             "type": "string"
           },
           {
-            "name": "x-page",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "type": "string"
-          },
-          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "page": {
-                  "example": "any"
-                },
                 "searchBy": {
                   "example": "any"
                 }
@@ -3225,9 +3239,6 @@
           },
           "401": {
             "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"

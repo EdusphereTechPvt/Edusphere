@@ -165,15 +165,14 @@ const Manage = () => {
                         color: "#7C3AED",
                       },
                     ]}
-                    height={300}
+                    height={400}
+                    width={800}
                     sx={{
-                      "& .MuiChartsAxis-line": { display: "none" },
                       "& .MuiChartsAxis-tickLabel": {
                         fill: "#555",
                         fontSize: "0.9rem",
                         fontWeight: 500,
                       },
-                      "& .MuiChartsLegend-root": { display: "none" },
                       "& .MuiBarElement-root": {
                         borderRadius: 3,
                         width: "8rem",
