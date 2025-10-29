@@ -1,0 +1,41 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@emotion/cache": "^11.14.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.2",
+    "@mui/lab": "^7.0.0-beta.17",
+    "@mui/material": "^7.3.2",
+    "@mui/material-nextjs": "^7.3.2",
+    "@mui/x-charts": "^8.15.0",
+    "@mui/x-date-pickers": "^8.12.0",
+    "@reduxjs/toolkit": "^2.9.0",
+    "axios": "^1.12.2",
+    "date-fns": "^4.1.0",
+    "dayjs": "^1.11.18",
+    "firebase": "^12.4.0",
+    "framer-motion": "^12.23.22",
+    "motion": "^12.23.21",
+    "next": "15.5.3",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-redux": "^9.2.0",
+    "react-toastify": "^11.0.5"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.3",
+    "tailwindcss": "^4"
+  }
+}
