@@ -25,7 +25,7 @@ const app = express();
 
 dotenv.config();
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: "https://edusphere-flax.vercel.app", headers: ["Content-Type"], credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -44,7 +44,7 @@ app.use("/section", sectionRoutes)
 app.use("/user", userRoutes)
 app.use("/parent", parentroutes)
 app.use("/admin", adminroutes)
-
+ 
 mongoose
   .connect(process.env.MONGO_URL, {})
   .then(() => {
