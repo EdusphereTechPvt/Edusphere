@@ -25,7 +25,7 @@ const app = express();
 
 dotenv.config();
 
-app.use(cors({ origin: "https://edusphere-flax.vercel.app", headers: ["Content-Type"], credentials: true }));
+app.use(cors({ origin: "https://edusphere-flax.vercel.app", headers: ["Content-Type", "x-page"], credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
