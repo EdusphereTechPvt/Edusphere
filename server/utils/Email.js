@@ -1,6 +1,7 @@
+import { config } from "dotenv";
 import { Resend } from "resend";
 
-require("dotenv").config()
+config();
 
 export const sendEmail = async (to, subject, template) => {
   try {
