@@ -86,7 +86,7 @@ const Header = ({ path, connectionStatus }) => {
       setDrawerOpen(false);
     } else if (item.action === "logout") {
       await logout();
-      router.push(item.actionValue);
+      router.push("/")
     }
   };
 
@@ -99,7 +99,7 @@ const Header = ({ path, connectionStatus }) => {
       setDrawerOpen(false);
     } else if (item.action === "logout") {
       await logout();
-      router.push(item.actionValue);
+      router.push("/")
     }
   };
 
