@@ -13,7 +13,6 @@ const addOrUpdateClass = async (req, res) => {
       _id,
       classId,
       name,
-      gradeLevel,
       sections = [],
       subjects = [],
       academicYear,
@@ -21,9 +20,9 @@ const addOrUpdateClass = async (req, res) => {
       isActive,
     } = req.body;
 
-    if (!name || !gradeLevel || !req.user.schoolId) {
+    if (!name || !academicYear || !req.user.schoolId) {
       return res.status(400).json({
-        message: "Class Name, Grade Level, and School ID are required",
+        message: "Class Name, Academic Year, and School ID are required",
         status: false,
       });
     }
@@ -41,7 +40,6 @@ const addOrUpdateClass = async (req, res) => {
 
       Object.assign(classData, {
         name,
-        gradeLevel,
         sections: Array.isArray(sections) ? sections : [],
         subjects: Array.isArray(subjects) ? subjects : [],
         academicYear,
@@ -52,38 +50,37 @@ const addOrUpdateClass = async (req, res) => {
       await classData.save({ session });
 
       await syncReferences({
-            action: "save",
-            targetModel: "Class",
-            targetId: classData._id,
-            filters: {
-              Subject: { _id: subjects },
-              Section: { _id: sections },
-            },
-            session,
-          });
-      
-          const removedIds = [...oldSubjects, ...oldSections].filter(
-            (id) => ![subjects, sections].includes(id)
-          );
-      
-          for (const removedId of removedIds) {
-            await syncReferences({
-              action: "remove",
-              targetModel: "Class",
-              targetId: classData._id,
-              filters: {
-                Subject: { _id: removedId },
-                Section: { _id: removedId },
-              },
-              session,
-            });
-          }
+        action: "save",
+        targetModel: "Class",
+        targetId: classData._id,
+        filters: {
+          Subject: { _id: subjects },
+          Section: { _id: sections },
+        },
+        session,
+      });
+
+      const removedIds = [...oldSubjects, ...oldSections].filter(
+        (id) => ![subjects, sections].includes(id)
+      );
+
+      for (const removedId of removedIds) {
+        await syncReferences({
+          action: "remove",
+          targetModel: "Class",
+          targetId: classData._id,
+          filters: {
+            Subject: { _id: removedId },
+            Section: { _id: removedId },
+          },
+          session,
+        });
+      }
     } else {
       // Create new class
       classData = new Class({
         classId: classId || `CLASS-${Date.now()}`,
         name: `Class ${name}`,
-        gradeLevel,
         sections: Array.isArray(sections) ? sections : [],
         subjects: Array.isArray(subjects) ? subjects : [],
         academicYear,
@@ -124,10 +121,10 @@ const addOrUpdateClass = async (req, res) => {
 
 
 const getClasses = async (req, res) => {
-  const { id, classId, name = "", gradeLevel = "", schoolId = "" } = req.body;
+  const { id, classId, name = "", schoolId = "" } = req.body;
 
   // Ensure at least one search field is provided
-  if (![id, classId, name, gradeLevel, schoolId].some(Boolean)) {
+  if (![id, classId, name, schoolId].some(Boolean)) {
     return res.status(400).json({
       message: "At least one search field is required",
       status: false,
@@ -138,7 +135,6 @@ const getClasses = async (req, res) => {
   if (id && mongoose.Types.ObjectId.isValid(id)) searchFields._id = id;
   if (classId) searchFields.classId = classId;
   if (name) searchFields.name = { $regex: name, $options: "i" };
-  if (gradeLevel) searchFields.gradeLevel = gradeLevel;
   if (schoolId) searchFields.schoolId = schoolId;
 
   try {
@@ -187,7 +183,6 @@ const getAllClasses = async (req, res) => {
     const formattedClasses = classes.map((cls) => ({
       classId: cls.classId,
       name: cls.name,
-      gradeLevel: cls.gradeLevel,
       sections: cls.sections.map((sec) => ({
         sectionId: sec.sectionId,
         name: sec.name,
@@ -216,17 +211,17 @@ const getAllClasses = async (req, res) => {
   }
 };
 
-const getProfileCardData = async(req,res) => {
-  try{
+const getProfileCardData = async (req, res) => {
+  try {
 
     let keyName = req.body.searchBy.key;
     let keyValue = req.body.searchBy.value
 
-    let classProfileData = await Class.findOne({ [keyName]:keyValue })
+    let classProfileData = await Class.findOne({ [keyName]: keyValue })
       .populate("sections")
-      .populate("subjects"); 
+      .populate("subjects");
 
-      const formattedTeachers = {
+    const formattedTeachers = {
       _id: classProfileData._id,
       id: classProfileData.classId,
       name: classProfileData.name,
@@ -235,10 +230,10 @@ const getProfileCardData = async(req,res) => {
       subjects: classProfileData.subjects
     };
 
-      res.status(200).json({
-        status: true,
-        data: formattedTeachers
-      })
+    res.status(200).json({
+      status: true,
+      data: formattedTeachers
+    })
   }
   catch (err) {
     console.error("Get Teacher Error:", err);
@@ -306,4 +301,4 @@ const deleteClass = async (req, res) => {
 };
 
 
-module.exports = { addOrUpdateClass, getClasses,getAllClasses,getProfileCardData, deleteClass };
+module.exports = { addOrUpdateClass, getClasses, getAllClasses, getProfileCardData, deleteClass };

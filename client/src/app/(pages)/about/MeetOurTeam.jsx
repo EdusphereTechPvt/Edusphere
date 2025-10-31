@@ -87,12 +87,12 @@ export default function MeetOurTeam() {
   ];
 
   return (
-    <section id="team-section" className="py-20 px-6 text-center bg-white">
-      <h2 className="text-2xl md:text-3xl font-bold mb-4 text-black">
+    <section id="team-section" className="py-10 md:py-20 px-6 text-center bg-white">
+      <h1 className="text-base md:text-xl lg:text-4xl   font-bold mb-4 text-black">
         Meet Our Team
-      </h2>
+      </h1>
 
-      <p className="text-gray-600 leading-relaxed max-w-md mx-auto  mb-12 text-center">
+      <p className="text-gray-600 text-[0.8rem] md:text-base leading-relaxed max-w-md mx-auto  mb-12 text-center">
         The Passionate Minds Behind Edusphere: Meet the Team Driving Educational
         Innovation.
       </p>
