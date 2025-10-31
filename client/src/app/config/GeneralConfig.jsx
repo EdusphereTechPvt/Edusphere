@@ -57,7 +57,7 @@ export const userMenuItems = [
     label: "Logout",
     icon: <Logout fontSize="small" />,
     action: "logout",
-    actionValue: "/auth/login",
+    actionValue: "/auth/logout",
   },
 ];
 
