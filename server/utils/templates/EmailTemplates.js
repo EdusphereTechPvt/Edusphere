@@ -299,3 +299,111 @@ export const parentSignupTemplate = (parentName, schoolName) => {
   `;
 };
 
+export const demoRequestTemplate = (
+  name,
+  schoolName,
+  email,
+  phone,
+  schoolSize,
+  preferredDate,
+  features,
+  reference,
+  message
+) => {
+  return `
+  <!DOCTYPE html>
+  <html lang="en" style="margin:0;padding:0;">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+      <title>New Demo Request - Edusphere</title>
+    </head>
+    <body style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background-color:#f4f7fb;">
+      <table align="center" width="100%" cellpadding="0" cellspacing="0" 
+        style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;
+               box-shadow:0 4px 16px rgba(0,0,0,0.1);margin-top:40px;">
+        
+        <!-- Header -->
+        <tr>
+          <td align="center" style="background-color:#3b82f6;padding:30px 20px;">
+            <h1 style="color:#ffffff;margin:0;font-size:28px;">New Demo Request 📩</h1>
+            <p style="color:#e0e7ff;margin:8px 0 0 0;font-size:16px;">A new school is interested in Edusphere!</p>
+          </td>
+        </tr>
+
+        <!-- Body -->
+        <tr>
+          <td style="padding:30px 40px;color:#111827;">
+            <p style="font-size:16px;">Hello Team,</p>
+
+            <p style="font-size:15px;line-height:1.6;">
+              A new demo request has been received from <strong>${schoolName}</strong>.  
+              Here are the details:
+            </p>
+
+            <table width="100%" cellpadding="8" cellspacing="0" 
+                   style="border-collapse:collapse;background:#f9fafb;border-radius:8px;margin:20px 0;">
+              <tr>
+                <td style="font-weight:bold;width:40%;">Contact Person:</td>
+                <td>${name}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:bold;">Email:</td>
+                <td>${email}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:bold;">Phone:</td>
+                <td>${phone}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:bold;">School Name:</td>
+                <td>${schoolName}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:bold;">School Size:</td>
+                <td>${schoolSize}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:bold;">Preferred Demo Date:</td>
+                <td>${preferredDate}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:bold;">Features Interested In:</td>
+                <td>${features || "Not specified"}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:bold;">Reference / Source:</td>
+                <td>${reference || "N/A"}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:bold;">Message:</td>
+                <td>${message || "No additional message provided"}</td>
+              </tr>
+            </table>
+
+            <p style="font-size:15px;line-height:1.6;">
+              Please reach out to the school representative to schedule and confirm their demo.
+            </p>
+
+            <div style="text-align:center;margin:30px 0;">
+              <a href="${process.env.FRONTEND_URL}/admin/demo-requests" 
+                 style="background-color:#3b82f6;color:#ffffff;text-decoration:none;
+                        padding:12px 28px;border-radius:6px;font-weight:bold;
+                        font-size:16px;display:inline-block;">
+                View Demo Requests 🚀
+              </a>
+            </div>
+
+            <hr style="margin:30px 0;border:none;border-top:1px solid #e5e7eb;" />
+
+            <p style="font-size:12px;color:#9ca3af;text-align:center;">
+              © 2025 Edusphere. All rights reserved. <br/>
+              Building smarter schools, one demo at a time.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>
+  `;
+};
