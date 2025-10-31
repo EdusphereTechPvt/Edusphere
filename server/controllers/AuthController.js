@@ -20,8 +20,8 @@ const { signupTemplate } = require("../utils/templates/EmailTemplates");
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "Strict",
-  // domain: '.edusphere.com'
+  sameSite: "none",
+  maxAge: 7 * 24 * 60 * 60 * 1000
 };
 
 function genJti() {
@@ -92,10 +92,7 @@ const loginController = async (req, res) => {
     });
 
     const csrf = crypto.randomBytes(24).toString("hex");
-    res.cookie("csrfToken", csrf, {
-      secure: cookieOptions.secure,
-      sameSite: "Strict",
-    });
+    res.cookie("csrfToken", csrf, cookieOptions);
 
     user.lastLogin = new Date();
     await user.save({ session });
@@ -388,10 +385,7 @@ const refreshController = async (req, res) => {
 
     // rotate csrf token
     const csrf = crypto.randomBytes(24).toString("hex");
-    res.cookie("csrfToken", csrf, {
-      secure: cookieOptions.secure,
-      sameSite: "Strict",
-    });
+    res.cookie("csrfToken", csrf, cookieOptions);
 
     res.json({ status: true, csrf, accessToken: newAccessEnc, user: {
       email: user.email,
@@ -411,10 +405,7 @@ const logout = async (req, res) => {
     if (!refreshToken) {
       res.clearCookie("accessToken", cookieOptions);
       res.clearCookie("refreshToken", cookieOptions);
-      res.clearCookie("csrfToken", {
-        sameSite: "Strict",
-        secure: cookieOptions.secure,
-      });
+      res.clearCookie("csrfToken", cookieOptions);
       return res.json({ status: true, message: "Logged out" });
     }
 
@@ -424,10 +415,7 @@ const logout = async (req, res) => {
     } catch {
       res.clearCookie("accessToken", cookieOptions);
       res.clearCookie("refreshToken", cookieOptions);
-      res.clearCookie("csrfToken", {
-        sameSite: "Strict",
-        secure: cookieOptions.secure,
-      });
+      res.clearCookie("csrfToken", cookieOptions);
       return res.json({ status: true, message: "Logged out" });
     }
 
@@ -439,10 +427,7 @@ const logout = async (req, res) => {
 
     res.clearCookie("accessToken", cookieOptions);
     res.clearCookie("refreshToken", cookieOptions);
-    res.clearCookie("csrfToken", {
-      sameSite: "Strict",
-      secure: cookieOptions.secure,
-    });
+    res.clearCookie("csrfToken", cookieOptions);
     return res.json({ status: true, message: "Logged out" });
   } catch (err) {
     console.error(err);
@@ -458,10 +443,7 @@ const revokeAll = async (req, res) => {
     await user.clearAllSessions();
     res.clearCookie("accessToken", cookieOptions);
     res.clearCookie("refreshToken", cookieOptions);
-    res.clearCookie("csrfToken", {
-      sameSite: "Strict",
-      secure: cookieOptions.secure,
-    });
+    res.clearCookie("csrfToken", cookieOptions);
     res.json({ status: true });
   } catch (err) {
     console.error(err);
@@ -551,10 +533,7 @@ const oAuthController = async (req, res) => {
     });
 
     const csrf = crypto.randomBytes(24).toString("hex");
-    res.cookie("csrfToken", csrf, {
-      secure: cookieOptions.secure,
-      sameSite: "Strict",
-    });
+    res.cookie("csrfToken", csrf, cookieOptions);
 
     user.lastLogin = new Date();
     await user.save({ session });
