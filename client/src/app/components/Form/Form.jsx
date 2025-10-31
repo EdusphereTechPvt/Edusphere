@@ -7,8 +7,15 @@ import {
   Divider,
   FormControlLabel,
   FormGroup,
+  IconButton,
 } from "@mui/material";
-import { Cancel, CloudUpload, Person, QrCode } from "@mui/icons-material";
+import {
+  ArrowBack,
+  Cancel,
+  CloudUpload,
+  Person,
+  QrCode,
+} from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import Dropdown from "../Dropdown/Dropdown";
 import MultiSelectDropdown from "../Dropdown/MultiSelectDropdown";
@@ -136,7 +143,11 @@ export default function Form({ type, mode, id }) {
           setFormData({});
           setResetFlag((f) => !f);
           setDisabled(true);
-          if (mode === "edit") router.back();
+          if (mode === "edit") {
+            router.back();
+          } else {
+            router.push(`/list/${type}`);
+          }
         }
       }
     },
@@ -261,16 +272,35 @@ export default function Form({ type, mode, id }) {
   return (
     <div className="flex flex-col gap-4 max-w-4xl mx-auto my-6 px-2 lg:px-0">
       {info && (
-        <div className="mb-2">
-          {info.map((item, idx) => (
-            <item.tag
-              key={idx}
-              className={item.styles?.className}
-              style={item.styles?.inlineStyle}
-            >
-              {item.mode?.[mode]?.value || item.value}
-            </item.tag>
-          ))}
+        <div className="relative flex ">
+          <IconButton
+            onClick={() => router.back()}
+            sx={{
+              position: "absolute",
+              left: -80,
+              backgroundColor: "#e0e0e0",
+              color: "black",
+              borderRadius: "50%",
+              p: 1.2,
+              "&:hover": {
+                backgroundColor: "#bdbdbd",
+              },
+            }}
+          >
+            <ArrowBack />
+          </IconButton>
+
+          <div className="">
+            {info.map((item, idx) => (
+              <item.tag
+                key={idx}
+                className={item.styles?.className}
+                style={item.styles?.inlineStyle}
+              >
+                {item.mode?.[mode]?.value || item.value}
+              </item.tag>
+            ))}
+          </div>
         </div>
       )}
       <FormGroup className="p-6 rounded-lg shadow-[0px_0px_10px_rgba(0,0,0,0.25)]">

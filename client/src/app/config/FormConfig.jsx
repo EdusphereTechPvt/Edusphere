@@ -984,13 +984,6 @@ const formConfig = {
             required: true,
           },
           {
-            type: "number",
-            name: "gradeLevel",
-            label: "Grade (in number)",
-            placeholder: "e.g., 10",
-            required: true,
-          },
-          {
             type: "text",
             name: "academicYear",
             label: "Academic Year",
