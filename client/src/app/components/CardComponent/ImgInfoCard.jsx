@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, Typography, Box } from "@mui/material";
 
-const ImgInfoCard = ({ title, desc, imgUrl, styles={} }) => {
+const ImgInfoCard = ({ title, desc, imgUrl, styles = {} }) => {
   return (
     <Card
       sx={{
@@ -12,7 +12,17 @@ const ImgInfoCard = ({ title, desc, imgUrl, styles={} }) => {
       }}
       className={styles.cardStyle?.className}
     >
-      <Box component="img" src={imgUrl || "https://placehold.co/600x400"} alt={title} sx={{ width: '100%', display: 'block', ...styles.imgstyle?.inlineStyle }} className={styles.imgstyle?.className}/>
+      <Box
+        component="img"
+        src={imgUrl || "https://placehold.co/600x400"}
+        alt={title}
+        sx={{
+          width: "100%",
+          display: "block",
+          ...styles.imgstyle?.inlineStyle,
+        }}
+        className={styles.imgstyle?.className}
+      />
       <Box
         sx={{
           position: "absolute",
@@ -22,12 +32,25 @@ const ImgInfoCard = ({ title, desc, imgUrl, styles={} }) => {
           color: "#fff",
           padding: "0.5rem",
           textAlign: "center",
+          background: "linear-gradient(to top, rgba(0,0,0,0.6), transparent)",
           ...styles.infoContainerStyle?.inlineStyle,
         }}
         className={styles.infoContainerStyle?.className}
       >
-        <Typography variant="h9" sx={styles.infoContainerStyle?.titleStyle?.inlineStyle} className={styles.infoContainerStyle?.titleStyle?.className}>{title}</Typography>
-         <Typography variant="body1" sx={styles.infoContainerStyle?.descStyle?.inlineStyle} className={styles.infoContainerStyle?.descStyle?.className}>{desc}</Typography>
+        <Typography
+          variant="h9"
+          sx={styles.infoContainerStyle?.titleStyle?.inlineStyle}
+          className={styles.infoContainerStyle?.titleStyle?.className}
+        >
+          {title}
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={styles.infoContainerStyle?.descStyle?.inlineStyle}
+          className={styles.infoContainerStyle?.descStyle?.className}
+        >
+          {desc}
+        </Typography>
       </Box>
     </Card>
   );

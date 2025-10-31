@@ -12,10 +12,6 @@ const ClassSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    gradeLevel: {
-      type: Number,
-      required: true,
-    },
     sections: [
       {
         type: mongoose.Schema.Types.ObjectId,

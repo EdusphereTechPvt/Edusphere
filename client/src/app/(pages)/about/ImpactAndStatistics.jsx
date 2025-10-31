@@ -15,7 +15,7 @@ export default function ImpactAndStatistic() {
           inlineStyle: { mt: 1 },
           titleStyle: {
             inlineStyle: {
-              fontSize: { xs: "2rem", sm: "2.3rem", lg: "2.5rem" },
+              fontSize: { xs: "1.5rem", sm: "2.3rem", lg: "2.5rem" },
               fontWeight: "600",
               color: "#0b73da",
             },
@@ -40,7 +40,7 @@ export default function ImpactAndStatistic() {
           inlineStyle: { mt: 1 },
           titleStyle: {
             inlineStyle: {
-              fontSize: { xs: "2rem", sm: "2.3rem", lg: "2.5rem" },
+              fontSize: { xs: "1.5rem", sm: "2.3rem", lg: "2.5rem" },
               fontWeight: "600",
               color: "#0b73da",
             },
@@ -65,7 +65,7 @@ export default function ImpactAndStatistic() {
           inlineStyle: { mt: 1 },
           titleStyle: {
             inlineStyle: {
-              fontSize: { xs: "2rem", sm: "2.3rem", lg: "2.5rem" },
+              fontSize: { xs: "1.5rem", sm: "2.3rem", lg: "2.5rem" },
               fontWeight: "600",
               color: "#0b73da",
             },
@@ -83,9 +83,11 @@ export default function ImpactAndStatistic() {
   const testimonials = [
     {
       type: "testimonial",
-      content: "This app is amazing!",
+      content:
+        "It's very easy to use, simple yet packed with powerful features, I absolutely loved it!",
       avatar: "https://avatar.iran.liara.run/public/18",
-      desc: "Role 1",
+      name: "Rajveer",
+      desc: "Student",
       styles: {
         cardStyle: {
           inlineStyle: {
@@ -133,8 +135,8 @@ export default function ImpactAndStatistic() {
       type: "testimonial",
       content: "Love this app, it has transformed my learning experience!",
       avatar: "https://avatar.iran.liara.run/public/19",
-      name: "Name 2",
-      desc: "Role 2",
+      name: "Sanjay",
+      desc: "Student",
       styles: {
         cardStyle: {
           inlineStyle: {
@@ -180,10 +182,11 @@ export default function ImpactAndStatistic() {
     },
     {
       type: "testimonial",
-      content: "Wow, this app is really helpful for my studies!",
+      content:
+        "This app helps my studies a lot and makes me more productive than I've ever been",
       avatar: "https://avatar.iran.liara.run/public/20",
-      name: "Name 3",
-      desc: "Role 3",
+      name: "Veer Singh",
+      desc: "Student",
       styles: {
         cardStyle: {
           inlineStyle: {
@@ -230,8 +233,8 @@ export default function ImpactAndStatistic() {
   ];
 
   return (
-    <section className="py-16 px-6 text-center bg-gray-100">
-      <h2 className="text-2xl md:text-3xl font-bold mb-10 text-black">
+    <section className="py-10 lg:py-16 px-6 text-center bg-gray-100">
+      <h2 className="text-base md:text-xl lg:text-4xl  font-bold mb-10 text-black">
         Impact and Statistics
       </h2>
       <div className="flex flex-wrap justify-center items-center gap-6 mx-auto">
@@ -242,7 +245,7 @@ export default function ImpactAndStatistic() {
 
       <div className="flex items-center justify-center my-16">
         <Image
-          src="https://placehold.co/600x400"
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMG0FWTrogTdgZw28c08ggULFZ25k1BFkPIQ&s"
           alt="Statistic Illustration"
           width={600}
           height={400}
@@ -251,16 +254,13 @@ export default function ImpactAndStatistic() {
         />
       </div>
 
-      <h2 className="text-3xl font-bold mb-12 text-black">
+      <h1 className="text-base md:text-xl lg:text-4xl font-bold mb-12 text-black">
         From Our Community
-      </h2>
+      </h1>
 
       <div className="flex flex-wrap justify-center items-center gap-6 mx-auto">
         {testimonials.map((testimonial, i) => (
-          <CardComponent
-            key={i}
-            data={testimonial}
-          />
+          <CardComponent key={i} data={testimonial} />
         ))}
       </div>
     </section>

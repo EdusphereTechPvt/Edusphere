@@ -71,7 +71,7 @@ const Footer = () => {
                 }}
               >
                 {section.logoUrl && (
-                  <img src={section.logoUrl} alt={section.name} style={section.styles.logoStyle} />
+                  <img src={section.logoUrl} alt={section.name} style={section.styles.logoStyle.inlineStyle} className={section.styles.logoStyle.className}/>
                 )}
                 <Typography variant="h6" sx={section.styles.nameStyle}>
                   {section.name}

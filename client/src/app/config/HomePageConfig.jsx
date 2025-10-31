@@ -6,7 +6,6 @@ import {
   PeopleOutline,
 } from "@mui/icons-material";
 
-
 export const HomePageConfig = {
   sections: [
     {
@@ -25,36 +24,34 @@ export const HomePageConfig = {
             buttons: [
               {
                 text: "Request a Demo",
-                action: "demo",
                 variant: "contained",
+                action: "demo",
                 styles: {
-                  // className: "font-bold",
+                  className: "",
                   inlineStyle: {
-                    fontWeight: "bold",
-                    py: { xs: 0.4, sm: 1.2, md: 1.5 },
-                    // maxWidth: {sm:120, md:140, lg:160},
-                    fontSize: { xs: "0.4rem", sm: "0.8rem", md: "0.9rem" },
+                    color: "white",
                     textTransform: "none",
-                    
-              
+                    fontWeight: "bold",
+                    py: { xs: 1, sm: 1.2, md: 1.5 },
+                    minWidth: { sm: 120, md: 140, lg: 160 },
+                    fontSize: { xs: "0.6rem", sm: "0.8rem", md: "0.9rem" },
                   },
                 },
               },
               {
                 text: "Sign Up Now",
+                variant: "contained",
                 action: "auth/signup",
-                variant: "outlined",
                 styles: {
                   className: "",
                   inlineStyle: {
-                    backgroundColor: "white",
                     color: "black",
-                    fontWeight: "bold",
                     textTransform: "none",
-                    border: "none",
-                    py: { xs: 0.4, sm: 1.2, md: 1.5 },
-                    minWidth: { sm: 120, md: 140, lg: 160 },
-                    fontSize: { xs: "0.4rem", sm: "0.8rem", md: "0.9rem" },
+                    fontWeight: "bold",
+                    backgroundColor: "#e8eef3",
+                    py: { xs: 1, sm: 1.2, md: 1.5 },
+                    minWidth: { sm: 160, md: 140, lg: 160 },
+                    fontSize: { xs: "0.6rem", sm: "0.8rem", md: "0.9rem" },
                   },
                 },
               },
@@ -65,24 +62,24 @@ export const HomePageConfig = {
             inlineStyle: {},
             imgStyle: {
               className:
-                "w-full h-auto object-cover rounded bg-gradient-to-t from-white to-transparent ",
+                "w-full h-[65vh] sm:h-[68vh] md:h-[70vh] lg:h-screen object-cover rounded bg-gradient-to-t from-white to-transparent ",
               inlineStyle: { display: "block" },
             },
             containerStyle: {
               className:
-                "absolute inset-0 flex flex-col item-center justify-center px-[20%] -space-y-3 mt-5 lg:mt-1 md:mt-2",
+                "absolute inset-0 flex flex-col item-center justify-center px-[8%] lg:px-[20%] -space-y-3 mt-5 lg:mt-1 md:mt-2",
               inlineStyle: {},
               textStyle: {
-                className: "font-bold text-sm md:text-3xl lg:text-6xl",
+                className: "font-bold text-xl md:text-3xl lg:text-6xl",
                 inlineStyle: {},
               },
               descStyle: {
-                className: "text-[0.6rem] md:text-base lg:text-lg mt-4",
+                className: "text-[0.7rem] md:text-base lg:text-lg mt-4",
                 inlineStyle: {},
               },
               btnCotainerStyle: {
                 className:
-                  "flex gap-4 mt-2 sm:mt-12 font-bold items-center justify-center",
+                  "flex gap-4 mt-12 font-bold items-center justify-center",
                 inlineStyle: {},
               },
             },
@@ -410,14 +407,18 @@ export const HomePageConfig = {
             type: "imgInfo",
             title: "Admin Dashboard",
             desc: "Manage all aspects of school operations.",
-            imgUrl: "https://placehold.co/600x400",
+            imgUrl: "/admin.JPG",
             styles: {
               cardStyle: {
                 inlineStyle: {
                   width: "100%",
+                  height: "280px",
                   maxWidth: "380px",
                   marginBottom: { xs: "1.5rem", md: "1.2rem", lg: "0rem" },
                 },
+              },
+              imgstyle: {
+                inlineStyle: { objectFit: "contain" },
               },
               infoContainerStyle: {
                 inlineStyle: { padding: "0.5rem", textAlign: "left" },
@@ -429,7 +430,7 @@ export const HomePageConfig = {
                       xs: "0.75rem",
                       sm: "0.85rem",
                       md: "0.85rem",
-                      lg: "1.5rem",
+                      lg: "1.2rem",
                     },
                     marginBottom: "0.2rem",
                   },
@@ -457,16 +458,20 @@ export const HomePageConfig = {
           // },
           data: {
             type: "imgInfo",
-            title: "Admin Dashboard",
-            desc: "Manage all aspects of school operations.",
-            imgUrl: "https://placehold.co/600x400",
+            title: "Student Dashboard",
+            desc: "Access learning materials and grades.",
+            imgUrl: "/student.JPG",
             styles: {
               cardStyle: {
                 inlineStyle: {
                   width: "100%",
+                  height: "280px",
                   maxWidth: "380px",
                   marginBottom: { xs: "1.5rem", md: "1.2rem", lg: "0rem" },
                 },
+              },
+              imgstyle: {
+                inlineStyle: { objectFit: "contain" },
               },
               infoContainerStyle: {
                 inlineStyle: { padding: "0.5rem", textAlign: "left" },
@@ -478,7 +483,7 @@ export const HomePageConfig = {
                       xs: "0.75rem",
                       sm: "0.85rem",
                       md: "0.85rem",
-                      lg: "1.5rem",
+                      lg: "1.2rem",
                     },
                     marginBottom: "0.2rem",
                   },
@@ -506,16 +511,20 @@ export const HomePageConfig = {
           // },
           data: {
             type: "imgInfo",
-            title: "Admin Dashboard",
-            desc: "Manage all aspects of school operations.",
-            imgUrl: "https://placehold.co/600x400",
+            title: "Teacher Dashboard",
+            desc: "Track student proress and communicate",
+            imgUrl: "/teacher.JPG",
             styles: {
               cardStyle: {
                 inlineStyle: {
                   width: "100%",
+                  height: "280px",
                   maxWidth: "380px",
                   marginBottom: { xs: "1.5rem", md: "1.2rem", lg: "0rem" },
                 },
+              },
+              imgstyle: {
+                inlineStyle: { objectFit: "contain" },
               },
               infoContainerStyle: {
                 inlineStyle: { padding: "0.5rem", textAlign: "left" },
@@ -527,7 +536,7 @@ export const HomePageConfig = {
                       xs: "0.75rem",
                       sm: "0.85rem",
                       md: "0.85rem",
-                      lg: "1.5rem",
+                      lg: "1.2rem",
                     },
                     marginBottom: "0.2rem",
                   },
@@ -555,16 +564,20 @@ export const HomePageConfig = {
           // },
           data: {
             type: "imgInfo",
-            title: "Admin Dashboard",
-            desc: "Manage all aspects of school operations.",
-            imgUrl: "https://placehold.co/600x400",
+            title: "Parent Dashboard",
+            desc: "Stay connected with your childs education",
+            imgUrl: "/parent.JPG",
             styles: {
               cardStyle: {
                 inlineStyle: {
                   width: "100%",
+                  height: "280px",
                   maxWidth: "380px",
                   marginBottom: { xs: "1.5rem", md: "1.2rem", lg: "0rem" },
                 },
+              },
+              imgstyle: {
+                inlineStyle: { objectFit: "contain" },
               },
               infoContainerStyle: {
                 inlineStyle: { padding: "0.5rem", textAlign: "left" },
@@ -576,7 +589,7 @@ export const HomePageConfig = {
                       xs: "0.75rem",
                       sm: "0.85rem",
                       md: "0.85rem",
-                      lg: "1.5rem",
+                      lg: "1.2rem",
                     },
                     marginBottom: "0.2rem",
                   },
@@ -830,11 +843,12 @@ export const HomePageConfig = {
           type: "card",
           data: {
             type: "testimonial",
-            avatar: "https://placehold.co/500x500",
+            avatar:
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkh_r9oYMaiOOPt14a8eiQqj34C1x33zmmxg&s",
             content:
               "Edusphere has transformed our school's efficiency and communication. Highly recommended!",
             name: "Administrator",
-            desc: "City High School",
+            desc: "Jain Secondary School",
             styles: {
               cardStyle: {
                 inlineStyle: {
@@ -843,6 +857,10 @@ export const HomePageConfig = {
                   maxWidth: "380px",
                   marginBottom: { xs: "1.5rem", md: "1.2rem", lg: "0rem" },
                   boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 8px 22px rgba(0,0,0,0.12)",
+                  },
                 },
               },
               textStyle: {
@@ -885,11 +903,12 @@ export const HomePageConfig = {
           type: "card",
           data: {
             type: "testimonial",
-            avatar: "https://placehold.co/500x500",
+            avatar:
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3BmaxMlPPeFoVIlpg8JTLyiPSZvIWxhtEibhT4HabrPC6B57hIK_cW4OxJqAEkEtzzdc&usqp=CAU",
             content:
-              "Edusphere has transformed our school's efficiency and communication. Highly recommended!",
-            name: "Administrator",
-            desc: "City High School",
+              "Edusphere helped us embrace the future, adapt to new changes and showing us what we had truly been missing.",
+            name: "Principal",
+            desc: "Delhi Public School",
             styles: {
               cardStyle: {
                 inlineStyle: {
@@ -898,6 +917,10 @@ export const HomePageConfig = {
                   maxWidth: "380px",
                   marginBottom: { xs: "1.5rem", md: "1.2rem", lg: "0rem" },
                   boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 8px 22px rgba(0,0,0,0.12)",
+                  },
                 },
               },
               textStyle: {
@@ -940,11 +963,12 @@ export const HomePageConfig = {
           type: "card",
           data: {
             type: "testimonial",
-            avatar: "https://placehold.co/500x500",
+            avatar:
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyBxpqHlfJqO0Z4sHEHVNAjpR5PhiimtHb0w&s",
             content:
-              "Edusphere has transformed our school's efficiency and communication. Highly recommended!",
-            name: "Administrator",
-            desc: "City High School",
+              "It’s a fabulous product for schools with so many features, it allows us to focus more on delivering quality teaching.",
+            name: "Admin",
+            desc: "Ravi Memmorial School",
             styles: {
               cardStyle: {
                 inlineStyle: {
@@ -953,6 +977,10 @@ export const HomePageConfig = {
                   maxWidth: "380px",
                   marginBottom: { xs: "1.5rem", md: "1.2rem", lg: "0rem" },
                   boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 8px 22px rgba(0,0,0,0.12)",
+                  },
                 },
               },
               textStyle: {
@@ -995,11 +1023,12 @@ export const HomePageConfig = {
           type: "card",
           data: {
             type: "testimonial",
-            avatar: "https://placehold.co/500x500",
+            avatar:
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-43JWsK8j9fnt0osUplkLGP4otu9KXUNXSw&s",
             content:
-              "Edusphere has transformed our school's efficiency and communication. Highly recommended!",
+              "It’s a remarkable tool for schools — its smart automation and rich features help us dedicate more time to effective teaching.",
             name: "Administrator",
-            desc: "City High School",
+            desc: "Angel Public School",
             styles: {
               cardStyle: {
                 inlineStyle: {
@@ -1008,6 +1037,10 @@ export const HomePageConfig = {
                   maxWidth: "380px",
                   marginBottom: { xs: "1.5rem", md: "1.2rem", lg: "0rem" },
                   boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 8px 22px rgba(0,0,0,0.12)",
+                  },
                 },
               },
               textStyle: {
@@ -1067,8 +1100,7 @@ export const HomePageConfig = {
         {
           type: "buttonGroup",
           styles: {
-            className:
-              "my-8 lg:my-12 flex justify-center items-center gap-4",
+            className: "my-8 lg:my-12 flex justify-center items-center gap-4",
             inlineStyle: {},
           },
           buttons: [
@@ -1081,7 +1113,7 @@ export const HomePageConfig = {
                 inlineStyle: {
                   color: "white",
                   textTransform: "none",
-                  fontWeight:"bold",
+                  fontWeight: "bold",
                   py: { xs: 1, sm: 1.2, md: 1.5 },
                   minWidth: { sm: 120, md: 140, lg: 160 },
                   fontSize: { xs: "0.6rem", sm: "0.8rem", md: "0.9rem" },
