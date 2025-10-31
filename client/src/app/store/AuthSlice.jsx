@@ -19,7 +19,7 @@ const authSlice = createSlice({
       state.refreshToken = refreshToken;
       state.connectionStatus = "connected";
     },
-    logout: (state) => {
+    setLogout: (state) => {
       state.user = null;
       state.accessToken = null;
       state.refreshToken = null;
@@ -33,5 +33,5 @@ const authSlice = createSlice({
     },
   },
 });
-export const { setCredentials, logout, setConnectionStatus, updateUser } = authSlice.actions;
+export const { setCredentials, setLogout, setConnectionStatus, updateUser } = authSlice.actions;
 export default authSlice.reducer;

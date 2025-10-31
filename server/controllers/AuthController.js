@@ -29,8 +29,6 @@ function genJti() {
 }
 
 const loginController = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
   try {
     const { role, uidOrEmail, password } = req.body;
 
@@ -41,7 +39,7 @@ const loginController = async (req, res) => {
 
     const user = await User.findOne({
       $or: [{ email: uidOrEmail }, { uid: uidOrEmail }],
-    }).session(session);
+    });
 
     if (!user)
       return res.status(404).json({ message: "User not found", status: false });
@@ -64,7 +62,7 @@ const loginController = async (req, res) => {
       if (user.failedLoginAttempts >= 5) {
         user.lockedUntil = new Date(Date.now() + 15 * 60 * 1000); // lock 15 minutes
       }
-      await user.save({ session });
+      await user.save();
       return res
         .status(401)
         .json({ message: "Invalid credentials", status: false });
@@ -95,15 +93,13 @@ const loginController = async (req, res) => {
     res.cookie("csrfToken", csrf, cookieOptions);
 
     user.lastLogin = new Date();
-    await user.save({ session });
+    await user.save();
 
     const jwtToken = jwt.sign(
       { id: user._id, uid: user.uid, role: user.role, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-
-    await session.commitTransaction();
 
     res.status(200).json({
       message: "Login successful",
@@ -112,7 +108,6 @@ const loginController = async (req, res) => {
       csrf,
     });
   } catch (err) {
-    await session.abortTransaction();
     console.error("Login Error:", err);
     res
       .status(500)
