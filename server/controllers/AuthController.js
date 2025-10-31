@@ -158,6 +158,8 @@ const signupController = async (req, res) => {
     await newUser.save({ session });
 
     const admin = new Admin({
+      name,
+      dateOfBirth,
       userId: newUser._id,
       schoolId: school._id,
     });
