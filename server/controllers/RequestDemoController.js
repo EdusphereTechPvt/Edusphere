@@ -1,6 +1,7 @@
 const RequestDemo = require("../models/RequestDemoSchema");
 const { sendEmail } = require("../utils/Email");
-
+const { demoRequestTemplate
+} = require("../utils/templates/EmailTemplates");
 const addRequestDemo = async (req, res) => {
   try {
     const { name, schoolName, email, phone, schoolSize, preferredDate, features, reference, message } = req.body;
