@@ -22,7 +22,7 @@ export const authenticateUser = async (mode, role, fields) => {
       showToast(data.message || "Authentication failed", "error");
       return false;
     }
-
+    console.log(data)
     showToast(data.message, "success");
     return true;
   } catch (error) {

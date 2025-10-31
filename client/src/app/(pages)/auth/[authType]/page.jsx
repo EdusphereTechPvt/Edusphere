@@ -109,14 +109,14 @@ export default function AuthPage() {
         setMode("login");
       } else if (status && mode === "login") {
         const prev = document.referrer;
-        if(prev === ""){
-          router.replace("/")
-        }
-        if (prev.includes("/forgotpassword")) {
-          router.replace("/dashboard");
-        } else {
-          router.back();
-        }
+        // if(prev === ""){
+        //   router.replace("/")
+        // }
+        // if (prev.includes("/forgotpassword")) {
+        //   router.replace("/dashboard");
+        // } else {
+        //   router.back();
+        // }
       }
     } catch (err) {
       showToast("Authentication failed", "error");
