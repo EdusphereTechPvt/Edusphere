@@ -1,6 +1,6 @@
 import axios from "axios";
 import store from "../store";
-import { setCredentials, logout, setConnectionStatus } from "../store/AuthSlice";
+import { setCredentials, logout, setConnectionStatus, setLogout } from "../store/AuthSlice";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_API,
@@ -70,7 +70,7 @@ api.interceptors.response.use(
       } catch (err) {
         processQueue(err, null);
         isRefreshing = false;
-        store.dispatch(logout());
+        store.dispatch(setLogout());
         window.location.href = "/auth/login";
         return Promise.reject(err);
       }

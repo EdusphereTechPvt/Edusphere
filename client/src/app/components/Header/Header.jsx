@@ -17,7 +17,12 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Close, Person, Settings, Logout } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import generalConfig, { connectionStatusConfig, generalRoutes, navItems, userMenuItems } from "../../config/GeneralConfig";
+import generalConfig, {
+  connectionStatusConfig,
+  generalRoutes,
+  navItems,
+  userMenuItems,
+} from "../../config/GeneralConfig";
 import { staticUpdateConfig } from "@/app/utils/FormatConfig";
 import { DynamicRenderer } from "@/app/utils/DynamicRender";
 import { logout } from "@/app/services/AuthService";
@@ -25,8 +30,8 @@ import { useAppSelector } from "@/app/store";
 import { AnimatedConnectionIcon } from "@/app/utils/Animation";
 
 const ConnectionChip = ({ status }) => {
-
-  const config = connectionStatusConfig[status] || connectionStatusConfig.disconnected;
+  const config =
+    connectionStatusConfig[status] || connectionStatusConfig.disconnected;
 
   return (
     <motion.div
@@ -44,17 +49,17 @@ const ConnectionChip = ({ status }) => {
           ml: 1,
           backgroundColor: config.bgColor,
           borderColor: config.borderColor,
-          padding: '1rem',
+          padding: "1rem",
           fontWeight: 600,
-          fontSize: '0.75rem',
-          marginLeft: '0',
-          '& .MuiChip-icon': {
-            color: 'inherit'
+          fontSize: "0.75rem",
+          marginLeft: "0",
+          "& .MuiChip-icon": {
+            color: "inherit",
           },
-          '&:hover': {
+          "&:hover": {
             backgroundColor: config.bgColor,
-            filter: 'brightness(0.95)'
-          }
+            filter: "brightness(0.95)",
+          },
         }}
       />
     </motion.div>
@@ -85,8 +90,8 @@ const Header = ({ path, connectionStatus }) => {
       router.push(item.actionValue);
       setDrawerOpen(false);
     } else if (item.action === "logout") {
-      await logout();
-      router.push("/")
+      const success = await logout();
+      if (success) router.push("/");
     }
   };
 
@@ -98,8 +103,8 @@ const Header = ({ path, connectionStatus }) => {
       router.push(item.actionValue);
       setDrawerOpen(false);
     } else if (item.action === "logout") {
-      await logout();
-      router.push("/")
+      const success = await logout();
+      if (success) router.push("/");
     }
   };
 
@@ -110,14 +115,19 @@ const Header = ({ path, connectionStatus }) => {
         if (user) {
           navItemsToUse = [
             ...navItems.default,
-            { id: "dashboard", label: "Dashboard", actionValue: "/dashboard", type: "link", action: "navigate" }
+            {
+              id: "dashboard",
+              label: "Dashboard",
+              actionValue: "/dashboard",
+              type: "link",
+              action: "navigate",
+            },
           ];
-        }
-        else {
+        } else {
           navItemsToUse = navItems.default;
         }
       } else {
-        navItemsToUse = navItems[user?.role]
+        navItemsToUse = navItems[user?.role];
       }
 
       staticUpdateConfig(generalConfig, [
@@ -213,20 +223,20 @@ const Header = ({ path, connectionStatus }) => {
                   mt: 1.5,
                   borderRadius: "12px",
                   minWidth: 160,
-                  overflow: 'visible',
-                  filter: 'drop-shadow(0px 4px 20px rgba(0,0,0,0.1))',
-                  '&:before': {
+                  overflow: "visible",
+                  filter: "drop-shadow(0px 4px 20px rgba(0,0,0,0.1))",
+                  "&:before": {
                     content: '""',
-                    display: 'block',
-                    position: 'absolute',
+                    display: "block",
+                    position: "absolute",
                     top: 0,
                     right: 14,
                     width: 10,
                     height: 10,
-                    bgcolor: 'background.paper',
-                    transform: 'translateY(-50%) rotate(45deg)',
+                    bgcolor: "background.paper",
+                    transform: "translateY(-50%) rotate(45deg)",
                     zIndex: 0,
-                  }
+                  },
                 },
               }}
               transformOrigin={{ horizontal: "right", vertical: "top" }}
@@ -237,17 +247,17 @@ const Header = ({ path, connectionStatus }) => {
                   key={index}
                   onClick={() => handleMenuClose(item)}
                   component={motion.div}
-                  whileHover={{ backgroundColor: 'rgba(0,0,0,0.04)' }}
+                  whileHover={{ backgroundColor: "rgba(0,0,0,0.04)" }}
                   transition={{ duration: 0.2 }}
                 >
                   <ListItemIcon>
                     {React.cloneElement(item.icon, {
-                      sx: { fontSize: 20 }
+                      sx: { fontSize: 20 },
                     })}
                   </ListItemIcon>
                   <ListItemText
                     primary={item.label}
-                    primaryTypographyProps={{ fontSize: '0.9rem' }}
+                    primaryTypographyProps={{ fontSize: "0.9rem" }}
                   />
                 </MenuItem>
               ))}
@@ -287,8 +297,16 @@ const Header = ({ path, connectionStatus }) => {
 
           {/* User Info Section */}
           {user && (
-            <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+            <Box sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flexWrap: "wrap",
+                  gap: 2,
+                  mb: 2,
+                }}
+              >
                 <Avatar
                   alt={user?.name || "User"}
                   src={user?.avatar || "/default-avatar.png"}
@@ -307,21 +325,23 @@ const Header = ({ path, connectionStatus }) => {
                 <ConnectionChip status={connectionStatus} />
               </Box>
 
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                 {userMenuItems.map((item, index) => (
                   <Chip
                     key={index}
-                    icon={React.cloneElement(item.icon, { sx: { fontSize: 16 } })}
+                    icon={React.cloneElement(item.icon, {
+                      sx: { fontSize: 16 },
+                    })}
                     label={item.label}
                     variant="outlined"
                     size="small"
                     onClick={() => handleMobileMenuClose(item)}
                     sx={{
                       mb: 0.5,
-                      '& .MuiChip-icon': {
-                        marginLeft: '6px',
-                        fontSize: '16px'
-                      }
+                      "& .MuiChip-icon": {
+                        marginLeft: "6px",
+                        fontSize: "16px",
+                      },
                     }}
                     component={motion.div}
                     whileHover={{ scale: 1.05 }}
@@ -333,11 +353,17 @@ const Header = ({ path, connectionStatus }) => {
           )}
 
           {/* Navigation Sections */}
-          <Box sx={{ display: "flex", flexDirection: "column", mt: "1rem", p: 2 }}>
+          <Box
+            sx={{ display: "flex", flexDirection: "column", mt: "1rem", p: 2 }}
+          >
             {header.sections
               .filter((section) => {
-                if (!["navigate", "action"].includes(section.type.toLowerCase())) return false;
-                if (user && section.type.toLowerCase() === "action") return false;
+                if (
+                  !["navigate", "action"].includes(section.type.toLowerCase())
+                )
+                  return false;
+                if (user && section.type.toLowerCase() === "action")
+                  return false;
                 return true;
               })
               .map((section, index) => (
@@ -352,9 +378,10 @@ const Header = ({ path, connectionStatus }) => {
               ))}
           </Box>
 
-
           {!user && (
-            <Box sx={{ p: 2, mt: 'auto', borderTop: 1, borderColor: 'divider' }}>
+            <Box
+              sx={{ p: 2, mt: "auto", borderTop: 1, borderColor: "divider" }}
+            >
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                 Connection Status
               </Typography>

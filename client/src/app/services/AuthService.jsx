@@ -2,7 +2,7 @@ import { signInWithPopup } from "firebase/auth";
 import { auth } from "../utils/Firebase";
 import { showToast } from "../utils/Toast";
 import api from "./MiddlewareService";
-import { setConnectionStatus } from "../store/AuthSlice";
+import { setConnectionStatus, setLogout } from "../store/AuthSlice";
 import store from "../store";
 
 export const authenticateUser = async (mode, role, fields) => {
@@ -170,15 +170,13 @@ export const logout = async () => {
     }
 
     showToast(data.message, "success");
+    store.dispatch(setConnectionStatus("disconnected"));
+    store.dispatch(setLogout());
     return data.status
   }
   catch (err) {
     showToast("Error Updating Password", "error")
     return false;
-  }
-  finally {
-    store.dispatch(setConnectionStatus("disconnected"));
-    store.dispatch(logout());
   }
 }
 
