@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const Subject = require("../models/Subject");
+const { syncReferences } = require("../utils/Sync");
 
 const save = async (req, res) => {
   const session = await mongoose.startSession();
@@ -11,7 +12,7 @@ const save = async (req, res) => {
       name,
       code,
       description,
-      classIds = [],
+      classes = [],
       teacherIds = [],
       credits = 0,
       isActive = true,
@@ -20,8 +21,35 @@ const save = async (req, res) => {
     const { schoolId } = req.user;
 
     if (!name || !schoolId) {
+      await session.abortTransaction();
       return res.status(400).json({
-        message: "Name, and School ID are required",
+        message: "Name and School ID are required",
+        status: false,
+      });
+    }
+
+    const existingByName = await Subject.findOne({
+      name: { $regex: `^${name.trim()}$`, $options: "i" },
+      schoolId,
+      _id: { $ne: _id },
+    }).session(session);
+    if (existingByName) {
+      await session.abortTransaction();
+      return res.status(409).json({
+        message: "A subject with this name already exists in the school",
+        status: false,
+      });
+    }
+
+    const existingByCode = await Subject.findOne({
+      code: code?.trim(),
+      schoolId,
+      _id: { $ne: _id },
+    }).session(session);
+    if (existingByCode) {
+      await session.abortTransaction();
+      return res.status(409).json({
+        message: "A subject with this code already exists in the school",
         status: false,
       });
     }
@@ -29,17 +57,49 @@ const save = async (req, res) => {
     let subject = await Subject.findOne({ _id, schoolId }).session(session);
 
     if (subject) {
+      const oldClasses = subject.classes.map((id) => id.toString());
+      const oldTeachers = subject.teacherIds.map((id) => id.toString());
+
       Object.assign(subject, {
         subjectId,
-        name,
-        code,
+        name: name.trim(),
+        code: code?.trim(),
         description,
-        classIds,
+        classes,
         teacherIds,
         credits,
         isActive,
       });
+
       await subject.save({ session });
+
+      await syncReferences({
+        action: "save",
+        targetModel: "Subject",
+        targetId: subject._id,
+        filters: {
+          Class: { _id: classes },
+          Teacher: { _id: teacherIds },
+        },
+        session,
+      });
+
+      const removedIds = [...oldClasses, ...oldTeachers].filter(
+        (id) => ![...classes, ...teacherIds].includes(id)
+      );
+      for (const removedId of removedIds) {
+        await syncReferences({
+          action: "remove",
+          targetModel: "Subject",
+          targetId: subject._id,
+          filters: {
+            Class: { _id: removedId },
+            Teacher: { _id: removedId },
+          },
+          session,
+        });
+      }
+
       await session.commitTransaction();
       return res.status(200).json({
         message: "Subject updated successfully",
@@ -50,10 +110,14 @@ const save = async (req, res) => {
 
     const newSubject = new Subject({
       subjectId: subjectId || `SUB-${Date.now()}`,
-      name,
-      code: code || `${name.replace(/\s+/g, '').toUpperCase()}-${Math.floor(Math.random() * 10000)}`,
+      name: name.trim(),
+      code:
+        code?.trim() ||
+        `${name.replace(/\s+/g, "").toUpperCase()}-${Math.floor(
+          Math.random() * 10000
+        )}`,
       description,
-      classIds,
+      classes,
       teacherIds,
       schoolId,
       credits,
@@ -61,8 +125,19 @@ const save = async (req, res) => {
     });
 
     await newSubject.save({ session });
-    await session.commitTransaction();
 
+    await syncReferences({
+      action: "save",
+      targetModel: "Subject",
+      targetId: newSubject._id,
+      filters: {
+        Class: { _id: classes },
+        Teacher: { _id: teacherIds },
+      },
+      session,
+    });
+
+    await session.commitTransaction();
     res.status(201).json({
       message: "Subject added successfully",
       data: newSubject,
@@ -70,7 +145,11 @@ const save = async (req, res) => {
     });
   } catch (err) {
     await session.abortTransaction();
-    res.status(500).json({ message: "Server error during subject add/update", status: false });
+    console.error(err);
+    res.status(500).json({
+      message: "Server error during subject add/update",
+      status: false,
+    });
   } finally {
     session.endSession();
   }
@@ -135,7 +214,7 @@ const getAllSubjectsList = async (req, res) => {
     const subjects = await Subject.find({ schoolId: req.user.schoolId });
 
     if (!subjects || subjects.length === 0) {
-      return res.status(404).json({
+      return res.status(200).json({
         data: [],
         message: "No subject found",
         status: false,
@@ -171,11 +250,19 @@ const deleteSubject = async (req, res) => {
     const subject = await Subject.findByIdAndDelete(id).session(session);
 
     if (!subject) {
+      await session.abortTransaction();
       return res.status(404).json({
         message: "Subject not found",
         status: false,
       });
     }
+
+    await syncReferences({
+      action: "remove",
+      targetModel: "Subject",
+      targetId: subject._id,
+      session,
+    });
 
     await session.commitTransaction();
     res.status(200).json({
@@ -184,6 +271,7 @@ const deleteSubject = async (req, res) => {
     });
   } catch (err) {
     await session.abortTransaction();
+    console.error(err);
     res.status(500).json({
       message: "Server error while deleting subject",
       status: false,

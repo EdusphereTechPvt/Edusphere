@@ -36,7 +36,7 @@ module.exports = function roleGuard() {
       if (schoolDetails) {
         user = {
           ...user.toObject?.() || user, 
-          schoolId: schoolDetails.schoolId,
+          schoolId: schoolDetails._id,
         };
 
         req.user = user;

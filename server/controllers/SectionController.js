@@ -1,8 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const Section = require("../models/Section");
-const Class = require("../models/Class");
-const Teacher = require("../models/Teacher");
-const Student = require("../models/Student");
+const { syncReferences } = require("../utils/Sync");
 
 const save = async (req, res) => {
   const session = await mongoose.startSession();
@@ -11,7 +9,7 @@ const save = async (req, res) => {
     const {
       _id,
       name,
-      classId,
+      classes,
       teachers = [],
       students = [],
       classTeacher,
@@ -22,10 +20,11 @@ const save = async (req, res) => {
 
     const { schoolId } = req.user;
 
-    if (!name || !classId || !classTeacher || !schoolId) {
-      return res
-        .status(400)
-        .json({ message: "Name, Class ID, Class Teacher and School ID are required", status: false });
+    if (!name || !classes || !classTeacher || !schoolId) {
+      return res.status(400).json({
+        message: "Name, Class ID, Class Teacher and School ID are required",
+        status: false,
+      });
     }
 
     let section;
@@ -35,9 +34,13 @@ const save = async (req, res) => {
         return res.status(404).json({ message: "Section not found", status: false });
       }
 
+      const oldTeachers = section.teachers || [];
+      const oldStudents = section.students || [];
+      const oldClasses = section.classes ? [section.classes.toString()] : [];
+
       Object.assign(section, {
         name,
-        classId,
+        classes,
         teachers,
         students,
         classTeacher,
@@ -47,38 +50,85 @@ const save = async (req, res) => {
       });
 
       await section.save({ session });
+
+      await syncReferences({
+        action: "save",
+        targetModel: "Section",
+        targetId: section._id,
+        filters: {
+          Teacher: { _id: oldTeachers },
+          Student: { _id: oldStudents },
+          Class: { _id: [classes]  },
+        },
+        session,
+      });
+
+      const removedIds = [...oldStudents, ...oldTeachers, ...oldClasses].filter(
+        (id) => ![...students, ...teachers, classes].includes(id)
+      );
+      for (const removedId of removedIds) {
+        await syncReferences({
+          action: "remove",
+          targetModel: "Section",
+          targetId: section._id,
+          filters: {
+            Teacher: { _id: removedId },
+            Student: { _id: removedId },
+            Class: { _id: removedId },
+          },
+          session,
+        });
+      }
+
       await session.commitTransaction();
-      return res
-        .status(200)
-        .json({ message: "Section updated successfully", data: section, status: true });
+      return res.status(200).json({
+        message: "Section updated successfully",
+        data: section,
+        status: true,
+      });
     }
 
     const newSection = new Section({
       sectionId: `SEC-${Date.now()}`,
-      name,
-      classId,
+      name: `Section ${name}`,
+      classes,
       teachers,
       students,
+      classTeacher,
       capacity,
-      
-        classTeacher,
       roomNumber,
       schoolId,
       isActive,
     });
 
     await newSection.save({ session });
+
+    await syncReferences({
+            action: "save",
+            targetModel: "Section",
+            targetId: newSection._id,
+            filters: {
+              Class: { _id: classes },
+              Teacher: { _id: teachers },
+              Student: { _id: students },
+            },
+            session,
+          });
+
     await session.commitTransaction();
 
-    res
-      .status(201)
-      .json({ message: "Section added successfully", data: newSection, status: true });
+    res.status(201).json({
+      message: "Section added successfully",
+      data: newSection,
+      status: true,
+    });
   } catch (err) {
     await session.abortTransaction();
     console.error("Save Section Error:", err);
-    res
-      .status(500)
-      .json({ message: "Server error during section add/update", status: false });
+    res.status(500).json({
+      message: "Server error during section add/update",
+      status: false,
+    });
   } finally {
     session.endSession();
   }
@@ -99,11 +149,7 @@ const getSectionDetails = async (req, res) => {
   if (name) searchFields.name = { $regex: name, $options: "i" };
 
   try {
-    const sections = await Section.find(searchFields)
-      .populate("classId", "name gradeLevel")
-      .populate("teachers", "teacherId name")
-      .populate("classTeacher")
-      .populate("students", "studentId name");
+    const sections = await Section.find(searchFields);
 
     if (!sections || sections.length === 0) {
       return res.status(404).json({
@@ -130,7 +176,7 @@ const getSectionDetails = async (req, res) => {
 const getAllSectionsList = async (req, res) => {
   try {
     const sections = await Section.find({ schoolId: req.user.schoolId })
-      .populate("classId", "name gradeLevel")
+      .populate("classes", "name gradeLevel")
       .populate("teachers", "teacherId name")
       .populate("classTeacher", "teacherId name")
       .populate("students", "studentId name");
@@ -146,7 +192,7 @@ const getAllSectionsList = async (req, res) => {
     const formattedSections = sections.map((sec) => ({
       sectionId: sec.sectionId,
       name: sec.name,
-      class: sec.classId ? { id: sec.classId._id, name: sec.classId.name } : null,
+      class: sec.classes ? { id: sec.classes._id, name: sec.classes.name } : null,
       teachers: sec.teachers.map((t) => ({
         teacherId: t.teacherId,
         name: t.name,
@@ -184,7 +230,7 @@ const getProfileCardData = async (req, res) => {
     let keyValue = req.body.searchBy.value;
 
     let sectionProfileData = await Section.findOne({ [keyName]: keyValue })
-      .populate("classId", "name")
+      .populate("classes", "name")
       .populate("classTeacher")
       .populate("students", "name");
 
@@ -200,7 +246,7 @@ const getProfileCardData = async (req, res) => {
       id: sectionProfileData.sectionId,
       name: sectionProfileData.name,
       classTeacher: sectionProfileData.classTeacher?.name,
-      className: sectionProfileData.classId?.name,
+      className: sectionProfileData.classes?.name,
       teacherCount: sectionProfileData.teachers.length,
       studentCount: sectionProfileData.students.length,
       capacity: sectionProfileData.capacity,
@@ -223,27 +269,26 @@ const deleteSection = async (req, res) => {
   session.startTransaction();
   try {
     const { id } = req.body;
-    const section = await Section.findByIdAndDelete(id).session(session);
+    const section = await Section.findById(id).session(session);
 
     if (!section) {
-      return res.status(404).json({
-        message: "Section not found",
-        status: false,
-      });
+      return res.status(404).json({ message: "Section not found", status: false });
     }
+
+    await syncReferences({ action: "remove", targetModel: "Section", targetId: section._id, session });
+
+    await Section.findByIdAndDelete(id).session(session);
 
     await session.commitTransaction();
 
-    res.status(200).json({
-      message: "Section deleted successfully",
-      status: true,
-    });
+    res.status(200).json({ message: "Section deleted successfully", status: true });
   } catch (err) {
     await session.abortTransaction();
     console.error("Delete Section Error:", err);
-    res
-      .status(500)
-      .json({ message: "Server error while deleting section", status: false });
+    res.status(500).json({
+      message: "Server error while deleting section",
+      status: false,
+    });
   } finally {
     session.endSession();
   }

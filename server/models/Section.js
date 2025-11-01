@@ -4,7 +4,7 @@ const { default: mongoose } = require("mongoose");
 const SectionSchema = new mongoose.Schema({
   sectionId: { type: String, unique: true, required: true },
   name: { type: String, required: true },
-  classId: { type: mongoose.Schema.Types.ObjectId, ref: "Class", required: true },
+  classes: { type: mongoose.Schema.Types.ObjectId, ref: "Class", required: true },
   students: [{ type: mongoose.Schema.Types.ObjectId, ref: "Student" }],
   teachers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Teacher" }],
    classTeacher: {
@@ -14,9 +14,9 @@ const SectionSchema = new mongoose.Schema({
   capacity: { type: Number, default: 40 },
   roomNumber: { type: String },
   schoolId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "School",
-      required: true,
+      required: true
     },
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });

@@ -9,6 +9,7 @@ const ElementAccessControllerSchema = new mongoose.Schema({
   },
   id: { type: String, required: true },
   label: { type: String },
+  disabled: { type: Boolean, default: false },
   action: { type: String },
   actionValue: { type: String }, 
   actionUse: {type:String},

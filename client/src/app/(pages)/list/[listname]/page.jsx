@@ -16,7 +16,7 @@ const Page = () => {
   const [selected, setSelected] = useState(null);
   const [profileCardData, setProfileCardData] = useState(null);
   const [fetchedData, setFetchedData] = useState([]);
-  const [updateFlag, setUpdateFlag] = useState(false)
+  const [updateFlag, setUpdateFlag] = useState(false);
   const [elements, setElements] = useState([]);
 
   const { listname } = useParams();
@@ -37,20 +37,32 @@ const Page = () => {
     fetchData();
   }, [listname, updateFlag]);
 
-  useEffect(()=>{
-    const fetchProfileCardData = async() => {
-      if(!selected) return;
+  useEffect(() => {
+    const fetchProfileCardData = async () => {
+      if (!selected) return;
 
-      let column = listConfig[listname].tableHeader.filter(data => data.displayName === selected.header)
-      let profileCardData = await getProfileCardData(listname,{key: column[0].map, value: selected.value})
-      setProfileCardData(profileCardData)
+      let column = listConfig[listname].tableHeader.filter(
+        (data) => data.displayName === selected.header
+      );
+      let profileCardData = await getProfileCardData(listname, {
+        key: column[0].map,
+        value: selected.value,
+      });
+      setProfileCardData((prev) => ({
+        ...prev,
+        ...profileCardData,
+      }));
 
-      let elements = await getElements(`list/${listname}/profilecard`)
-      elements = formatElement("profile", elements)
-      setProfileCardData({...profileCardData, buttons: elements})
-    }
-    fetchProfileCardData()
-  },[selected])
+      let elements = await getElements(`list/${listname}/profilecard`);
+      elements = formatElement("profile", elements);
+      setProfileCardData((prev) => ({
+        ...prev,
+        ...profileCardData,
+        buttons: elements,
+      }));
+    };
+    fetchProfileCardData();
+  }, [selected]);
 
   const { headers, data } = formatTable(
     fetchedData,
@@ -72,7 +84,9 @@ const Page = () => {
             fontWeight: "bold",
           }}
         >
-          {`${listname.substring(0,1).toUpperCase()+ listname.substring(1)} Lists`}
+          {`${
+            listname.substring(0, 1).toUpperCase() + listname.substring(1)
+          } Lists`}
         </Typography>
         <Typography variant="body1" color="text.secondary">
           View, manage, and track all {listname} information.
@@ -83,6 +97,7 @@ const Page = () => {
       <Box
         sx={{
           display: "flex",
+          alignItems: "center",
           flexDirection: { xs: "column", md: "row" },
           gap: "3rem",
         }}
@@ -97,10 +112,27 @@ const Page = () => {
             headers={headers}
             data={data}
             columnStyles={{
-              Id: { fontWeight: "bold" },
+              ID: {
+                fontWeight: "bold",
+                color: "#555",
+                "&:hover": { color: "#000" },
+              },
               Name: { color: "#1d7ddd" },
             }}
-            onClick={(header,value) => setSelected({header,value})}
+            onClick={(header, value, rowData) => {
+              const RowData = JSON.parse(rowData);
+              setProfileCardData((prev) => {
+                const updatedData = { ...prev, ...RowData };
+                Object.entries(RowData).forEach(([key, value]) => {
+                  if (value === null || value === undefined || value === "") {
+                    delete updatedData[key];
+                  }
+                });
+                return updatedData;
+              });
+
+              setSelected({ header, value, rowData });
+            }}
             pagination={true} // use boolean
             clickableFields={listConfig[listname]?.clickableFields}
             styles={{
@@ -112,20 +144,23 @@ const Page = () => {
             }}
           />
         </Box>
-
         <AnimatePresence>
-          {selected &&
-          (
-              <motion.div
-                initial={{ x: "100%", opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: "100%", opacity: 0 }}
-                transition={{ duration: 0.4, ease: "easeInOut" }}
-                className="flex-1 flex justify-center items-center order-1 md:order-2"
-              >
-                <ProfileCard role={listname} data={profileCardData || {}} updateFlag={updateFlag} setUpdateFlag={setUpdateFlag}/>
-              </motion.div>
-            )}
+          {selected && (
+            <motion.div
+              initial={{ x: "100%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "100%", opacity: 0 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              className="flex justify-center items-center order-1 md:order-2"
+            >
+              <ProfileCard
+                role={listname}
+                data={profileCardData || {}}
+                updateFlag={updateFlag}
+                setUpdateFlag={setUpdateFlag}
+              />
+            </motion.div>
+          )}
         </AnimatePresence>
       </Box>
     </Box>

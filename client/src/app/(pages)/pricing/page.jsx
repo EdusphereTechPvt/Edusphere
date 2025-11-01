@@ -1,7 +1,7 @@
 "use client";
 
 import { PricingConfig } from "@/app/config/PricingConfig";
-import { ButtonGroup, Grid } from "@mui/material";
+import { Box, ButtonGroup, Grid } from "@mui/material";
 import React, { useState } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -22,14 +22,21 @@ const Subscription = () => {
   };
 
   return (
-    <>
-      <div className="p-6 md:p-8 rounded-2xl w-full max-w-2xl mx-auto my-8 md:my-16">
+    <Box
+      sx={{
+        p: "2rem",
+        px: { xs: "1.5rem", sm: "2rem", md: "3rem", lg: "4rem" },
+        gap: "3rem",
+      }}
+    >
+      {/* header */}
+      <div className="lg:mt-10">
         <h1 className="text-xl md:text-5xl font-bold mb-2 text-gray-900 text-center ">
           {config.title}
         </h1>
         <p className="text-sm text-gray-500 text-center mb-6">{config.desc}</p>
 
-        <div className="text-center">
+        <div className="text-center my-8 md:my-16">
           <ButtonGroup
             style={{ background: "#f0f0f0", borderRadius: "50px" }}
             className="m-4 text-center"
@@ -60,85 +67,125 @@ const Subscription = () => {
         </div>
       </div>
 
-      <div style={{ display: "block", margin: "auto", width: "80%" }}>
+      {/* cards */}
+      <div className="mx-auto ">
         <Grid container spacing={5} justifyContent="center">
           {config.cards.map((card, key) => (
-            <Grid item xs={12} sm={6} md={4} key={key}>
-              <div
-                style={
-                  card.title === "Pro"
-                    ? { position: "relative", bottom: "1.5rem" }
-                    : {}
-                }
-              >
-                {card.title == "Pro" ? (
-                  <div className="card position-absolute">
-                    <div
-                      style={{ position: "relative", bottom: "-13px" }}
-                      className=" text-center w-80 "
+            <div
+              key={key}
+              style={
+                card.title === "Pro"
+                  ? { position: "relative", bottom: "1.5rem" }
+                  : {}
+              }
+            >
+              {card.title == "Pro" ? (
+                <div className="card position-absolute">
+                  <div
+                    style={{ position: "relative", bottom: "-13px" }}
+                    className="text-center lg:w-80 w-75 "
+                  >
+                    <span
+                      style={{
+                        borderRadius: "30px",
+                        background: "#1976d2",
+                        color: "white",
+                      }}
+                      className="px-5 pt-[3px] pb-[5px]"
                     >
-                      <button
-                        style={{
-                          borderRadius: "30px",
-                          background: "#1976d2",
-                          color: "white",
-                        }}
-                        className="px-5"
-                      >
-                        Most Popular
-                      </button>
-                    </div>
+                      Most Popular
+                    </span>
                   </div>
-                ) : null}
-                <Card
-                  className="w-80 h-100 display-flex align-items p-4 "
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    border: card.title == "Pro" && "2px solid #1976d2",
-                    borderRadius: "12px",
-                    boxShadow: "0 0 6px 0px black",
-                  }}
-                >
-                  <div>
-                    <CardContent>
-                      <Typography
-                        gutterBottom
-                        sx={{ color: "text.secondary", fontSize: 14 }}
-                      >
-                        {card.title}
-                      </Typography>
-                      <Typography variant="h5" component="div">
-                        {`${card[period].price} /${
-                          period === "monthly" ? "month" : "year"
-                        }`}
-                      </Typography>
-                      <Typography sx={{ color: "text.secondary", mb: 1.5 }}>
-                        {card[period].desc}
-                      </Typography>
-                      <Typography variant="body2" component="div">
-                        {card[period].features.map((feature) => (
-                          <div key={feature.feature}>
-                            <CheckIcon /> {feature.feature}
-                          </div>
-                        ))}
-                      </Typography>
-                    </CardContent>
-                  </div>
-                  <div className=" text-center rounded py-1 ">
-                    <Button variant="contained">
-                      <span className="px-14">{card[period].button}</span>
-                    </Button>
-                  </div>
-                </Card>
-              </div>
-            </Grid>
+                </div>
+              ) : null}
+              <Card
+                className="lg:w-80 w-75 h-100 display-flex align-items p-4"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  border: card.title == "Pro" && "2px solid #1976d2",
+                  borderRadius: "12px",
+                  boxShadow: "0 0 6px 0px black",
+                }}
+              >
+                <div>
+                  <CardContent>
+                    <Typography
+                      gutterBottom
+                      sx={{
+                        color: "text.secondary",
+                        fontSize: { xs: 12, lg: 14 },
+                      }}
+                    >
+                      {card.title}
+                    </Typography>
+                    <Typography
+                      component="div"
+                      variant="h5"
+                      sx={{
+                        fontSize: {
+                          xs: "1.2rem",
+                          sm: "1.35rem",
+                          md: "1.5rem",
+                          lg: "1.75rem",
+                        },
+                      }}
+                    >
+                      {`${card[period].price} /${
+                        period === "monthly" ? "month" : "year"
+                      }`}
+                    </Typography>
+                    <Typography
+                      component="div"
+                      sx={{
+                        color: "text.secondary",
+                        mb: 1.5,
+                        fontSize: {
+                          xs: "0.8rem",
+                          sm: "0.85rem",
+                          md: "0.9rem",
+                          lg: "0.85rem",
+                        },
+                      }}
+                    >
+                      {card[period].desc}
+                    </Typography>
+                    <Typography
+                      component="div"
+                      sx={{
+                        fontSize: {
+                          xs: "0.75rem", 
+                          sm: "0.8rem",
+                          md: "0.85rem",
+                          lg: "0.9rem",
+                        },
+                      }}
+                    >
+                      {card[period].features.map((feature) => (
+                        <div
+                          key={feature.feature}
+                          className="flex items-center gap-1"
+                        >
+                          <CheckIcon fontSize="small" /> {feature.feature}
+                        </div>
+                      ))}
+                    </Typography>
+                  </CardContent>
+                </div>
+                <div className="text-center rounded py-1">
+                  <Button variant="contained">
+                    <span className="px-14">{card[period].button}</span>
+                  </Button>
+                </div>
+              </Card>
+            </div>
           ))}
         </Grid>
       </div>
 
-      <div className="p-6 md:p-8 rounded-2xl  max-w-5xl mx-auto my-8 md:my-15">
+      {/* table */}
+      <div className="max-w-5xl mx-auto my-8 md:my-15">
         <h1 className="text-lg md:text-3xl font-bold  mb-5 text-gray-900 text-center ">
           {config.tableTitle}
         </h1>
@@ -159,7 +206,8 @@ const Subscription = () => {
         />
       </div>
 
-      <div className="p-6 md:p-8 rounded-2xl w-full max-w-2xl mx-auto my-8 md:my-16">
+      {/* schoool title */}
+      <div className="w-full max-w-5xl mx-auto my-8 md:my-16">
         <h4 className="text-lg md:text-2xl font-bold mb-2 text-gray-900 text-center ">
           {config.schoolTitle}
         </h4>
@@ -173,30 +221,64 @@ const Subscription = () => {
             justifyContent: "center",
             width: "100%",
             overflowX: "auto",
-            scrollbarWidth: "none" /* Firefox */,
+            scrollbarWidth: "none",
             msOverflowStyle: "none",
           }}
         >
-          <Grid container spacing={3} wrap="nowrap" justifyContent="center">
-            {config.schoolLogos.map((logo, key) => (
-              <Grid
-                key={key}
-                item
-                xs={12}
-                sm={6}
-                md={4}
-                sx={{ display: "flex", flexShrink: 0 }}
-              >
-                <Card className="flex-row items-center mx-2 my-5">
-                  <img src={logo} alt="" width="100px" className="w-40" />
+          <Box
+            sx={{
+              display: "flex",
+              gap: 4,
+              overflowX: "auto",
+              overflowY: "hidden",
+              scrollSnapType: "x mandatory",
+              scrollbarWidth: "thin",
+              scrollbarColor: "transparent transparent",
+              transition: "scrollbar-color 0.09s ease",
+              "&:hover": {
+                scrollbarColor: "#9ca3af #f1f1f1",
+              },
+              "&::-webkit-scrollbar": {
+                height: "6px",
+                backgroundColor: "transparent",
+              },
+              "&:hover::-webkit-scrollbar": {
+                backgroundColor: "#f1f1f1",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "transparent",
+                borderRadius: "8px",
+              },
+              "&:hover::-webkit-scrollbar-thumb": {
+                backgroundColor: "#9ca3af",
+              },
+              "&::-webkit-scrollbar-thumb:hover": {
+                backgroundColor: "#6b7280",
+              },
+            }}
+            className="py-4 max-w-3xl"
+          >
+            <div className="flex gap-4">
+              {config.schoolLogos.map((logo, key) => (
+                <Card
+                  key={key}
+                  className="flex-shrink-0 flex items-center justify-center p-4"
+                  style={{ minWidth: "120px" }}
+                >
+                  <img
+                    src={logo}
+                    alt=""
+                    className="w-24 md:w-32 object-contain"
+                  />
                 </Card>
-              </Grid>
-            ))}
-          </Grid>
+              ))}
+            </div>
+          </Box>
         </div>
       </div>
 
-      <div className="p-6 md:p-8 rounded-2xl w-full max-w-2xl mx-auto  ">
+      {/* feedback */}
+      <div className="w-full max-w-3xl mx-auto">
         <p className="text-sm text-gray-500 text-center mb-6">
           {config.principalFeedBack}
         </p>
@@ -209,7 +291,8 @@ const Subscription = () => {
         </p>
       </div>
 
-      <div className="p-6 md:p-8 rounded-2xl w-full max-w-2xl mx-auto  ">
+      {/* faq */}
+      <div className="w-full max-w-3xl mx-auto mt-12">
         <h4
           className="text-xl md:text-2xl font-bold mb-2 text-gray-900 text-center "
           style={{
@@ -223,8 +306,9 @@ const Subscription = () => {
         ))}
       </div>
 
-      <div className="p-6 md:p-8 rounded-2xl w-full max-w-2xl mx-auto  ">
-        <h4 className="text-xl md:text-3xl font-bold mb-2 text-gray-900 text-center ">
+      {/* button */}
+      <div className="w-full max-w-3xl mx-auto mt-12">
+        <h4 className="text-lg md:text-3xl font-bold mb-1 text-gray-900 text-center ">
           {config.transformSchool.title}
         </h4>
         <p className="text-sm text-gray-500 text-center mb-6">
@@ -232,12 +316,15 @@ const Subscription = () => {
         </p>
 
         <div className="w-full text-center">
-          <Button variant="contained" className="px-5 py-5">
+          <Button
+            variant="contained"
+            sx={{ fontSize: { xs: "0.85rem", md: "1.1rem" } }}
+          >
             {config.transformSchool.button}
           </Button>
         </div>
       </div>
-    </>
+    </Box>
   );
 };
 

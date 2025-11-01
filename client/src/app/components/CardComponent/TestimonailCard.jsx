@@ -54,11 +54,11 @@ const TestimonailCard = ({onclick, styles={}, content, avatar, name, desc}) => {
             />
           )}
           <Box sx={{ ...styles.infoContainerStyle?.inlineStyle }} className={styles.infoContainerStyle?.className}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: "1em" }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: "1em", mb:-1 }}>
               {name}
             </Typography>
             {desc && (
-              <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.75em", }}>
+              <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.75em",}}>
                 {desc}
               </Typography>
             )}

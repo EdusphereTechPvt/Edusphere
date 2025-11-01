@@ -1,24 +1,39 @@
 import api from "./MiddlewareService";
 
-export const fetchDistinctValues = async (field, formData, page) => {
+export const fetchDistinctValues = async (field, formData, page, mode) => {
   try {
-    const payload = {};
+    const baseFilter = field.filter?.[mode] || {};
+    const filter = { isActive: true };
 
-    if (field.dependancy?.length) {
-      for (const dep of field.dependancy) {
-        if (formData[dep]) {
-          payload[dep] = formData[dep];
-        }
+    for (const [key, value] of Object.entries(baseFilter)) {
+      if (typeof value === "string" && value.startsWith("$")) {
+        const formKey = value.slice(1);
+        filter[key] = formData?.[formKey] ?? null;
+      } else {
+        filter[key] = value;
       }
     }
 
-    const response = await api.post(`/api/distinct-values`, {
-      fieldName: field.name,
-      ...payload,
-    },{
+    if (field.dependancy?.length) {
+      for (const dep of field.dependancy) {
+        if (formData[dep] !== undefined && formData[dep] !== null) {
+          filter[dep] = formData[dep];
+        }
+      }
+    }
+    
+    const response = await api.post(
+      `/api/distinct-values`,
+      {
+        fieldName: field.fieldName,
+        collectionName: field.collectionName,
+        filter,
+      },
+      {
         headers: { "x-page": page },
-        withCredentials: true
-      });
+        withCredentials: true,
+      }
+    );
 
     return response.data || [];
   } catch (error) {
@@ -26,3 +41,4 @@ export const fetchDistinctValues = async (field, formData, page) => {
     return [];
   }
 };
+

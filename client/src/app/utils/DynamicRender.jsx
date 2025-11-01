@@ -6,9 +6,11 @@ import {
   AccordionSummary,
   AccordionDetails,
   Button,
+  TableCell,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Link from "next/link";
+import Dropdown from "../components/Dropdown/Dropdown";
 
 export const DynamicRenderer = ({
   config,
@@ -67,7 +69,7 @@ export const DynamicRenderer = ({
             className={config.styles.authorStyle.className}
             style={config.styles.authorStyle.inlineStyle}
             mt={1}
-            // variant="caption"
+          // variant="caption"
           >
             {config.author}
           </Typography>
@@ -205,4 +207,146 @@ export const DynamicRenderer = ({
     default:
       return null;
   }
+};
+
+//topHeaderRenderer
+export const renderTopHeader = (items, handleAction) => {
+  return items?.map(
+    (
+      {
+        id,
+        label,
+        action,
+        actionValue,
+        actionUse,
+        type,
+        path,
+        onClick,
+        Icon,
+        disabled,
+        variant,
+        items = [],
+        placeholder,
+        required,
+        styles,
+      },
+      idx
+    ) => {
+      switch (type) {
+        case "text":
+          return (
+            <Typography
+              key={idx}
+              sx={{
+                fontWeight: "bold",
+                width: "100%",
+                fontSize: { xs: "0.75rem", sm: "0.85rem", md: "0.9rem" },
+                lineHeight: 1.4,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+
+                display: "inline-flex",
+                alignItems: "center",
+                ...styles,
+              }}
+            >
+              {label}
+            </Typography>
+          );
+
+        case "link":
+          return (
+            <a
+              href={path}
+              key={idx}
+              className="flex items-center gap-2 px-2 py-1 text-sm sm:text-base font-medium transition relative"
+              style={styles}
+            >
+              {Icon && <span className="text-lg">{Icon}</span>}
+              <span>{label}</span>
+            </a>
+          );
+
+        case "dropdown":
+          return (
+            <Box sx={{ minWidth: "280px", width: "100%" }}>
+              <Dropdown
+                key={idx}
+                data={{
+                  label,
+                  placeholder,
+                  required,
+                  items: items || [],
+                }}
+                onSelect={(value) => console.log("from dropdown", value)}
+                styles={{
+                  ...styles,
+                  minWidth: "280px",
+                  width: "100%",
+                  backgroundColor: "#fff",
+                  borderRadius: "12px",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)"
+                }}
+              />
+            </Box>
+          );
+
+        case "search":
+          return (
+            <Box
+              key={idx}
+              sx={{
+
+                justifyContent: "center",
+                width: "100%",
+                maxWidth: 400,
+                mx: "auto",
+                py: 1,
+              }}
+            >
+              <SearchBox
+                placeholder={placeholder}
+                style={{
+                  width: "100%",
+                  borderRadius: "12px",
+
+                  ...styles?.elementStyles,
+                }}
+                onSearch={(value) => handleAction(action, value, actionUse)}
+              />
+            </Box>
+          );
+        case "button":
+          return (
+            <Button
+              key={idx}
+              variant={variant || "contained"}
+              disabled={disabled}
+              onClick={() => handleAction(action, actionValue, actionUse)}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+
+                px: 1,
+                py: 1,
+                textTransform: "none",
+                fontSize: "0.8rem",
+                minWidth: 80,
+                ":hover": {
+                  filter: "brightness(95%)",
+                },
+                ...styles?.elementStyles,
+              }}
+            >
+              {Icon && <Icon sx={{ ...styles?.iconStyles }} />}
+              <span style={{ ...styles?.labelStyles }}>{label}</span>
+            </Button>
+          );
+
+        default:
+          return <TableCell key={idx}>{text}</TableCell>;
+      }
+    }
+  );
 };

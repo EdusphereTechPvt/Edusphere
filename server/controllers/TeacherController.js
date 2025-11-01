@@ -1,11 +1,15 @@
 const { default: mongoose } = require("mongoose");
 const User = require("../models/AuthSchema");
 const Teacher = require("../models/Teacher");
-
+const School = require("../models/SchoolSchema");
+const { sendEmail } = require("../utils/Email");
+const { signupTemplate } = require("../utils/templates/EmailTemplates");
+const { syncReferences } = require("../utils/Sync");
 
 const save = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
+
   try {
     const {
       _id,
@@ -17,46 +21,121 @@ const save = async (req, res) => {
       gender,
       qualification,
       experienceYears,
-      classes,
-      sections,
-      subjects,
+      classes = [],
+      sections = [],
+      subjects = [],
       isActive,
       joiningDate,
       emergencyContactName,
       emergencyContactRelation,
-      emergencyContactPhone
+      emergencyContactPhone,
     } = req.body;
 
     const { schoolId } = req.user;
 
     if (!name || !email || !dateOfBirth || !schoolId) {
-      return res.status(400).json({ message: "Full Name, Date of Birth, Email and School ID are required", status: false });
+      await session.abortTransaction();
+      return res.status(400).json({
+        message: "Full Name, Date of Birth, Email and School ID are required",
+        status: false,
+      });
+    }
+
+    const existingUser = await User.findOne({ email }).session(session);
+    if (existingUser && !_id) {
+      await session.abortTransaction();
+      return res.status(400).json({
+        message: "A user with this email already exists.",
+        status: false,
+      });
     }
 
     let user = await User.findOne({ email }).session(session);
-
-    if (user && !_id && user.role !== "teacher") {
-      return res.status(403).json({ message: "Email already exists with different role", status: false });
-    }
-
     if (!user) {
-      const dateOfBirthString = new Date(dateOfBirth).toISOString().split("T")[0].replace(/-/g, "");
-      const password = `${name.split(" ")[0]}@${dateOfBirthString}`;
-      user = new User({ name, dateOfBirth: dateOfBirth, email, password, role: "teacher" });
+      const dobStr = new Date(dateOfBirth)
+        .toISOString()
+        .split("T")[0]
+        .replace(/-/g, "");
+      const password = `${name.split(" ")[0]}@${dobStr}`;
+      user = new User({
+        name,
+        dateOfBirth,
+        schoolId,
+        email,
+        password,
+        role: "teacher",
+      });
       await user.save({ session });
     }
 
-    let teacher = await Teacher.findOne({ userId: user._id, schoolId }).session(session);
+    let teacher = await Teacher.findOne({ userId: user._id, schoolId }).session(
+      session
+    );
 
     if (teacher) {
-      const emailConflict = await Teacher.findOne({ email, _id: { $ne: teacher._id } }).session(session);
-      if (emailConflict) {
-        return res.status(403).json({ message: "Email already exists for another teacher", status: false });
-      }
-      Object.assign(teacher, { name, dateOfBirth, gender, phone, email, address, subjects, classes, sections, joiningDate, qualification, experienceYears, emergencyContactName, emergencyContactRelation, emergencyContactPhone, isActive });
+      const oldSubjects = teacher.subjects.map((id) => id.toString());
+      const oldClasses = teacher.classes.map((id) => id.toString());
+      const oldSections = teacher.sections.map((id) => id.toString());
+
+      Object.assign(teacher, {
+        name,
+        dateOfBirth,
+        gender,
+        phone,
+        email,
+        address,
+        subjects,
+        classes,
+        sections,
+        joiningDate,
+        qualification,
+        experienceYears,
+        emergencyContactName,
+        emergencyContactRelation,
+        emergencyContactPhone,
+        isActive,
+      });
+
       await teacher.save({ session });
+
+      await syncReferences({
+        action: "save",
+        targetModel: "Teacher",
+        targetId: teacher._id,
+        filters: {
+          Class: { _id: classes },
+          Section: { _id: sections },
+          Subject: { _id: subjects },
+        },
+        session,
+      });
+
+      const removedIds = [...oldSubjects, ...oldClasses, ...oldSections].filter(
+        (id) => ![...subjects, ...classes, ...sections].includes(id)
+      );
+
+      for (const removedId of removedIds) {
+        await syncReferences({
+          action: "remove",
+          targetModel: "Teacher",
+          targetId: teacher._id,
+          filters: {
+            Class: { _id: removedId },
+            Section: { _id: removedId },
+            Subject: { _id: removedId },
+          },
+          session,
+        });
+      }
+
       await session.commitTransaction();
-      return res.status(200).json({ message: "Teacher updated successfully", data: teacher, status: true });
+      return res
+        .status(200)
+        .json({
+          message: "Teacher updated successfully",
+          data: teacher,
+          status: true,
+        });
     }
 
     const newTeacher = new Teacher({
@@ -78,16 +157,48 @@ const save = async (req, res) => {
       emergencyContactRelation,
       emergencyContactPhone,
       isActive,
-      teacherId: `TEACH-${Date.now()}`
+      teacherId: `TEACH-${Date.now()}`,
     });
 
     await newTeacher.save({ session });
+
+    await syncReferences({
+      action: "save",
+      targetModel: "Teacher",
+      targetId: newTeacher._id,
+      filters: {
+        Class: { _id: classes },
+        Section: { _id: sections },
+        Subject: { _id: subjects },
+      },
+      session,
+    });
+
+      const school = await School.findById(schoolId).session(session);
+    await sendEmail(
+            email,
+            `Hey ${name}, You’re Officially Part of Edusphere 🚀`,
+            signupTemplate(name, school.name, false)
+          );
+
     await session.commitTransaction();
 
-    res.status(201).json({ message: "Teacher added successfully", data: newTeacher, status: true });
+    res
+      .status(201)
+      .json({
+        message: "Teacher added successfully",
+        data: newTeacher,
+        status: true,
+      });
   } catch (err) {
     await session.abortTransaction();
-    res.status(500).json({ message: "Server error during teacher add/update", status: false });
+    console.error(err);
+    res
+      .status(500)
+      .json({
+        message: "Server error during teacher add/update",
+        status: false,
+      });
   } finally {
     session.endSession();
   }
@@ -155,18 +266,19 @@ const getTeacherDetails = async (req, res) => {
 
 const getAllTeachersList = async (req, res) => {
   try {
-    const teachers = await Teacher.find({ schoolId: req.user.schoolId })
-      .populate("userId", "name email dateOfBirth role avatar isActive"); 
+    const teachers = await Teacher.find({
+      schoolId: req.user.schoolId,
+    }).populate("userId", "name email dateOfBirth role avatar isActive");
 
     if (!teachers || teachers.length === 0) {
-      return res.status(404).json({
+      return res.status(200).json({
         data: [],
         message: "No teacher found",
         status: false,
       });
     }
 
-     const formattedteachers = teachers.map((teacher) => ({
+    const formattedteachers = teachers.map((teacher) => ({
       teacherId: teacher.teacherId,
       name: teacher.userId?.name,
       email: teacher.userId?.email,
@@ -193,71 +305,82 @@ const getAllTeachersList = async (req, res) => {
   }
 };
 
-const getProfileCardData = async(req,res) => {
-  try{
-
+const getProfileCardData = async (req, res) => {
+  try {
     let keyName = req.body.searchBy.key;
-    let keyValue = req.body.searchBy.value
+    let keyValue = req.body.searchBy.value;
 
-    console.log(keyName, keyValue)
+    console.log(keyName, keyValue);
 
-    let teacherProfileData = await Teacher.findOne({ [keyName]:keyValue })
-      .populate("userId", "name email dateOfBirth role avatar isActive"); 
+    let teacherProfileData = await Teacher.findOne({
+      [keyName]: keyValue,
+    }).populate("userId", "name email dateOfBirth role avatar isActive");
 
-      const formattedTeachers = {
-        _id: teacherProfileData._id,
+    const formattedTeachers = {
+      _id: teacherProfileData._id,
       id: teacherProfileData.teacherId,
       name: teacherProfileData.name,
       avatar: teacherProfileData.userId?.avatar,
       qualification: teacherProfileData.qualification,
-      address: teacherProfileData.address
+      address: teacherProfileData.address,
     };
 
-      res.status(200).json({
-        status: true,
-        data: formattedTeachers
-      })
-  }
-  catch (err) {
+    res.status(200).json({
+      status: true,
+      data: formattedTeachers,
+    });
+  } catch (err) {
     console.error("Get Teacher Error:", err);
     res.status(500).json({
       message: "Server error while fetching teacher details",
-      status: false
-    });
-  }
-}
-
-
-const deleteTeacher = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction()
-  try {
-    const { id } = req.body;
-    const teacher = await Teacher.findByIdAndDelete(id).session(session);
-
-    if (!teacher) {
-      return res.status(404).json({
-        message: "Teacher not found",
-        status: false,
-      });
-    }
-
-    await User.findByIdAndDelete(teacher.userId).session(session);
-
-    session.commitTransaction()
-
-    res.status(200).json({
-      message: "Teacher deleted successfully",
-      status: true,
-    });
-  } catch (err) {
-    session.abortTransaction()
-    console.error("Delete teacher error:", err);
-    res.status(500).json({
-      message: "Server error while deleting teacher",
       status: false,
     });
   }
 };
 
-module.exports = { save, getTeacherDetails, deleteTeacher,getAllTeachersList,getProfileCardData };
+const deleteTeacher = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { id } = req.body;
+    const teacher = await Teacher.findByIdAndDelete(id).session(session);
+
+    if (!teacher) {
+      await session.abortTransaction();
+      return res
+        .status(404)
+        .json({ message: "Teacher not found", status: false });
+    }
+
+    await syncReferences({
+      action: "remove",
+      targetModel: "Teacher",
+      targetId: teacher._id,
+      session,
+    });
+
+    await User.findByIdAndDelete(teacher.userId).session(session);
+
+    await session.commitTransaction();
+    res
+      .status(200)
+      .json({ message: "Teacher deleted successfully", status: true });
+  } catch (err) {
+    await session.abortTransaction();
+    console.error("Delete teacher error:", err);
+    res
+      .status(500)
+      .json({ message: "Server error while deleting teacher", status: false });
+  } finally {
+    session.endSession();
+  }
+};
+
+module.exports = {
+  save,
+  getTeacherDetails,
+  deleteTeacher,
+  getAllTeachersList,
+  getProfileCardData,
+};

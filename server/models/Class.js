@@ -12,10 +12,6 @@ const ClassSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    gradeLevel: {
-      type: Number,
-      required: true,
-    },
     sections: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -39,7 +35,7 @@ const ClassSchema = new mongoose.Schema(
       type: String,
     },
     schoolId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "School",
       required: true,
     },

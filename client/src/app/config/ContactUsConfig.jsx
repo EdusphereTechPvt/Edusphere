@@ -51,6 +51,10 @@ export const ContactUsConfig = {
       cardStyle:{
         inlineStyle: {alignItems: 'flex-start', gap: '1rem'},
       },
+      iconStyles:{
+        inlineStyle:{ fontSize: '24px', color:'primary' },
+        className:"text-2xl text-blue-600"
+      },
       textContainerStyle:{
         inlineStyle:{ textAlign: 'start' },
         titleStyle:{
@@ -58,14 +62,14 @@ export const ContactUsConfig = {
           className:"text-lg font-semibold text-gray-900"
         },
         descStyle:{
-          inlineStyle:{ fontSize: '1rem', color: '#666', marginTop: '0.5rem' },
+          inlineStyle:{ fontSize: '1rem', color: 'secondary', marginTop: '0.5rem' },
           className:"text-sm text-gray-500 mt-2"
         },
         additionalInfoStyle:{
           inlineStyle:{},
           className:"text-sm text-gray-500",
           email:{
-            inlineStyle:{ fontSize: '0.875rem', color: 'blue', marginTop: '4px' },
+            inlineStyle:{ fontSize: '0.875rem', color: 'blue', marginTop: '4px', cursor: "pointer" },
             className:"text-sm text-blue-500"
           },
           time:{

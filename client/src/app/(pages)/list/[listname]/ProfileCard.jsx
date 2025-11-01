@@ -11,25 +11,37 @@ import {
   Button,
   Tooltip,
 } from "@mui/material";
-import { statusConfig } from "@/app/config/TableConfig";
 import { ProfileCardConfig } from "@/app/config/ListConfig";
 import { useHandleAction } from "@/app/utils/HelperFunctions";
 import DeleteModal from "@/app/components/Modal/DeleteModal";
 import { handleDeleteData } from "@/app/services/ListService";
+import LableChip from "@/app/components/LableChip/LableChip";
 
 const ProfileCard = ({ role, data, updateFlag, setUpdateFlag }) => {
   const { header, fields = [], quickLinks = [] } = ProfileCardConfig[role];
 
+  const showAvatar = [
+    "student",
+    "teacher",
+    "admin",
+    "driver",
+    "parent",
+  ].includes(role.toLowerCase())
+    ? true
+    : false;
   const { handleAction, modalProps, closeModal } = useHandleAction();
 
-  const handleDelete = async() =>{
-    const res = await handleDeleteData(modalProps.actionValue, modalProps.data.id)
+  const handleDelete = async () => {
+    const res = await handleDeleteData(
+      modalProps.actionValue,
+      modalProps.data.id
+    );
 
-    if(res){
+    if (res) {
       closeModal();
-      setUpdateFlag(!updateFlag)
+      setUpdateFlag(!updateFlag);
     }
-  }
+  };
 
   const getAttendanceColor = (value) => {
     if (value < 40) return "var(--color-red)";
@@ -104,15 +116,41 @@ const ProfileCard = ({ role, data, updateFlag, setUpdateFlag }) => {
             >
               {field.label}
             </Typography>
-            <Chip
-              label={`● ${value}`}
-              size="small"
+            <LableChip value={value} size="small" variant="outlined" />
+          </Box>
+        );
+
+      case "array":
+        return (
+          <Box
+            key={field.key}
+            mb={1}
+            display="flex"
+            justifyContent="space-between"
+          >
+            <Typography
               sx={{
-                backgroundColor: statusConfig[value]?.chipBg,
-                color: statusConfig[value]?.chipColor,
-                fontWeight: "bold",
+                fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                color: "text.secondary",
+                fontWeight: 500,
+                mb: 1,
               }}
-            />
+            >
+              {field.label}
+            </Typography>
+            <Box display="flex" flexWrap="wrap" gap={1}>
+              {value.map((item, index) => (
+                <Typography
+                  key={index}
+                  sx={{
+                    fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                    fontWeight: 600,
+                  }}
+                >
+                  {item.name || item}
+                </Typography>
+              ))}
+            </Box>
           </Box>
         );
 
@@ -149,154 +187,169 @@ const ProfileCard = ({ role, data, updateFlag, setUpdateFlag }) => {
 
   return (
     <>
-    {modalProps && (
-      <DeleteModal
-      open={!!modalProps}
-      onClose={closeModal}
-      onConfirm={handleDelete}
-      data={modalProps.data}
-      />
-    )}
-    <Card
-    sx={{
-      maxWidth: 450,
-      borderRadius: 3,
-      height: "100%",
-      boxShadow: "none",
-      border: "1px solid #D3D4D9",
-    }}
-    >
-      <CardContent>
-        {/* Header */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: 3,
-          }}
+      {modalProps && (
+        <DeleteModal
+          open={!!modalProps}
+          onClose={closeModal}
+          onConfirm={handleDelete}
+          data={modalProps.data}
+        />
+      )}
+      <Card
+        sx={{
+          maxWidth: 450,
+          borderRadius: 3,
+          height: "auto",
+          boxShadow: "none",
+          border: "1px solid #D3D4D9",
+        }}
+      >
+        <CardContent>
+          {/* Header */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              mb: 3,
+            }}
           >
-          <Typography
-            fontWeight={600}
-            sx={{ fontSize: { xs: "0.9rem", sm: "1rem", md: "1.1rem" } }}
+            <Typography
+              fontWeight={600}
+              sx={{ fontSize: { xs: "0.9rem", sm: "1rem", md: "1.1rem" } }}
             >
-            {header?.title}
-          </Typography>
+              {header?.title}
+            </Typography>
 
-          {/* Buttons */}
-          <Box sx={{ display: "flex", gap: 1 }}>
-            {data?.buttons?.map((btn, idx) => (
-              btn.type === 'iconbutton' && 
-              <Tooltip title={btn.label} key={idx} arrow>
-                <Button
-                  variant={btn.variant}
-                  color={btn.color}
-                  sx={{
-                    ...btn.styles.elementStyles,
-                    textTransform: "none",
-                    minWidth: 0,
-                  }}
-                  onClick={() => {
-                    handleAction(btn.action,btn.actionValue,btn.actionUse,{label: btn.label, id: data._id})
-                  }}
-                  >
-                  <btn.icon
-                    sx={{
-                      fontSize: { sm: "0.9rem", md: "1rem", lg: "1.15rem" },
-                    }}
-                    />
-                </Button>
-              </Tooltip>
-            ))}
+            {/* Buttons */}
+            <Box sx={{ display: "flex", gap: 1 }}>
+              {data?.buttons?.map(
+                (btn, idx) =>
+                  btn.type === "iconbutton" && (
+                    <Tooltip title={btn.label} key={idx} arrow>
+                      <Button
+                        variant={btn.variant}
+                        color={btn.color}
+                        sx={{
+                          ...btn.styles.elementStyles,
+                          textTransform: "none",
+                          minWidth: 0,
+                        }}
+                        onClick={() => {
+                          handleAction(
+                            btn.action,
+                            btn.actionValue,
+                            btn.actionUse,
+                            { label: btn.label, id: data._id }
+                          );
+                        }}
+                      >
+                        <btn.icon
+                          sx={{
+                            fontSize: {
+                              sm: "0.9rem",
+                              md: "1rem",
+                              lg: "1.15rem",
+                            },
+                          }}
+                        />
+                      </Button>
+                    </Tooltip>
+                  )
+              )}
+            </Box>
           </Box>
-        </Box>
 
-        {/* Avatar & Name */}
-        <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
-          <Avatar
-            src={data?.avatar || ""}
-            alt={name || ""}
-            imgProps={{ loading: "lazy" }}
-            sx={{
-              width: { xs: 75, sm: 80, md: 85, lg: 90 },
-              height: { xs: 75, sm: 80, md: 85, lg: 90 },
-              mb: 1,
-            }}
-            />
-          <Typography
-            fontWeight={600}
-            sx={{ fontSize: { xs: "0.95rem", sm: "1.05rem", md: "1.1rem" } }}
-            >
-            {data.name}
-          </Typography>
-
-          <Typography
-            sx={{
-              fontSize: { xs: "0.7rem", sm: "0.8rem" },
-              color: "text.secondary",
-            }}
-            >
-            ID: {data.id}
-          </Typography>
-
-          {data.grade && (
+          {/* Avatar & Name */}
+          <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
+            {showAvatar && (
+              <Avatar
+                src={data?.avatar || ""}
+                alt={name || ""}
+                imgProps={{ loading: "lazy" }}
+                sx={{
+                  width: { xs: 75, sm: 80, md: 85, lg: 90 },
+                  height: { xs: 75, sm: 80, md: 85, lg: 90 },
+                  mb: 1,
+                }}
+              />
+            )}
             <Typography
-            sx={{
-              fontSize: { xs: "0.7rem", sm: "0.8rem" },
-              color: "text.secondary",
-            }}
+              fontWeight={600}
+              sx={{ fontSize: { xs: "0.95rem", sm: "1.05rem", md: "1.1rem" } }}
             >
-              Class: {data.grade}
+              {data.name || data.Name || data.NAME}
             </Typography>
-          )}
-          {data.section && (
+
             <Typography
-            sx={{
-              fontSize: { xs: "0.7rem", sm: "0.8rem" },
-              color: "text.secondary",
-            }}
-            >
-              Section: {data.section}
-            </Typography>
-          )}
-        </Box>
-
-        {/* Dynamic Fields */}
-        {fields.map((field) => renderField(field))}
-
-        {/* Quick Links */}
-        <Box mt={3}>
-          <Typography
-            fontWeight={600}
-            sx={{ fontSize: { xs: "0.85rem", sm: "0.95rem" }, mb: 1 }}
-            >
-            Quick Links
-          </Typography>
-          {quickLinks.map((link, idx) => (
-            <Button
-              key={idx}
-              fullWidth
-              variant={idx === 0 ? "contained" : "outlined"}
-              startIcon={link.icon}
-              onClick={link.action}
               sx={{
-                mb: 1,
-                textTransform: "none",
-                fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                py: 1.3,
-                fontWeight: 500,
-                borderRadius: 1,
-                color: idx !== 0 ? "#334155" : undefined,
-                border: idx !== 0 ? "1px solid #9999" : undefined,
+                fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                color: "text.secondary",
               }}
+            >
+              ID: {data.id || data.ID || data.Id}
+            </Typography>
+
+            {data.grade && (
+              <Typography
+                sx={{
+                  fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                  color: "text.secondary",
+                }}
               >
-              {link.label}
-            </Button>
-          ))}
-        </Box>
-      </CardContent>
-    </Card>
-  </>
+                Class: {data.grade}
+              </Typography>
+            )}
+            {data.section && (
+              <Typography
+                sx={{
+                  fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                  color: "text.secondary",
+                }}
+              >
+                Section: {data.section}
+              </Typography>
+            )}
+          </Box>
+
+          {/* Dynamic Fields */}
+          {fields.map((field) => renderField(field))}
+
+          {/* Quick Links */}
+          {quickLinks.length > 0 && (
+            <Box mt={3}>
+              <Typography
+                fontWeight={600}
+                sx={{ fontSize: { xs: "0.85rem", sm: "0.95rem" }, mb: 1 }}
+              >
+                Quick Links
+              </Typography>
+              {quickLinks.map((link, idx) => (
+                <Button
+                  key={idx}
+                  fullWidth
+                  variant={idx === 0 ? "contained" : "outlined"}
+                  startIcon={link.icon}
+                  onClick={link.action}
+                  sx={{
+                    mb: 1,
+                    textTransform: "none",
+                    fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                    py: 1.3,
+                    fontWeight: 500,
+                    borderRadius: 1,
+                    color: idx !== 0 ? "#334155" : undefined,
+                    border: idx !== 0 ? "1px solid #9999" : undefined,
+                  }}
+                >
+                  {link.label}
+                </Button>
+              ))}
+            </Box>
+          )}
+        </CardContent>
+      </Card>
+    </>
   );
 };
 

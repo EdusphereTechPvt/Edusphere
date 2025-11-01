@@ -12,19 +12,27 @@ import {
 const Dropdown = ({value, data, resetFlag, style = {}, onSelect, onBlur, disabled }) => {
   const [selectedValue, setSelectedValue] = useState("");
 
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setSelectedValue(value);
-    onSelect?.(value);
+  const handleItemClick = (itemId) => {
+    const newValue = itemId === selectedValue ? "" : itemId;
+    setSelectedValue(newValue);
+    onSelect?.(newValue);
   };
 
-  useEffect(()=>{
-    setSelectedValue("")
-  },[resetFlag])
+  useEffect(() => {
+    setSelectedValue("");
+    onSelect?.("");
+  }, [resetFlag]);
+
+  useEffect(() => {
+    setSelectedValue(value || "");
+  }, [value]);
+
   return (
-    <Box className={`${style.className}`} sx={{ ...style.inlineStyle }}>
+    <Box className={`${style.className || ""}`} sx={{ ...style.inlineStyle }}>
       {data.label && (
-        <Box className="text-sm font-medium mb-[0.33rem] text-gray-700">{data.label} {data.required && "*"}</Box>
+        <Box className="text-sm font-medium mb-[0.33rem] text-gray-700">
+          {data.label} {data.required && "*"}
+        </Box>
       )}
 
       <FormControl
@@ -37,8 +45,7 @@ const Dropdown = ({value, data, resetFlag, style = {}, onSelect, onBlur, disable
 
         <Select
           labelId="dropdown-label"
-          value={selectedValue || value || ""}
-          onChange={handleChange}
+          value={selectedValue}
           onBlur={() => onBlur?.(selectedValue)}
           label={data.placeholder}
           disabled={disabled}
@@ -54,21 +61,25 @@ const Dropdown = ({value, data, resetFlag, style = {}, onSelect, onBlur, disable
           }}
         >
           {data?.items?.map((item) => (
-            <MenuItem key={item.id} value={item.id}
-            sx={{
+            <MenuItem
+              key={item.id}
+              value={item.id}
+              onClick={() => handleItemClick(item.id)}
+              sx={{
+                "&:hover": {
+                  backgroundColor: "var(--color-secondary)",
+                },
+                "&.Mui-selected": {
+                  backgroundColor: "var(--color-primary)",
+                  color: "#fff",
                   "&:hover": {
-                    backgroundColor: "var(--color-secondary)",
-                  },
-                  "&.Mui-selected": {
                     backgroundColor: "var(--color-primary)",
-                    color: "#fff",
-                    "&:hover": {
-                      backgroundColor: "var(--color-primary)",
-                    },
                   },
-                  borderRadius: "0.45rem",
-                  mx: "0.25rem",
-                }}>
+                },
+                borderRadius: "0.45rem",
+                mx: "0.25rem",
+              }}
+            >
               {item.value}
             </MenuItem>
           ))}

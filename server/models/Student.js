@@ -8,74 +8,81 @@ const StudentProfileSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+
     studentId: {
       type: String,
       unique: true,
       sparse: true,
     },
-    schoolId: {
-      type: String,
-      ref: "School",
-      required: true,
-    },
+
     name: {
       type: String,
-      required: true
-    },
-    grade: {
-      type: String,
       required: true,
     },
-    section: {
+
+    email: {
       type: String,
-      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
     },
-    gender: {
-      type: String,
-      enum: ["Male", "Female"],
-      required: true
-    },
-    enrollmentDate: {
+
+    dateOfBirth: {
       type: Date,
       required: true,
     },
 
+    gender: {
+      type: String,
+      required: true,
+    },
+
+    classes: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Class",
+      required: true,
+    },
+
+    sections: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Section",
+      required: true,
+    },
+    contactNumber: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
     previousSchool: {
       type: String,
     },
-
-    guardianName: {
+    photo: {
       type: String,
+    },
+
+    schoolId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "School",
       required: true,
     },
 
-    relationshipToStudent: {
-      type: String,
-      required: true,
+    enrollmentDate: {
+      type: Date,
+      default: Date.now,
     },
 
-    guardianContact: {
-      type: String,
+    parent: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Parent",
       required: true,
     },
-
-    allergies: {
-      type: String,
+    isActive: {
+      type: Boolean,
+      default: false,
     },
 
-    medicalConditions: {
-      type: String,
-    },
-
-    emergencyContacts: {
-      type: String,
-      required: true,
-    },
-    status:{
-      type: String,
-      required: true,
-      enum: ["Active", "On Hold", "Inactive"]
-    }
   },
   { timestamps: true }
 );

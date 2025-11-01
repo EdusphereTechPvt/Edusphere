@@ -14,22 +14,25 @@ const helpcenterroutes = require("./routes/HelpCenterRoutes");
 const classRoutes = require("./routes/ClassRoutes")
 const subjectRoutes = require("./routes/SubjectRoutes");
 const sectionRoutes = require("./routes/SectionRoute")
+const userRoutes = require("./routes/UserRoutes")
 const AuthGuard = require("./middleware/AuthGuard");
 const RoleGuard = require("./middleware/RoleGuard");
 const { ping } = require("./controllers/AuthController");
 const utilsRoute = require("./routes/UtilsRoutes")
+const parentroutes = require("./routes/ParentRoutes")
+const adminroutes = require("./routes/AdminRoutes")
 const qrSessionRoutes = require("./routes/QrSessionRoutes")
 
 const app = express();
 
 dotenv.config();
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: "https://edusphere-flax.vercel.app",methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], headers: ["Content-Type", "x-page"], credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
-app.use("/ping", AuthGuard, RoleGuard(), ping)
+app.use("/ping",AuthGuard, ping)
 app.use("/api", utilsRoute)
 app.use("/permission", elementRoutes);
 app.use("/auth", authRoutes);
@@ -40,7 +43,10 @@ app.use("/teacher", teacherRoutes);
 app.use("/class", classRoutes);
 app.use("/subject", subjectRoutes);
 app.use("/section", sectionRoutes)
-app.use("/qr", qrSessionRoutes)
+app.use("/user", userRoutes)
+app.use("/parent", parentroutes)
+app.use("/admin", adminroutes)
+ app.use("/qr", qrSessionRoutes)
 
 
 mongoose

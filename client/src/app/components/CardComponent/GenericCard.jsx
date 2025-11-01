@@ -85,6 +85,14 @@ const GenericCard = ({
 
         const [key, value] = Object.entries(info)[0];
 
+        const handleClick = () => {
+          switch(key){
+            case "email":
+            window.location.href = `mailto:${value}`;
+            break;
+          }
+        }
+
         const baseStyle = styles.textContainerStyle?.additionalInfoStyle?.inlineStyle || {};
         const baseClass = styles.textContainerStyle?.additionalInfoStyle?.className || "";
 
@@ -95,6 +103,7 @@ const GenericCard = ({
             key={index}
             sx={{ ...baseStyle, ...keyStyle }}
             className={`${baseClass} ${keyClass}`}
+            onClick={handleClick}
           >
             {value}
           </Typography>

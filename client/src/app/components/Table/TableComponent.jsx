@@ -9,14 +9,18 @@ import {
   TableContainer,
   Paper,
   Typography,
-  Chip,
   TableFooter,
-  Button,
+  Tooltip,
 } from "@mui/material";
 import CustomPagination from "./Pagination";
-import { statusConfig } from "@/app/config/TableConfig";
-import { useHandleAction } from "@/app/utils/HelperFunctions";
-import Dropdown from "../Dropdown/Dropdown";
+import {
+  getBackgroundColor,
+  useHandleAction,
+} from "@/app/utils/HelperFunctions";
+import { useMemo } from "react";
+import LableChip from "../LableChip/LableChip";
+import { Checkbox } from "@mui/material";
+import { renderTopHeader } from "@/app/utils/DynamicRender";
 
 export const TableComponent = ({
   topHeader = [],
@@ -30,129 +34,56 @@ export const TableComponent = ({
   styles = {},
   colors = [],
   clickableFields = [],
+  checkBox = false,
+  selectedRow,
+  onPaginationChange,
 }) => {
-  const {handleAction} = useHandleAction()
+  const { handleAction } = useHandleAction();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [statusRowStyle, setStatusRowStyle] = useState({});
+  const [selected, setSelected] = useState([]);
 
+  //pagination logic
   useEffect(() => {
-    if (!pagination) {
-      setRowsPerPage(data.length);
-    }
+    if (!pagination) setRowsPerPage(data.length);
   }, [data, pagination]);
 
+  useEffect(() => {
+    if (selectedRow) {
+      selectedRow(selected);
+    }
+  }, [selected]);
+
+  useEffect(() => {
+    if (onPaginationChange) onPaginationChange({ page, rowsPerPage });
+  }, [page, rowsPerPage]);
+
   const startIndex = (page - 1) * rowsPerPage;
-  const paginatedData = data?.slice(startIndex, startIndex + rowsPerPage);
+  const paginatedData = useMemo(
+    () => data.slice(startIndex, startIndex + rowsPerPage),
+    [data, page, rowsPerPage]
+  );
   const date = new Date();
   const currentDay = date.toLocaleDateString("en-US", { weekday: "long" });
 
-  // get color
-  const getStatusStyle = (status) =>
-    statusConfig[status] || statusConfig.default;
-
-  //topHeaderRenderer
-  const renderTopHeader = (items) => {
-    return items?.map(
-      (
-        {
-          id,
-          label,
-          action,
-          actionValue,
-          actionUse,
-          type,
-          path,
-          onClick,
-          Icon,
-          variant,
-          options = [],
-          placeholder,
-          required,
-          styles,
-        },
-        idx
-      ) => {
-        switch (type) {
-          case "text":
-            return (
-              <Typography
-                key={idx}
-                sx={{ fontWeight: "bold", fontSize: "0.9rem", ...styles }}
-              >
-                {label}
-              </Typography>
-            );
-
-          case "link":
-            return (
-              <a
-                href={path}
-                key={idx}
-                className="flex items-center gap-2 px-2 py-1 text-sm sm:text-base font-medium transition relative"
-                style={styles}
-              >
-                {Icon && <span className="text-lg">{Icon}</span>}
-                <span>{label}</span>
-              </a>
-            );
-
-          case "dropdown":
-            return (
-              <Dropdown
-                key={idx}
-                data={items}
-                onSelect={(value) => console.log("from dropdown", value)}
-                styles={styles}
-              />
-            );
-          case "search":
-            return (
-              <input
-                key={idx}
-                type="text"
-                className="w-full rounded-4xl p-2 border border-gray-200"
-                placeholder={placeholder}
-                required={required}
-                styles={styles}
-              />
-            );
-          case "button":
-            return (
-              <Button
-                key={idx}
-                variant={variant || "contained"}
-                onClick={()=>handleAction(action,actionValue,actionUse)}
-                sx={{
-                  borderRadius: "1.5rem",
-                  width: "100%",
-                  flexWrap: "nowrap",
-                  gap: '0.5rem',
-                  display: "flex",
-                  alignItems: "center",
-                  padding:'1rem',
-                  textTransform: "none",
-                  fontSize:'1rem',
-                  ":hover": {
-                    filter: "brightness(95%)",
-                  },
-                  ...styles.elementStyles,
-                }}
-              >
-                {Icon && <Icon sx={{...styles?.iconStyles}} />}
-                <div style={{...styles?.labelStyles}}>{label}</div>
-              </Button>
-            );
-
-          default:
-            return <TableCell key={idx}>{text}</TableCell>;
-        }
-      }
-    );
+  const handleCellClick = (header, value, rowData) => {
+    if (onClick) onClick(header, value, rowData);
   };
 
-    const handleCellClick = (header,value) => {
-    if (onClick) {
-      onClick(header,value);
+  const handleSelect = (row) => {
+    setSelected((prev) => {
+      const isSelected = prev.includes(row);
+      if (isSelected) return prev.filter((r) => r !== row);
+      return [...prev, row];
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selected.length === data.length) {
+      setSelected([]);
+    } else {
+      setSelected([...data]);
     }
   };
 
@@ -162,7 +93,7 @@ export const TableComponent = ({
         component={Paper}
         elevation={0}
         className="border border-gray-200 rounded-4xl"
-        sx={{ borderRadius: "0.3rem", overflow: "hidden", ...styles }}
+        sx={{ borderRadius: "0.3rem", overflow: "auto", ...styles }}
       >
         <Table sx={{ fontSize: { xs: "0.75rem", lg: "1rem" } }}>
           {/* Top Header */}
@@ -170,29 +101,24 @@ export const TableComponent = ({
             <TableHead>
               <TableRow>
                 <TableCell
-                  colSpan={headers?.length}
+                  colSpan={checkBox ? headers?.length + 1 : headers?.length}
                   sx={{ px: 2, py: 1, ...styles?.topHeaderStyles }}
                 >
                   {/* conTainer */}
                   <div className="flex flex-row items-center justify-between gap-4 w-full px-2">
                     {/* left */}
                     <div className="flex items-center justify-start gap-5">
-                      {renderTopHeader(
-                        topHeader.filter(
-                          (item) =>
-                            item.type === "text" ||
-                            item.type === "search" ||
-                            item.type === "dropdown"
-                        )
+                      {topHeader.filter((item) =>
+                        ["text", "search", "dropdown"].includes(item.type)
                       )}
                     </div>
                     {/* right */}
                     <div className="flex items-center justify-end gap-5">
                       {renderTopHeader(
-                        topHeader.filter(
-                          (item) =>
-                            item.type === "button" || item.type === "link"
-                        )
+                        topHeader.filter((item) =>
+                          ["button", "link"].includes(item.type)
+                        ),
+                        handleAction
                       )}
                     </div>
                   </div>
@@ -201,9 +127,32 @@ export const TableComponent = ({
             </TableHead>
           )}
 
-          {/* Table Column Headers */}
+          {/* Table Header Row */}
           <TableHead>
             <TableRow>
+              {checkBox && type !== "timetable" && (
+                <TableCell
+                  sx={{
+                    minWidth: 50,
+                    whiteSpace: "normal",
+                    px: { xs: 1, sm: 1.5, md: 2 },
+                    ...styles?.headerCell,
+                  }}
+                  padding="checkbox"
+                >
+                  <Tooltip title="Select All" enterDelay={500}>
+                    <Checkbox
+                      checked={selected.length === data.length}
+                      onChange={handleSelectAll}
+                      sx={{
+                        transform: { xs: "scale(0.7)", md: "scale(0.9)" },
+                        padding: 0.5,
+                      }}
+                    />
+                  </Tooltip>
+                </TableCell>
+              )}
+
               {headers?.map((header, index) => (
                 <TableCell
                   key={index}
@@ -212,9 +161,20 @@ export const TableComponent = ({
 
                     fontWeight: 600,
                     whiteSpace: "normal",
-                    wordBreak: "break-word",
                     px: { xs: 1, sm: 1.5, md: 2 },
                     color: "#9ca3af",
+                    borderLeft:
+                      type === "timetable"
+                        ? currentDay === header
+                          ? "2px solid #3b82f6 "
+                          : "1px solid #e5e7eb"
+                        : "none",
+                    borderRight:
+                      type === "timetable"
+                        ? currentDay === header
+                          ? "2px solid #3b82f6 "
+                          : "1px solid #e5e7eb"
+                        : "none",
                     fontSize: {
                       xs: "0.75rem",
                       sm: "0.82rem",
@@ -234,80 +194,152 @@ export const TableComponent = ({
           <TableBody>
             {paginatedData?.length > 0 ? (
               paginatedData?.map((row, rowIndex) => {
-                const rowStatus = row["Status"] || row["status"];
-                const { bg, hoverBg, chipBg, chipColor } =
-                  getStatusStyle(rowStatus);
-
-                return (
-                  <TableRow
-                    key={rowIndex}
-                    sx={{
-                      backgroundColor: bg,
-                      "&:hover": {
-                        backgroundColor: hoverBg,
-                      },
-                    }}
-                  >
-                    {headers?.map((header, colIndex) => {
-                      const cellValue =
-                        row[header] || row[header.toLowerCase()];
-
-                      // Check if current header is clickable
-                      const isClickable = clickableFields.includes(
-                        header.toLowerCase()
-                      );
-
-                      return (
-                        <TableCell
-                          key={colIndex}
-                          onClick={
-                            isClickable
-                              ? () => handleCellClick(header,cellValue)
-                              : undefined
-                          }
-                          sx={{
-                            cursor: isClickable ? "pointer" : "default",
-                            transition: "filter 0.2s",
-                            "&:hover": {
-                              filter: isClickable ? "brightness(0.7)" : "none",
-                            },
-                          }}
-                        >
-                          {header === "Status" ? (
-                            <Chip
-                              label={`● ${cellValue}`}
-                              size="small"
+                switch (type) {
+                  case "timetable":
+                    return (
+                      <TableRow key={rowIndex}>
+                        {headers.map((header, colIndex) => (
+                          <TableCell
+                            key={colIndex}
+                            sx={{
+                              fontSize: { xs: "0.75rem", lg: "0.85rem" },
+                              fontWeight: header === "Time" ? "bold" : "500",
+                              borderRight:
+                                header === currentDay
+                                  ? "2px solid #3b82f6 "
+                                  : "1px solid #e5e7eb",
+                              textAlign: "center",
+                              backgroundColor:
+                                row[header] &&
+                                getBackgroundColor(row[header].status, colors),
+                              borderLeft:
+                                header === currentDay
+                                  ? "2px solid #3b82f6 "
+                                  : "1px solid #e5e7eb",
+                              borderRadius:
+                                row[header] &&
+                                row[header].status === "Current Period"
+                                  ? "20px"
+                                  : "0px",
+                            }}
+                          >
+                            {row[header] && row[header].value ? (
+                              row[header].value.split("\n").map((line, idx) => (
+                                <div
+                                  key={idx}
+                                  style={{
+                                    fontWeight: idx === 0 ? "bold" : "",
+                                  }}
+                                >
+                                  {line}
+                                </div>
+                              ))
+                            ) : (
+                              <div
+                                style={{
+                                  fontWeight: "500",
+                                  fontSize: "2.5rem",
+                                }}
+                              >
+                                -
+                              </div>
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    );
+                  default:
+                    return (
+                      <TableRow
+                        key={rowIndex}
+                        sx={{
+                          backgroundColor: statusRowStyle[rowIndex]?.bg,
+                          "&:hover": {
+                            backgroundColor: statusRowStyle[rowIndex]?.hoverBg,
+                          },
+                        }}
+                      >
+                        {checkBox && type !== "timetable" && (
+                          <TableCell
+                            sx={{
+                              minWidth: 50,
+                              whiteSpace: "normal",
+                              px: { xs: 1, sm: 1.5, md: 2 },
+                            }}
+                            padding="checkbox"
+                          >
+                            <Checkbox
+                              checked={selected.includes(row)}
+                              onChange={() => handleSelect(row)}
                               sx={{
-                                backgroundColor: chipBg,
-                                color: chipColor,
-                                fontSize: {
-                                  xs: "0.65rem",
-                                  sm: "0.75rem",
-                                  md: "0.85rem",
+                                transform: {
+                                  xs: "scale(0.7)",
+                                  md: "scale(0.9)",
                                 },
-                                ...columnStyles?.[header],
+                                padding: 0.5,
                               }}
                             />
-                          ) : (
-                            <Typography
+                          </TableCell>
+                        )}
+                        {headers?.map((header, colIndex) => {
+                          const cellValue =
+                            row[header] || row[header.toLowerCase()];
+                          const isClickable = clickableFields.some(
+                            (field) =>
+                              field.toLowerCase() === header.toLowerCase()
+                          );
+                          return (
+                            <TableCell
+                              key={colIndex}
+                              onClick={
+                                isClickable
+                                  ? () => handleCellClick(header, cellValue, JSON.stringify(row))
+                                  : undefined
+                              }
                               sx={{
-                                fontSize: {
-                                  xs: "0.65rem",
-                                  sm: "0.75rem",
-                                  md: "0.85rem",
+                                cursor: isClickable ? "pointer" : "default",
+                                transition: "filter 0.2s",
+                                "&:hover": {
+                                  filter: isClickable
+                                    ? "brightness(0.7)"
+                                    : "none",
                                 },
-
-                                ...columnStyles?.[header],
                               }}
                             >
-                              {cellValue}
-                            </Typography>
-                          )}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
+                              {/* check to add chip */}
+                              {header.toLowerCase().includes("status") ? (
+                                <LableChip
+                                  value={cellValue}
+                                  variant="outlined"
+                                  style={columnStyles?.[header]}
+                                  rowStyle={(colors) =>
+                                    setStatusRowStyle((prev) => ({
+                                      ...prev,
+                                      [rowIndex]: colors,
+                                    }))
+                                  }
+                                />
+                              ) : (
+                                <Typography
+                                  sx={{
+                                    fontSize: {
+                                      xs: "0.65rem",
+                                      sm: "0.75rem",
+                                      md: "0.85rem",
+                                    },
+
+                                    ...columnStyles?.[header],
+                                  }}
+                                >
+                                  {cellValue}
+                                </Typography>
+                              )}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    );
+                }
               })
             ) : (
               <TableRow>
@@ -326,22 +358,18 @@ export const TableComponent = ({
           {pagination && (
             <TableFooter>
               <TableRow>
-                <TableCell colSpan={headers?.length} sx={{ padding: "16px" }}>
-                  <div className="flex justify-between items-center w-full">
-                    <Typography variant="body2" className="text-gray-500">
-                      Showing {startIndex + 1} to{" "}
-                      {Math.min(startIndex + rowsPerPage, data?.length)} of{" "}
-                      {data?.length} results
-                    </Typography>
-
-                    <CustomPagination
-                      limit={rowsPerPage}
-                      setLimit={setRowsPerPage}
-                      page={page}
-                      setPage={setPage}
-                      totalValues={data?.length}
-                    />
-                  </div>
+                <TableCell
+                  colSpan={checkBox ? headers?.length + 1 : headers?.length}
+                  sx={{ padding: "16px" }}
+                >
+                  <CustomPagination
+                    limit={rowsPerPage}
+                    setLimit={setRowsPerPage}
+                    page={page}
+                    setPage={setPage}
+                    totalValues={data?.length}
+                    selectedRow={selected.length}
+                  />
                 </TableCell>
               </TableRow>
             </TableFooter>

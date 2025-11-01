@@ -15,7 +15,7 @@ const page = () => {
         title="Empowering Educators, Inspiring Students"
         subtitle="Edusphere is dedicated to transforming education through innovative technology solutions. We provide schools with the tools they need to create engaging, effective learning environments."
         buttonText="Learn More"
-        imageUrl="https://placehold.co/1200x800"
+        imageUrl="/about.png"
         onButtonClick={() => alert("Learn more!")}
       />
 
