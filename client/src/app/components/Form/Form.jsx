@@ -20,6 +20,7 @@ import { showToast } from "@/app/utils/Toast";
 import { formatLabel } from "@/app/utils/Format";
 import { dynamicUpdateConfig } from "@/app/utils/FormatConfig";
 import DateComponent from "../Date/date";
+import MultiFiled from "@/app/components/Multifield/Multifield";
 
 export default function Form({ type, mode, id }) {
   const router = useRouter();
@@ -259,7 +260,7 @@ export default function Form({ type, mode, id }) {
   if (!config) return <p className="text-red-600">Invalid form type</p>;
 
   return (
-    <div className="flex flex-col gap-4 max-w-4xl mx-auto my-6 px-2 lg:px-0">
+    <div className="flex flex-col gap-4 max-w-6xl mx-auto my-3 lg:px-0">
       {info && (
         <div className="mb-2">
           {info.map((item, idx) => (
@@ -536,6 +537,24 @@ export default function Form({ type, mode, id }) {
                           maxDate={field?.max}
                         />
                       </div>
+                    );
+                    case "multifield":
+                    return (
+                      <Box
+                        key={i}
+                        className="col-span-1 sm:col-span-2"
+                        sx={field.styles?.containerStyle?.inlineStyle || {}}
+                      >
+                        <MultiFiled
+                          label={field.label || ""}
+                          btnText={field.btnText || ""}
+                          DropdownData={field.DropdownData || {
+                            placeholder: "Select Category",
+                            items: field.DropdownData?.items || [],
+                          }}
+                          onChange={(value) => handleChange(field.name, value)}
+                        />
+                      </Box>
                     );
                   default:
                     return null;

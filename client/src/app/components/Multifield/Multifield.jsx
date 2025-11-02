@@ -74,7 +74,7 @@ const MultiFiled = ({
         {fields.map((field, idx) => (
           <Box
             key={idx}
-            sx={{ display: "flex", gap: 1, alignItems: "center", width: "80%" }}
+            sx={{ display: "flex", gap: 1, alignItems: "center", width: "100%" }}
           >
             {/* Dropdown */}
             <Box sx={{ width: { xs: "100%", sm: "35%" } }}>
