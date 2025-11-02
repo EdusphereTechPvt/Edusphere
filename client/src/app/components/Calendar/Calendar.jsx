@@ -1,29 +1,25 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  Paper,
+  Tooltip,
+  TextField,
+  Chip,
+  MenuItem,
+  Alert,
+  Button,
+} from "@mui/material";
 import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format, isSameDay, addDays, isWithinInterval } from "date-fns";
 import {
-  Box,
-  Chip,
-  Typography,
-  Paper,
-  Alert,
-  Tooltip,
-  Button,
-  ButtonGroup,
-  TextField,
-  Grid,
-  Card,
-  CardContent,
-  Fade,
-} from "@mui/material";
-import {
-  Event as EventIcon,
-  BeachAccess as HolidayIcon,
   Payment as PaymentIcon,
   Notifications as ReminderIcon,
+  BeachAccess as HolidayIcon,
+  Event as EventIcon,
   ClearAll,
   Cancel,
 } from "@mui/icons-material";
@@ -43,58 +39,48 @@ const Calendar = ({
   const [rangeEnd, setRangeEnd] = useState(null);
 
   const dateTypes = {
-    payment: { label: "Payment", color: "#d32f2f", lightColor: "#ffcdd2", icon: <PaymentIcon /> },
-    reminder: { label: "Reminder", color: "#1976d2", lightColor: "#bbdefb", icon: <ReminderIcon /> },
-    holiday: { label: "Holiday", color: "#f57c00", lightColor: "#ffe0b2", icon: <HolidayIcon /> },
-    event: { label: "Event", color: "#388e3c", lightColor: "#c8e6c9", icon: <EventIcon /> },
+    payment: { label: "Payment", color: "#d32f2f", light: "#ffcdd2", icon: <PaymentIcon fontSize="small" /> },
+    reminder: { label: "Reminder", color: "#1976d2", light: "#bbdefb", icon: <ReminderIcon fontSize="small" /> },
+    holiday: { label: "Holiday", color: "#f57c00", light: "#ffe0b2", icon: <HolidayIcon fontSize="small" /> },
+    event: { label: "Event", color: "#388e3c", light: "#c8e6c9", icon: <EventIcon fontSize="small" /> },
   };
 
-  const isDateSelected = (date) => selectedDates.some((item) => isSameDay(item.date, date));
-  const getDateType = (date) => selectedDates.find((item) => isSameDay(item.date, date))?.type;
+  const isDateSelected = (date) => selectedDates.some((d) => isSameDay(d.date, date));
+  const getDateType = (date) => selectedDates.find((d) => isSameDay(d.date, date))?.type;
 
   const handleDateSelect = (date) => {
     if (selectionMode === "range") {
-      if (!rangeStart) {
-        setRangeStart(date);
-        return;
-      }
+      if (!rangeStart) return setRangeStart(date);
       setRangeEnd(date);
       handleRangeConfirm(date);
       return;
     }
 
     if (selectionMode === "multiple") {
-      if (isDateSelected(date)) {
-        setSelectedDates((prev) => prev.filter((item) => !isSameDay(item.date, date)));
-      } else {
-        const newDate = { date, type: currentDateType, label: dateLabel || dateTypes[currentDateType].label };
-        setSelectedDates((prev) => [...prev, newDate]);
-      }
+      setSelectedDates((prev) =>
+        isDateSelected(date)
+          ? prev.filter((d) => !isSameDay(d.date, date))
+          : [...prev, { date, type: currentDateType, label: dateLabel || dateTypes[currentDateType].label }]
+      );
     } else {
-      const newDate = { date, type: currentDateType, label: dateLabel || dateTypes[currentDateType].label };
-      setSelectedDates([newDate]);
+      setSelectedDates([{ date, type: currentDateType, label: dateLabel || dateTypes[currentDateType].label }]);
     }
     setDateLabel("");
   };
 
   const handleRangeConfirm = (endDate) => {
     if (!rangeStart) return;
-    const start = rangeStart;
-    const end = endDate || rangeEnd;
-    if (!end) return;
-
-    const dateRange = [];
-    let current = start;
-    while (current <= end) {
-      dateRange.push({
+    const range = [];
+    let current = rangeStart;
+    while (current <= endDate) {
+      range.push({
         date: new Date(current),
         type: currentDateType,
-        label: dateLabel || `${format(start, "MMM dd")} - ${format(end, "MMM dd")}`,
+        label: dateLabel || `${format(rangeStart, "MMM dd")} - ${format(endDate, "MMM dd")}`,
       });
       current = addDays(current, 1);
     }
-
-    setSelectedDates((prev) => [...prev, ...dateRange]);
+    setSelectedDates((prev) => [...prev, ...range]);
     setRangeStart(null);
     setRangeEnd(null);
     setDateLabel("");
@@ -111,7 +97,7 @@ const Calendar = ({
   };
 
   const CustomDay = (props) => {
-    const { day, outsideCurrentMonth, ...other } = props;
+    const { day, outsideCurrentMonth } = props;
     const date = day;
     const isSelected = isDateSelected(date);
     const dateType = getDateType(date);
@@ -119,17 +105,23 @@ const Calendar = ({
     const isRangeStart = rangeStart && isSameDay(date, rangeStart);
     const isRangeEnd = rangeEnd && isSameDay(date, rangeEnd);
 
-    const bgColor = isRangeStart || isRangeEnd ? dateTypes[currentDateType].color 
-                 : isInRange ? dateTypes[currentDateType].lightColor 
-                 : isSelected && dateType ? dateTypes[dateType].color 
-                 : "transparent";
+    const color = dateType ? dateTypes[dateType].color : "#ccc";
+    const lightColor = dateType ? dateTypes[dateType].light : "#f0f0f0";
 
-    const textColor = isRangeStart || isRangeEnd || isSelected ? "white" 
-                    : isInRange ? dateTypes[currentDateType].color 
-                    : "text.primary";
+    const bgColor =
+      isRangeStart || isRangeEnd
+        ? color
+        : isInRange
+        ? lightColor
+        : isSelected
+        ? color
+        : "transparent";
+
+    const textColor =
+      isRangeStart || isRangeEnd || isSelected ? "white" : isInRange ? color : "inherit";
 
     return (
-      <Tooltip title={dateType ? `${dateTypes[dateType].label}` : "Click to schedule"} arrow>
+      <Tooltip title={dateType ? dateTypes[dateType].label : "Click to schedule"} arrow>
         <Box
           onClick={() => handleDateSelect(date)}
           sx={{
@@ -140,16 +132,11 @@ const Calendar = ({
             alignItems: "center",
             justifyContent: "center",
             cursor: "pointer",
-            fontSize: "0.875rem",
-            fontWeight: isSelected || isRangeStart || isRangeEnd ? "bold" : "normal",
+            fontWeight: isSelected ? "bold" : "normal",
             backgroundColor: bgColor,
             color: textColor,
-            border: isInRange ? `2px solid ${dateTypes[currentDateType].color}` : "none",
             transition: "all 0.2s ease",
-            "&:hover": {
-              backgroundColor: isSelected ? dateTypes[dateType]?.color : dateTypes[currentDateType].lightColor,
-              transform: "scale(1.1)",
-            },
+            "&:hover": { transform: "scale(1.1)", backgroundColor: lightColor },
           }}
         >
           {format(date, "d")}
@@ -164,75 +151,95 @@ const Calendar = ({
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Paper sx={{ p: 2, width: '100%', maxWidth: 400 }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: 3,
+          width: "100%",
+          maxWidth: 420,
+          borderRadius: 3,
+          background: "linear-gradient(180deg, #fff, #fafafa)",
+        }}
+      >
         {/* Header */}
-        <Typography variant="h6" gutterBottom color="primary">
+        <Typography variant="h6" color="primary" gutterBottom>
           Schedule Calendar
         </Typography>
 
-        {/* Controls Row */}
-        <Box sx={{ mb: 2 }}>
-          <ButtonGroup fullWidth size="small" sx={{ mb: 1 }}>
-            {["single", "multiple", "range"].map((mode) => (
-              <Button
-                key={mode}
-                variant={selectionMode === mode ? "contained" : "outlined"}
-                onClick={() => setSelectionMode(mode)}
-                sx={{ textTransform: 'capitalize' }}
-              >
-                {mode}
-              </Button>
-            ))}
-          </ButtonGroup>
-
-          <Grid container spacing={1} sx={{ mb: 1 }}>
-            {Object.entries(dateTypes).map(([key, config]) => (
-              <Grid item xs={6} key={key}>
-                <Button
-                  fullWidth
-                  variant={currentDateType === key ? "contained" : "outlined"}
-                  startIcon={config.icon}
-                  onClick={() => setCurrentDateType(key)}
-                  size="small"
-                  sx={{
-                    bgcolor: currentDateType === key ? config.color : "transparent",
-                    borderColor: config.color,
-                    color: currentDateType === key ? "white" : config.color,
-                    textTransform: 'none',
-                    fontSize: '0.75rem',
-                  }}
-                >
-                  {config.label}
-                </Button>
-              </Grid>
-            ))}
-          </Grid>
+        {/* Dropdown Controls */}
+        <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+          <TextField
+            select
+            size="small"
+            fullWidth
+            label="Selection Mode"
+            value={selectionMode}
+            onChange={(e) => setSelectionMode(e.target.value)}
+          >
+            <MenuItem value="single">Single</MenuItem>
+            <MenuItem value="multiple">Multiple</MenuItem>
+            <MenuItem value="range">Range</MenuItem>
+          </TextField>
 
           <TextField
-            fullWidth
+            select
             size="small"
-            label="Description"
-            value={dateLabel}
-            onChange={(e) => setDateLabel(e.target.value)}
-            placeholder="Add description"
-            sx={{ mb: 1 }}
-          />
+            fullWidth
+            label="Date Type"
+            value={currentDateType}
+            onChange={(e) => setCurrentDateType(e.target.value)}
+          >
+            {Object.entries(dateTypes).map(([key, config]) => (
+              <MenuItem key={key} value={key}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  {config.icon}
+                  {config.label}
+                </Box>
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
 
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <Button variant="outlined" color="error" onClick={handleClearAll} size="small" startIcon={<ClearAll />}>
-              Clear
+        {/* Description Input */}
+        <TextField
+          fullWidth
+          size="small"
+          label="Description"
+          value={dateLabel}
+          onChange={(e) => setDateLabel(e.target.value)}
+          placeholder="Add description (optional)"
+          sx={{ mb: 2 }}
+        />
+
+        {/* Buttons */}
+        <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+          <Button
+            variant="outlined"
+            color="error"
+            size="small"
+            onClick={handleClearAll}
+            startIcon={<ClearAll />}
+          >
+            Clear
+          </Button>
+          {selectionMode === "range" && rangeStart && (
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => {
+                setRangeStart(null);
+                setRangeEnd(null);
+              }}
+              startIcon={<Cancel />}
+            >
+              Cancel Range
             </Button>
-            {selectionMode === "range" && rangeStart && (
-              <Button variant="outlined" size="small" onClick={() => { setRangeStart(null); setRangeEnd(null); }} startIcon={<Cancel />}>
-                Cancel
-              </Button>
-            )}
-          </Box>
+          )}
         </Box>
 
         {/* Range Info */}
         {selectionMode === "range" && rangeStart && (
-          <Alert severity="info" sx={{ mb: 1, fontSize: '0.8rem' }}>
+          <Alert severity="info" sx={{ mb: 2, fontSize: "0.8rem" }}>
             {rangeEnd
               ? `${format(rangeStart, "MMM dd")} - ${format(rangeEnd, "MMM dd")}`
               : `Start: ${format(rangeStart, "MMM dd")}`}
@@ -243,37 +250,11 @@ const Calendar = ({
         <DateCalendar
           showDaysOutsideCurrentMonth
           slots={{ day: CustomDay }}
-          sx={{ 
-            width: '100%',
-            '& .MuiPickersCalendarHeader-root': { marginBottom: 1 },
-            '& .MuiPickersCalendarHeader-label': { fontWeight: "600" },
+          sx={{
+            "& .MuiPickersCalendarHeader-root": { mb: 1 },
+            "& .MuiPickersCalendarHeader-label": { fontWeight: 600 },
           }}
         />
-
-        {/* Selected Dates */}
-        {showSelectedSummary && selectedDates.length > 0 && (
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              Selected ({selectedDates.length})
-            </Typography>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, maxHeight: 80, overflow: "auto" }}>
-              {selectedDates.map((item, i) => (
-                <Chip
-                  key={i}
-                  label={format(item.date, "MMM dd")}
-                  size="small"
-                  onDelete={() => handleRemoveDate(item.date)}
-                  sx={{
-                    backgroundColor: dateTypes[item.type].color,
-                    color: "white",
-                    fontSize: '0.7rem',
-                    '& .MuiChip-deleteIcon': { color: "white", fontSize: '1rem' },
-                  }}
-                />
-              ))}
-            </Box>
-          </Box>
-        )}
       </Paper>
     </LocalizationProvider>
   );
