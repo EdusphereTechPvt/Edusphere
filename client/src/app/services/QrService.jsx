@@ -1,8 +1,12 @@
+import { showToast } from "../utils/Toast";
 import api from "./MiddlewareService";
 
 export const addOrUpdate = async (payload) => {
   try {
-    const response = await api.post("/qr/addOrUpdate", payload);
+    const response = await api.post("/qr/add", payload, {
+      headers: { "x-page": `/qr/add` },
+      withCredentials: true
+    }); //send x page /qr/get  /qr
 
     if (!response.data.status) {
       showToast("Failed to save QR session", "error");
@@ -37,7 +41,7 @@ export const fetchData = async (path, query = {}) => {
 
 export const fetchSessions = async () => {
   try {
-    const response = await api.post("/qr/search", {});
+    const response = await api.post("/qr/get", {});
 
     if (!response.data.status) {
       showToast("Failed to fetch sessions", "error");

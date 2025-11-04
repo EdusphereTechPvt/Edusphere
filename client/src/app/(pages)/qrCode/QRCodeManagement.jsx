@@ -1,111 +1,140 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import {
   Button,
   Checkbox,
   FormControlLabel,
-  FormGroup,
   TextField,
   Typography,
 } from "@mui/material";
+import { Download, Print } from "@mui/icons-material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { Download, QrCode, Warning } from "@mui/icons-material";
 import Dropdown from "@/app/components/Dropdown/Dropdown";
 import DateTimePicker from "@/app/components/DateTimePicker/DateTimePicker";
 import { showToast } from "@/app/utils/Toast";
+import { fetchDistinctValues } from "@/app/services/UtilityService";
+import { addOrUpdate } from "@/app/services/QrService";
 
-function QRCodeManagement({onGenerate, result, data}) {
-  console.log("data",data);
-  
-  const [formData, setFormData] = useState({
-    type: "Event",
-  });
-  const [doesExist, setDoesexist] = useState("Yes");
-  const [qrCodeValue, setQrCodeValue] = useState( "");
-  const [isComplete, setIsComplete] = useState(false);
+function QRCodeManagement({ onGenerate, result, data = {} }) {
   const qrRef = useRef();
+  const [formData, setFormData] = useState({});
+  const [doesExist, setDoesExist] = useState(false);
+  const [qrCodeValue, setQrCodeValue] = useState("");
+  const [isDownloadReady, setIsDownloadReady] = useState(false);
+  const [options, setOptions] = useState([]);
 
-  const handleChange = (name, value) => {
+  useEffect(() => {
+    const fetchDistinct = async () => {
+      if (!formData.type || (formData.type === "Event" && doesExist === false))
+        return;
+      try {
+        const res = await fetchDistinctValues(
+          {
+            fieldName: "name",
+            collectionName: formData.type.toLowerCase(),
+            filter: { view: { isAvailable: true } },
+          },
+          formData,
+          "/qr/get"
+        );
+        if (res.distinctValues.length <= 0)
+          showToast(`There is no existing ${formData.type}s`, "warning");
+        setOptions(res.distinctValues || []);
+      } catch (err) {
+        console.error("Error fetching distinct values:", err);
+      }
+    };
+
+    fetchDistinct();
+  }, [formData.type, doesExist]);
+
+  useEffect(() => {
+    if (result?.data) {
+      setQrCodeValue(JSON.stringify(result.data));
+      setIsDownloadReady(true);
+    }
+  }, [result]);
+
+  const handleChange = useCallback((name, value) => {
+    if (typeof value === "string") value = value.trim();
+    // if (name === "type") {
+    //   if (!value) {
+    //     showToast("Type is required (Resetting to Class)", "warning");
+    //     return setFormData((prev) => ({ ...prev, type: "Class" }));
+    //   }
+    //   return setFormData((prev) => ({ ...prev, type: value }));
+    // }
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  const handleDownload = (format) => {
-    const canvas = qrRef.current.querySelector("canvas");
-    const url = canvas.toDataURL(
+  const handleDownload = useCallback((format) => {
+    const canvas = qrRef.current?.querySelector("canvas");
+    if (!canvas) return showToast("QR code not available", "warning");
+
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL(
       format === "png" ? "image/png" : "image/svg+xml"
     );
-    const link = document.createElement("a");
-    link.href = url;
     link.download = `qr-code.${format}`;
     link.click();
-  };
+  }, []);
 
-  const handlePrint = () => {
-    const canvas = qrRef.current.querySelector("canvas");
+  const handlePrint = useCallback(() => {
+    const canvas = qrRef.current?.querySelector("canvas");
+    if (!canvas) return showToast("QR code not available", "warning");
+
     const img = canvas.toDataURL("image/png");
-    const win = window.open();
+    const win = window.open("", "_blank");
     win.document.write(
-      `<img src="${img}" onload="window.print();window.close()" />`
+      `<img src="${img}" onload="window.print();window.close();" />`
     );
-    win.document.close();
-  };
+  }, []);
 
   const handleBulkGenerate = async () => {
-   const payload = {
-      sessionName:
-    formData.type.toLowerCase() === "event"
-      ? formData[`${formData.type} Selector`]
-      : `${formData.type} Session`,
-      sessionType: formData.type.toLowerCase(),
-      startDate: formData.startDate.toISOString(),
-      endDate: formData.endDate.toISOString(),
-      duration: formData.duration,
-      autoExpire: formData.autoExpire || false,
-      expired: false,
-      associatedClass:
-        formData.type.toLowerCase() === "class"
-          ? parseInt(formData[`${formData.type} Selector`].match(/\d+/)?.[0] || 0, 10)
-          : "",
-    };
-    console.log("payload", payload);
-    console.log("formData", formData);
-
-    const requiredFields = [
-      "sessionName",
-      "sessionType",
-      "startDate",
-      "endDate",
-      "duration",
-      "autoExpire",
-    ];
-
-    if (formData.type.toLowerCase() === "class") {
-      requiredFields.push("associatedClass");
-    }
-
-    const missingFields = requiredFields.filter(
-      (field) =>
-        payload[field] === undefined ||
-        payload[field] === null ||
-        payload[field] === ""
-    );
-
-    if (missingFields.length > 3) {
-      showToast("Please fill all the required fields", "warning");
-    } else if (missingFields.length > 0) {
-      showToast(`Please fill ${missingFields.join(", ")}`, "warning");
-    }
-    onGenerate?.(payload);
     try {
-      setQrCodeValue(JSON.stringify(result?.data)); 
+      const payload = {
+        sessionType: formData.type.toLowerCase(),
+        sessionName: formData.sessionName?.trim().toLowerCase(),
+        startDate: formData.startDate?.toISOString(),
+        endDate: formData.endDate?.toISOString(),
+        duration: formData.duration,
+        autoExpire: formData.autoExpire || false,
+        expired: false,
+        ...(formData.type === "Class"
+          ? { associatedClass: formData.associated }
+          : { associatedEvent: formData.associated }),
+      };
+      const required = [
+        "sessionName",
+        "sessionType",
+        "startDate",
+        "endDate",
+        "duration",
+       formData.type === "Class" ? "associatedClass" : "associatedEvent",
+      ];
+      const missing = required.filter((f) => !payload[f]);
+      if (missing.length > 0) {
+        return showToast(`Please fill ${missing.join(", ")}`, "warning");
+      }
+      // showToast("...Processing", "pending")
+      const res = await addOrUpdate(payload); //
+      if (res?.data) {
+        showToast("QR generated successfully!", "success");
+        setQrCodeValue(JSON.stringify(res.data));
+        setIsDownloadReady(true);
+      } else {
+        setIsDownloadReady(false);
+        showToast("Failed to generate QR", "error");
+      }
     } catch (error) {
-      console.error("Error sending QR session", error);
+      console.error("QR generation error:", error);
+      showToast("Error while generating QR", "error");
     }
   };
 
   return (
-    <div>
+    <div className="pb-6">
       <Typography
         variant="h5"
         fontWeight="bold"
@@ -123,80 +152,108 @@ function QRCodeManagement({onGenerate, result, data}) {
         QR Code Management
       </Typography>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ">
-        {/* left form */}
-        <form className="col-span-2 bg-white p-6 rounded-lg shadow space-y-6">
-          {/* heading */}
+      <div className="flex flex-col lg:flex-row gap-6 w-ful">
+        <form className="flex-1 bg-white p-6 rounded-lg shadow space-y-6">
           <div>
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="xs:text-lg md:text-xl font-semibold text-gray-800 mb-1">
               QR Code Generation Interface
             </h2>
-            <p className="text-gray-600 text-sm">
+            <Typography variant="p" sx={{fontSize: {xs: "0.75em", lg:"1rem"}}} className="text-gray-600 ">
               Create, distribute, and control the lifecycle of attendance QR
               codes.
-            </p>
+            </Typography>
           </div>
-          <Dropdown
-            data={{
-              label: "Session Type",
-              items: [
-                { id: "Event", value: "Event" },
-                { id: "Class", value: "Class" },
-              ],
-            }}
-            onSelect={(type) => handleChange("type", type)}
-            value="Event"
-            style={{ inlineStyle: { mt: 0, mb: 0 } }}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={doesExist}
-                onChange={() => setDoesexist(!doesExist)}
-                size="small"
-              />
-            }
-            label={
-              <Typography fontSize="0.875rem" color="text.secondary">
-                Does {formData.type} exist?
-              </Typography>
-            }
-          />
 
-          {/* Conditional Dropdown or TextField */}
-          {doesExist ? (
-            <Dropdown
-              value={formData[`${formData.type} Selector`] || ""}
-              data={{
-                label: `Associated ${formData?.type} Selector`,
-                placeholder: `Select ${formData?.type}`,
-                items: data[formData?.type?.toLowerCase()] || [],
-              }}
-              onSelect={(v) => handleChange(`${formData.type} Selector`, v)}
-            />
-          ) : (
-            <>
+          <div className="flex flex-wrap items-center gap-5">
+            <div className="w-1/2">
+              <Dropdown
+                data={{
+                  label: "Session Type",
+                  items: [
+                    { id: "Event", value: "Event" },
+                    { id: "Class", value: "Class" },
+                  ],
+                  placeholder: "Select Session Type",
+                }}
+                onSelect={(type) => handleChange("type", type)}
+                value={formData.type}
+              />
+            </div>
+            <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {`Associated ${formData?.type} Name`}
+                Session Name
               </label>
               <TextField
-                label={`Enter ${formData?.type} Name`}
+                label="Enter Session Name"
                 placeholder="e.g., Annual Day"
-                value={formData[`${formData.type} Selector`] || ""}
-                onChange={(e) =>
-                  handleChange(`${formData.type} Selector`, e.target.value)
-                }
-                fullWidth
+                value={formData["sessionName"] || ""}
+                onChange={(e) => handleChange("sessionName", e.target.value)}
                 size="small"
                 variant="outlined"
-                sx={{ mb: 3 }}
+                fullWidth
               />
+            </div>
+          </div>
+          {formData.type === "Event" ? (
+            <>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={doesExist}
+                    onChange={() => setDoesExist((prev) => !prev)}
+                    size="small"
+                  />
+                }
+                label={
+                  <Typography fontSize="0.875rem" color="text.secondary">
+                    Does Event Exist?
+                  </Typography>
+                }
+                sx={{ mt: -2, mb: -0.2 }}
+              />
+
+              {doesExist ? (
+                <Dropdown
+                  value={formData["Event Selector"] || ""}
+                  data={{
+                    label: "Associated Event Selector",
+                    placeholder: "Select Event",
+                    items: data?.event || options || [],
+                  }}
+                  onSelect={(v) => handleChange("associated", v)}
+                />
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Associated Event Name
+                  </label>
+                  <TextField
+                    label="Enter Event Name"
+                    placeholder="e.g., Annual Day"
+                    value={formData["Event Selector"] || ""}
+                    onChange={(e) => handleChange("associated", e.target.value)}
+                    fullWidth
+                    size="small"
+                    variant="outlined"
+                  />
+                </div>
+              )}
             </>
+          ) : (
+            <Dropdown
+              value={formData["associated"] || ""}
+              data={{
+                label: "Associated Class Selector",
+                placeholder: "Select Class",
+                items: data?.class || options || [],
+              }}
+              onSelect={(v) => handleChange("associated", v)}
+            />
           )}
 
-          {/* Session Duration */}
-          <div>
-            <h3 className="text-base font-semibold text-gray-700 mb-2">
+          {/* Duration Section */}
+          <div className="space-y-2">
+            <h3 className="text-base font-semibold text-gray-700">
               Session Duration Settings
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -217,8 +274,13 @@ function QRCodeManagement({onGenerate, result, data}) {
                     : ""
                 }
                 onSelect={(item) => {
-                  handleChange("duration", item);
-                  handleChange("durationSource", "dropdown");
+                  if (!item) {
+                    handleChange("duration", "");
+                    handleChange("durationSource", "");
+                  } else {
+                    handleChange("duration", item);
+                    handleChange("durationSource", "dropdown");
+                  }
                 }}
                 disabled={formData.durationSource === "custom"}
               />
@@ -238,8 +300,13 @@ function QRCodeManagement({onGenerate, result, data}) {
                   }
                   onChange={(e) => {
                     const val = e.target.value;
-                    handleChange("duration", val ? parseInt(val) : "");
-                    handleChange("durationSource", "custom");
+                    if (!val) {
+                      handleChange("duration", "");
+                      handleChange("durationSource", "");
+                    } else {
+                      handleChange("duration", parseInt(val));
+                      handleChange("durationSource", "custom");
+                    }
                   }}
                   fullWidth
                   size="small"
@@ -266,19 +333,16 @@ function QRCodeManagement({onGenerate, result, data}) {
             />
           </div>
 
-          {/* Validity Period */}
-          <div>
+          {/* Date Pickers */}
+          <div className="space-y-2">
             <h3 className="text-base font-semibold text-gray-700">
               Validity Period Controls
             </h3>
-            <div className="flex flex-row max-sm:flex-col gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <DateTimePicker
                 label="Start Date & Time"
                 value={formData.startDate || null}
                 onChange={(value) => handleChange("startDate", value)}
-                slotProps={{
-                  textField: { fullWidth: true },
-                }}
               />
               <DateTimePicker
                 label="Select End Date & Time"
@@ -286,43 +350,11 @@ function QRCodeManagement({onGenerate, result, data}) {
                 onChange={(value) => handleChange("endDate", value)}
                 minDateTime={formData.startDate}
                 disabled={!formData.startDate}
-                slotProps={{
-                  textField: { fullWidth: true },
-                }}
               />
-            </div>
-
-            {/* Days of Week */}
-            <div className="mt-3">
-              <Typography variant="subtitle2">Days of Week</Typography>
-              <FormGroup row>
-                {["Mon", "Tue", "Wed", "Thu", "Fri"].map((day) => (
-                  <FormControlLabel
-                    key={day}
-                    control={
-                      <Checkbox
-                        checked={(formData.days || []).includes(day)}
-                        onChange={() => {
-                          const selected = formData.days || [];
-                          const newDays = selected.includes(day)
-                            ? selected.filter((d) => d !== day)
-                            : [...selected, day];
-                          handleChange("days", newDays);
-                        }}
-                      />
-                    }
-                    label={
-                      <Typography fontSize="0.88rem" color="text.secondary">
-                        {day}
-                      </Typography>
-                    }
-                  />
-                ))}
-              </FormGroup>
             </div>
           </div>
 
-          {/*  Generate */}
+          {/* Generate Button */}
           <Button
             onClick={handleBulkGenerate}
             fullWidth
@@ -332,9 +364,7 @@ function QRCodeManagement({onGenerate, result, data}) {
               justifyContent: "center",
               textTransform: "none",
               fontWeight: 600,
-              border: "none",
               borderRadius: 2,
-              mb: 1,
               py: 1.2,
             }}
           >
@@ -342,32 +372,30 @@ function QRCodeManagement({onGenerate, result, data}) {
           </Button>
         </form>
 
-        {/* QR Code Preview */}
-        <div className="bg-white p-6 rounded-lg shadow flex flex-col items-center w-full  space-y-4 relative ">
+        {/* Right QR Preview Section */}
+        <div className="bg-white p-6 rounded-lg shadow flex flex-col items-center xs:w-full lg:w-1/3 space-y-4">
           <h3 className="text-base font-semibold text-gray-700">
             QR Code Preview
           </h3>
           <div
             ref={qrRef}
-            className="p-4 border rounded-lg bg-gray-50 w-full lg:h-[33.7rem] h-[15rem] flex justify-center items-center"
+            className="p-4 border rounded-lg bg-gray-50 w-full flex justify-center items-center min-h-[16rem] lg:min-h-[23.9rem]"
           >
             {qrCodeValue ? (
-              <QRCodeCanvas value={qrCodeValue} size={180} />
+              <QRCodeCanvas value={qrCodeValue} size={250} />
             ) : (
               <p className="text-gray-400 text-sm">No QR Code Generated</p>
             )}
           </div>
 
-          {/* Buttons */}
-
-          <div className="flex w-full mb-2 gap-2">
+          <div className="flex w-full gap-2">
             {["png", "svg"].map((name, idx) => (
               <Button
                 key={idx}
                 onClick={() => handleDownload(name)}
                 variant="outlined"
                 startIcon={<Download />}
-                disabled={!isComplete}
+                disabled={!isDownloadReady}
                 sx={{
                   textTransform: "none",
                   backgroundColor: "#e2e8f0",
@@ -377,7 +405,7 @@ function QRCodeManagement({onGenerate, result, data}) {
                   borderRadius: 2,
                   justifyContent: "center",
                   "&:hover": { backgroundColor: "#cbd5e1" },
-                  py: 1.2,
+                  py: 1.1,
                   px: 2,
                   width: "50%",
                 }}
@@ -386,11 +414,12 @@ function QRCodeManagement({onGenerate, result, data}) {
               </Button>
             ))}
           </div>
+
           <Button
             onClick={handlePrint}
             variant="outlined"
-            startIcon={<Download />}
-            disabled={!isComplete}
+            startIcon={<Print />}
+            disabled={!isDownloadReady}
             fullWidth
             sx={{
               textTransform: "none",
@@ -399,11 +428,9 @@ function QRCodeManagement({onGenerate, result, data}) {
               color: "grey.800",
               border: "none",
               borderRadius: 2,
-              mb: 1,
               justifyContent: "center",
               "&:hover": { backgroundColor: "#cbd5e1" },
               py: 1.2,
-              px: 2,
             }}
           >
             Print QR Code

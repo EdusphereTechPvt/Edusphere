@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Grid, Typography, Box } from "@mui/material";
 import GenericCard from "@/app/components/CardComponent/GenericCard";
 
-const SystemOverview = () => {
+const SystemOverview = ({}) => {
   const [overviewData, setOverviewData] = useState([]);
 
   // Fetch system overview data from backend
@@ -60,10 +60,7 @@ const SystemOverview = () => {
         {overviewData.map((item, index) => (
           <div
             key={index}
-            style={{
-              flex: "1 1 250px", // grow, shrink, and min width
-           
-            }}
+            className="flex-1 flex-wrap"
           >
             <GenericCard
               title={item.title}
@@ -75,6 +72,7 @@ const SystemOverview = () => {
                     alignItems: "flex-start",
                     padding: "16px",
                     width: "100%",
+                    maxWidth: "100%",
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
@@ -84,18 +82,20 @@ const SystemOverview = () => {
                 textContainerStyle: {
                   titleStyle: {
                     inlineStyle: {
-                      fontSize: "0.9rem",
+                      fontSize: {xs:"0.7rem", md:"0.9rem"},
                       fontWeight: 500,
                       color: "#6b7280",
                       marginBottom: "4px",
+                      whiteSpace: "nowrap"
                     },
                   },
                   additionalInfoStyle: {
                     value: {
                       inlineStyle: {
-                        fontSize: "1.3rem",
+                        fontSize: {xs:"0.9rem", md:"1.3rem"},
                         fontWeight: "bold",
                         color: "#111827",
+                        whiteSpace: "nowrap"
                       },
                     },
                   },

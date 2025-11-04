@@ -12,46 +12,9 @@ import {
   fetchData,
   fetchSessions,
 } from "@/app/services/QrService";
+import Dropdown from "@/app/components/Dropdown/Dropdown";
 
 export default function Page() {
-  const [sessions, setSessions] = useState([]);
-  const [result, setResult] = useState(null);
-  const [data, setData] = useState({});
-  const [currentType, setCurrentType] = useState("");
-
-  const handleGenerate = async (payload) => {
-    try {
-      const res = await addOrUpdate(payload);
-      setCurrentType(payload.sessionType || "event");
-      setResult(res);
-    } catch (err) {
-      console.error("Error:", err);
-    }
-  };
-
-  useEffect(() => {
-    const fetchResponse = async () => {
-      try {
-        const qrSessions = await fetchData("qr/search", {});
-        setData((prev) => ({
-          ...prev,
-          session: qrSessions,
-        }));
-
-        if (currentType) {
-          const res = await fetchData(`${currentType.toLowerCase()}/getAll`);
-          setData((prev) => ({
-            ...prev,
-            [currentType.toLowerCase()]: res,
-          }));
-        }
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      }
-    };
-    fetchResponse();
-  }, [result, currentType]);
-
   const logs = [
     { user: "John Doe", type: "in", session: "Math 101", time: "08:02 AM" },
     {
@@ -80,6 +43,13 @@ export default function Page() {
       time: "07:45 AM",
     },
   ];
+  const [result, setResult] = useState(null);
+  const [data, setData] = useState({ session: [], logs: logs });
+
+  const [sessions, setSessions] = useState([]); // all sessions from backend
+  const [selectedSession, setSelectedSession] = useState(""); // id of selected session
+  const [selectedSessionData, setSelectedSessionData] = useState(null);
+
 
   return (
     <div className="py-8 px-4 lg:px-8 space-y-8 bg-gray-50 min-h-screen">
@@ -87,13 +57,13 @@ export default function Page() {
       <Box
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", lg: "row" }, // column on small screens, row on large
+          flexDirection: { xs: "column", lg: "row" },
           justifyContent: "space-between",
           alignItems: { xs: "flex-start", lg: "center" },
           mb: 4,
+          gap: 2,
         }}
       >
-        {/* Title and breadcrumb */}
         <Box sx={{ mb: { xs: 1, lg: 0 } }}>
           <Typography
             variant="h3"
@@ -101,69 +71,63 @@ export default function Page() {
               fontWeight: "bold",
               color: "text.primary",
               fontSize: { xs: "1.5rem", md: "1.8rem", lg: "2rem" },
+              whiteSpace: "nowrap",
             }}
           >
             Admin QR Code Management
           </Typography>
-          <Typography
-            sx={{
-              color: "text.secondary",
-              mt: 1,
-              fontSize: { xs: "0.8rem", md: "0.9rem" },
-            }}
-          >
-            Dashboard{" "}
-            <Box
-              component="span"
-              sx={{ color: "text.primary", fontWeight: 500 }}
-            >
-              / QR Code Management
-            </Box>
-          </Typography>
         </Box>
 
-        {/* <Typography
+        <Box sx={{ width: { xs: 150, md: 250 } }}>
+          <Dropdown
+            value=""
+            data={{
+              placeholder: "Select a Day",
+              items: [
+                { id: "sun", value: "Sunday" },
+                { id: "mon", value: "Monday" },
+                { id: "tue", value: "Tuesday" },
+                { id: "wed", value: "Wednesday" },
+                { id: "thu", value: "Thursday" },
+                { id: "fri", value: "Friday" },
+                { id: "sat", value: "Saturday" },
+              ],
+            }}
+            onSelect={(value) => {
+              const found = sessions.find((s) => s.value === value);
+              setSelectedSessionData(found?.fullData || null);
+            }}
+          />
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", lg: "row" },
+          gap: 4,
+          width: "100%",
+        }}
+      >
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
+          <SystemOverview overviewData = {data?.overviewData}/>
+          <QRCodeManagement />
+        </Box>
+
+        <Box
           sx={{
-            color: "text.secondary",
-            fontSize: { xs: "0.875rem", md: "0.9rem" },
-            mt: { xs: 2, lg: 0 },
-            mr: { lg: 8 },
+            flexBasis: { xs: "100%", lg: "28%" },
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
           }}
         >
-          <Box component="span" sx={{ color: "success.main", fontWeight: 600 }}>
-            Online
-          </Box>{" "}
-          &bull; Last Sync: 2 minutes ago
-        </Typography> */}
+          <SecurityFeature />
+          <ConfigurationPanel />
+        </Box>
       </Box>
-
-      {/* Main Layout */}
-      <div className="flex flex-col lg:flex-row w-full h-full gap-6">
-        {/* Left Section */}
-        <div className="space-y-6 lg:w-[75%]">
-          <SystemOverview />
-          <QRCodeManagement
-            onGenerate={handleGenerate}
-            result={result}
-            data={data}
-          />
-        </div>
-
-        {/* Right Section */}
-        <div className="space-y-6 flex flex-col lg:flex-col md:flex-row  justify-center lg:gap-0 gap-4 w-full lg:w-[25%]">
-          <div className="w-full">
-            <SecurityFeature />
-          </div>
-          <div className="w-full">
-            <ConfigurationPanel />
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ActiveQR sessions={data?.session} />
-        <CheckinHistory logs={logs} />
+        {data?.session?.length > 0 && <ActiveQR sessions={data?.session} />}
+        {data?.logs?.length > 0 && <CheckinHistory logs={data?.logs} />}
       </div>
     </div>
   );
