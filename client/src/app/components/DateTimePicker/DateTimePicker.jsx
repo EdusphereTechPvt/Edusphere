@@ -22,13 +22,16 @@ const DateTimePicker = ({
         minDateTime={minDateTime}
         disabled={disabled}
         sx={{
-          width: styles.width || "100%",
+          width: styles.width || "100vw",
           ...sx,
         }}
         slotProps={{
           textField: {
             size: "small",
+            fullWidth: true,
+            size: "small",
             sx: {
+              width: "100%",
               "& .MuiInputBase-root": {
                 paddingTop: "4px",
                 paddingBottom: "4px",
