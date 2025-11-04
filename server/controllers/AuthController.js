@@ -20,7 +20,7 @@ const { signupTemplate } = require("../utils/templates/EmailTemplates");
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "none",
+  sameSite: "strict",
   maxAge: 7 * 24 * 60 * 60 * 1000
 };
 

@@ -21,18 +21,19 @@ const { ping } = require("./controllers/AuthController");
 const utilsRoute = require("./routes/UtilsRoutes")
 const parentroutes = require("./routes/ParentRoutes")
 const adminroutes = require("./routes/AdminRoutes")
+const eventRoutes = require("./routes/EventRoutes");
 const qrSessionRoutes = require("./routes/QrSessionRoutes")
 
 const app = express();
 
 dotenv.config();
 
-app.use(cors({ origin: "https://edusphere-flax.vercel.app",methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], headers: ["Content-Type", "x-page"], credentials: true }));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
-app.use("/ping",AuthGuard, ping)
+app.use("/ping", AuthGuard, ping)
 app.use("/api", utilsRoute)
 app.use("/permission", elementRoutes);
 app.use("/auth", authRoutes);
@@ -46,7 +47,8 @@ app.use("/section", sectionRoutes)
 app.use("/user", userRoutes)
 app.use("/parent", parentroutes)
 app.use("/admin", adminroutes)
- app.use("/qr", qrSessionRoutes)
+app.use("/event", eventRoutes);
+app.use("/qr", qrSessionRoutes)
 
 
 mongoose

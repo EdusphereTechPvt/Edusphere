@@ -1,10 +1,13 @@
 const express = require("express");
-
-const { addOrUpdateQrSession, getSessionDetails, deleteSession } = require("../controllers/QrSessionController")
 const router = express.Router();
+const {
+  addOrUpdateQrSession,
+  getSessionDetails,
+  deleteSession,
+} = require("../controllers/QrSessionController");
 
-router.post("/addOrUpdate", addOrUpdateQrSession);
-router.post("/search", getSessionDetails);
+router.post("/add", addOrUpdateQrSession);
+router.post("/get", getSessionDetails);
 router.delete("/delete/:id", deleteSession);
 
 module.exports = router;
