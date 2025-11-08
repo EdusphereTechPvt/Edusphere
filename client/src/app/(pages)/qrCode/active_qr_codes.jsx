@@ -133,7 +133,7 @@ const ActiveQR = ({ sessions }) => {
                         },
                       }}
                     >
-                      {session.sessionName}
+                      {formatLabel(session.sessionName)}
                     </Typography>
                     <Typography
                       sx={{

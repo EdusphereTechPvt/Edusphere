@@ -4,15 +4,17 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateTimePicker as MuiDateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
-const DateTimePicker = ({
-  label,
-  value,
-  onChange,
-  minDateTime = null,
-  disabled = false,
-  styles = {},
-  sx = {},
-}) => {
+const DateTimePicker = (props) => {
+  const {
+    label,
+    value,
+    onChange,
+    minDateTime = null,
+    disabled = false,
+    styles = {},
+    sx = {},
+    ...restProps
+  } = props;
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <MuiDateTimePicker
@@ -21,6 +23,7 @@ const DateTimePicker = ({
         onChange={(newValue) => onChange(newValue)}
         minDateTime={minDateTime}
         disabled={disabled}
+        {...restProps}
         sx={{
           width: styles.width || "100vw",
           ...sx,

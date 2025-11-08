@@ -2,34 +2,20 @@
 import React, { useEffect, useState } from "react";
 import { Grid, Typography, Box } from "@mui/material";
 import GenericCard from "@/app/components/CardComponent/GenericCard";
+import { formatLabel } from "@/app/utils/Format";
 
-const SystemOverview = ({}) => {
-  const [overviewData, setOverviewData] = useState([]);
+const SystemOverview = ({ data = {} }) => {
+  console.log("Data: ", data);
+  const { name = "N/A", stats = {} } = data;
+  const usage = stats.total > 0 ? `${Math.round((Number(stats.checkIns) / Number(stats.total)) * 100)}%`
+      : "0%";
 
-  // Fetch system overview data from backend
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Replace with actual backend API endpoint
-        const res = await fetch("/api/system-overview");
-        // const data = await res.json();
-
-        // Sample data format from backend
-        const data = [
-          { title: "Active QR Code Session", value: "Session 1" },
-          { title: "Today's Check-ins", value: "250" },
-          // { title: "Today's Check-outs", value: "230" },
-          { title: "Usage Analytics", value: "85%" },
-        ];
-
-        setOverviewData(data);
-      } catch (err) {
-        console.error("Failed to fetch system overview:", err);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const overviewData = [
+    { title: "Active QR Code Session", value: formatLabel(name) },
+    { title: "Today's Check-ins", value: stats.checkIns ?? 0 },
+    // { title: "Today's Check-outs", value: "230" },
+    { title: "Usage Analytics", value: usage },
+  ];
 
   return (
     <Box>
@@ -58,10 +44,7 @@ const SystemOverview = ({}) => {
         }}
       >
         {overviewData.map((item, index) => (
-          <div
-            key={index}
-            className="flex-1 flex-wrap"
-          >
+          <div key={index} className="flex-1 flex-wrap">
             <GenericCard
               title={item.title}
               additionalInfo={[{ value: item.value }]}
@@ -82,20 +65,20 @@ const SystemOverview = ({}) => {
                 textContainerStyle: {
                   titleStyle: {
                     inlineStyle: {
-                      fontSize: {xs:"0.7rem", md:"0.9rem"},
+                      fontSize: { xs: "0.7rem", md: "0.9rem" },
                       fontWeight: 500,
                       color: "#6b7280",
                       marginBottom: "4px",
-                      whiteSpace: "nowrap"
+                      whiteSpace: "nowrap",
                     },
                   },
                   additionalInfoStyle: {
                     value: {
                       inlineStyle: {
-                        fontSize: {xs:"0.9rem", md:"1.3rem"},
+                        fontSize: { xs: "0.9rem", md: "1.3rem" },
                         fontWeight: "bold",
                         color: "#111827",
-                        whiteSpace: "nowrap"
+                        whiteSpace: "nowrap",
                       },
                     },
                   },

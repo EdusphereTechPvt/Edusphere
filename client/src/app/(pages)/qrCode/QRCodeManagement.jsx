@@ -14,15 +14,15 @@ import Dropdown from "@/app/components/Dropdown/Dropdown";
 import DateTimePicker from "@/app/components/DateTimePicker/DateTimePicker";
 import { showToast } from "@/app/utils/Toast";
 import { fetchDistinctValues } from "@/app/services/UtilityService";
-import { addOrUpdate } from "@/app/services/QrService";
-
-function QRCodeManagement({ onGenerate, result, data = {} }) {
+import { addOrUpdate, downloadQr, printQr } from "@/app/services/QrService";
+function QRCodeManagement() {
   const qrRef = useRef();
   const [formData, setFormData] = useState({});
   const [doesExist, setDoesExist] = useState(false);
   const [qrCodeValue, setQrCodeValue] = useState("");
   const [isDownloadReady, setIsDownloadReady] = useState(false);
   const [options, setOptions] = useState([]);
+  const [response, setResponse] = useState();
 
   useEffect(() => {
     const fetchDistinct = async () => {
@@ -50,86 +50,112 @@ function QRCodeManagement({ onGenerate, result, data = {} }) {
   }, [formData.type, doesExist]);
 
   useEffect(() => {
-    if (result?.data) {
-      setQrCodeValue(JSON.stringify(result.data));
+    if (response) {
+      setQrCodeValue(JSON.stringify(response));
       setIsDownloadReady(true);
     }
-  }, [result]);
+  }, [response]);
 
   const handleChange = useCallback((name, value) => {
-    if (typeof value === "string") value = value.trim();
-    // if (name === "type") {
-    //   if (!value) {
-    //     showToast("Type is required (Resetting to Class)", "warning");
-    //     return setFormData((prev) => ({ ...prev, type: "Class" }));
-    //   }
-    //   return setFormData((prev) => ({ ...prev, type: value }));
-    // }
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleDownload = useCallback((format) => {
-    const canvas = qrRef.current?.querySelector("canvas");
-    if (!canvas) return showToast("QR code not available", "warning");
+  const handleDownload = useCallback(async () => {
+    if (!response || response.length === 0)
+      return showToast("No QR data to download", "warning");
 
-    const link = document.createElement("a");
-    link.href = canvas.toDataURL(
-      format === "png" ? "image/png" : "image/svg+xml"
-    );
-    link.download = `qr-code.${format}`;
-    link.click();
-  }, []);
+    const qrArray = Array.isArray(response) ? response : [response];
+    const sessionIds = qrArray.map((r) => r.sessionId).filter(Boolean);
+    if (!sessionIds.length) return showToast("Session IDs missing", "warning");
 
-  const handlePrint = useCallback(() => {
-    const canvas = qrRef.current?.querySelector("canvas");
-    if (!canvas) return showToast("QR code not available", "warning");
+    await downloadQr(sessionIds);
+  }, [response]);
 
-    const img = canvas.toDataURL("image/png");
-    const win = window.open("", "_blank");
-    win.document.write(
-      `<img src="${img}" onload="window.print();window.close();" />`
-    );
-  }, []);
+  const handlePrint = useCallback(async () => {
+    if (!response || response.length === 0)
+      return showToast("No QR data available", "warning");
+
+    const qrArray = Array.isArray(response) ? response : [response];
+    const sessionIds = qrArray.map((r) => r.sessionId).filter(Boolean);
+    if (!sessionIds.length) return showToast("Session IDs missing", "warning");
+
+    await printQr(sessionIds);
+  }, [response]);
 
   const handleBulkGenerate = async () => {
+    let toastId;
     try {
+      const sessionType = formData.type?.toLowerCase();
       const payload = {
-        sessionType: formData.type.toLowerCase(),
-        sessionName: formData.sessionName?.trim().toLowerCase(),
+        sessionType,
+        sessionName: formData.sessionName?.trim(),
         startDate: formData.startDate?.toISOString(),
         endDate: formData.endDate?.toISOString(),
         duration: formData.duration,
         autoExpire: formData.autoExpire || false,
         expired: false,
-        ...(formData.type === "Class"
+        ...(sessionType === "class"
           ? { associatedClass: formData.associated }
           : { associatedEvent: formData.associated }),
       };
+
       const required = [
         "sessionName",
         "sessionType",
         "startDate",
         "endDate",
         "duration",
-       formData.type === "Class" ? "associatedClass" : "associatedEvent",
+        sessionType === "class" ? "associatedClass" : "associatedEvent",
       ];
       const missing = required.filter((f) => !payload[f]);
       if (missing.length > 0) {
         return showToast(`Please fill ${missing.join(", ")}`, "warning");
       }
-      // showToast("...Processing", "pending")
-      const res = await addOrUpdate(payload); //
+
+      toastId = showToast(
+        "Generating QR codes...",
+        "pending",
+        "top-right",
+        null,
+        true
+      );
+
+      const res = await addOrUpdate(payload);
+
       if (res?.data) {
-        showToast("QR generated successfully!", "success");
-        setQrCodeValue(JSON.stringify(res.data));
+        const qrDataArray = Array.isArray(res.data) ? res.data : [res.data];
+
+        setResponse(qrDataArray);
         setIsDownloadReady(true);
+        setFormData({})
+
+        showToast(
+          "QRs generated successfully!",
+          "success",
+          "top-right",
+          toastId,
+          false
+        );
       } else {
         setIsDownloadReady(false);
-        showToast("Failed to generate QR", "error");
+        showToast(
+          "Failed to generate QR",
+          "error",
+          "top-right",
+          toastId,
+          false
+        );
       }
     } catch (error) {
       console.error("QR generation error:", error);
-      showToast("Error while generating QR", "error");
+      showToast(
+        "Error while generating QR",
+        "error",
+        "top-right",
+        toastId,
+        false
+      );
+      setIsDownloadReady(false);
     }
   };
 
@@ -158,7 +184,11 @@ function QRCodeManagement({ onGenerate, result, data = {} }) {
             <h2 className="xs:text-lg md:text-xl font-semibold text-gray-800 mb-1">
               QR Code Generation Interface
             </h2>
-            <Typography variant="p" sx={{fontSize: {xs: "0.75em", lg:"1rem"}}} className="text-gray-600 ">
+            <Typography
+              variant="p"
+              sx={{ fontSize: { xs: "0.75em", lg: "1rem" } }}
+              className="text-gray-600 "
+            >
               Create, distribute, and control the lifecycle of attendance QR
               codes.
             </Typography>
@@ -218,7 +248,7 @@ function QRCodeManagement({ onGenerate, result, data = {} }) {
                   data={{
                     label: "Associated Event Selector",
                     placeholder: "Select Event",
-                    items: data?.event || options || [],
+                    items: options || [],
                   }}
                   onSelect={(v) => handleChange("associated", v)}
                 />
@@ -230,7 +260,7 @@ function QRCodeManagement({ onGenerate, result, data = {} }) {
                   <TextField
                     label="Enter Event Name"
                     placeholder="e.g., Annual Day"
-                    value={formData["Event Selector"] || ""}
+                    value={formData["associated"] || ""}
                     onChange={(e) => handleChange("associated", e.target.value)}
                     fullWidth
                     size="small"
@@ -245,7 +275,7 @@ function QRCodeManagement({ onGenerate, result, data = {} }) {
               data={{
                 label: "Associated Class Selector",
                 placeholder: "Select Class",
-                items: data?.class || options || [],
+                items: options || [],
               }}
               onSelect={(v) => handleChange("associated", v)}
             />
@@ -343,6 +373,7 @@ function QRCodeManagement({ onGenerate, result, data = {} }) {
                 label="Start Date & Time"
                 value={formData.startDate || null}
                 onChange={(value) => handleChange("startDate", value)}
+                disablePast
               />
               <DateTimePicker
                 label="Select End Date & Time"
@@ -373,68 +404,68 @@ function QRCodeManagement({ onGenerate, result, data = {} }) {
         </form>
 
         {/* Right QR Preview Section */}
-        <div className="bg-white p-6 rounded-lg shadow flex flex-col items-center xs:w-full lg:w-1/3 space-y-4">
+        <div className="bg-white p-6 rounded-lg shadow flex flex-col items-center xs:w-full lg:w-[30%] space-y-4">
           <h3 className="text-base font-semibold text-gray-700">
             QR Code Preview
           </h3>
           <div
             ref={qrRef}
-            className="p-4 border rounded-lg bg-gray-50 w-full flex justify-center items-center min-h-[16rem] lg:min-h-[23.9rem]"
+            className="p-4 border rounded-lg bg-gray-50 w-full flex justify-center items-center min-h-[16rem] lg:min-h-[25.7rem]"
           >
             {qrCodeValue ? (
-              <QRCodeCanvas value={qrCodeValue} size={250} />
+              <QRCodeCanvas
+                value={response[0]}
+                size={200}
+              />
             ) : (
               <p className="text-gray-400 text-sm">No QR Code Generated</p>
             )}
           </div>
 
-          <div className="flex w-full gap-2">
-            {["png", "svg"].map((name, idx) => (
-              <Button
-                key={idx}
-                onClick={() => handleDownload(name)}
-                variant="outlined"
-                startIcon={<Download />}
-                disabled={!isDownloadReady}
-                sx={{
-                  textTransform: "none",
-                  backgroundColor: "#e2e8f0",
-                  fontWeight: 600,
-                  color: "grey.800",
-                  border: "none",
-                  borderRadius: 2,
-                  justifyContent: "center",
-                  "&:hover": { backgroundColor: "#cbd5e1" },
-                  py: 1.1,
-                  px: 2,
-                  width: "50%",
-                }}
-              >
-                {name.toUpperCase()}
-              </Button>
-            ))}
-          </div>
+          <div className="flex flex-col gap-2 w-full">
+            <Button
+              onClick={() => handleDownload()}
+              variant="outlined"
+              startIcon={<Download />}
+              disabled={!isDownloadReady}
+              fullWidth
+              sx={{
+                textTransform: "none",
+                backgroundColor: "#e2e8f0",
+                fontWeight: 600,
+                color: "grey.800",
+                border: "none",
+                borderRadius: 2,
+                justifyContent: "center",
+                "&:hover": { backgroundColor: "#cbd5e1" },
+                py: 1.1,
+                px: 2,
+              }}
+            >
+              {/* {name.toUpperCase()} */} Download
+            </Button>
 
-          <Button
-            onClick={handlePrint}
-            variant="outlined"
-            startIcon={<Print />}
-            disabled={!isDownloadReady}
-            fullWidth
-            sx={{
-              textTransform: "none",
-              backgroundColor: "#e2e8f0",
-              fontWeight: 600,
-              color: "grey.800",
-              border: "none",
-              borderRadius: 2,
-              justifyContent: "center",
-              "&:hover": { backgroundColor: "#cbd5e1" },
-              py: 1.2,
-            }}
-          >
-            Print QR Code
-          </Button>
+            <Button
+              onClick={handlePrint}
+              variant="outlined"
+              startIcon={<Print />}
+              disabled={!isDownloadReady}
+              fullWidth
+              sx={{
+                textTransform: "none",
+                backgroundColor: "#e2e8f0",
+                fontWeight: 600,
+                color: "grey.800",
+                border: "none",
+                borderRadius: 2,
+                justifyContent: "center",
+                "&:hover": { backgroundColor: "#cbd5e1" },
+                py: 1.2,
+              }}
+            >
+              Print QR Code
+            </Button>
+          </div>
         </div>
       </div>
     </div>

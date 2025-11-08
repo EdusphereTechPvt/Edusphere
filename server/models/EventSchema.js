@@ -6,13 +6,12 @@ const EventSchema = new mongoose.Schema({
     },
     location: {
         type: String,
-        required: true,
     },
-    start: {
+    startDate: {
         type: Date,
         required: true,
     },
-    end: {
+    endDate: {
         type: Date,
         required: true,
     },
@@ -24,9 +23,17 @@ const EventSchema = new mongoose.Schema({
     img: {
         type: String,
     },
+    duration: {
+        type: String
+    },
     isActive: {
-      type: Boolean,
-      default: true,
+        type: Boolean,
+        default: true,
+    },
+    schoolId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "School",
+        required: true,
     },
 });
 

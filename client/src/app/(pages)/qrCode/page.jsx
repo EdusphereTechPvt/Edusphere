@@ -13,6 +13,7 @@ import {
   fetchSessions,
 } from "@/app/services/QrService";
 import Dropdown from "@/app/components/Dropdown/Dropdown";
+import { formatLabel } from "@/app/utils/Format";
 
 export default function Page() {
   const logs = [
@@ -43,13 +44,38 @@ export default function Page() {
       time: "07:45 AM",
     },
   ];
-  const [result, setResult] = useState(null);
   const [data, setData] = useState({ session: [], logs: logs });
+  const [activeSessions, setActiveSessions] = useState([]);
+  const [selectedSession, setSelectedSession] = useState({});
+  useEffect(() => {
+    const loadSessions = async () => {
+      try {
+        const uniqueSessions = await fetchSessions();
 
-  const [sessions, setSessions] = useState([]); // all sessions from backend
-  const [selectedSession, setSelectedSession] = useState(""); // id of selected session
-  const [selectedSessionData, setSelectedSessionData] = useState(null);
+        setData((prev) => ({
+          ...prev,
+          session: uniqueSessions,
+        }));
 
+        const now = new Date();
+        const active = uniqueSessions.filter(
+          (s) =>
+            !s.expired &&
+            new Date(s.startDate) <= now &&
+            new Date(s.endDate) >= now
+        );
+        setActiveSessions(active);
+
+        if (active.length > 0) {
+          setSelectedSession(active[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching sessions:", error);
+      }
+    };
+
+    loadSessions();
+  }, []);
 
   return (
     <div className="py-8 px-4 lg:px-8 space-y-8 bg-gray-50 min-h-screen">
@@ -79,25 +105,24 @@ export default function Page() {
         </Box>
 
         <Box sx={{ width: { xs: 150, md: 250 } }}>
-          <Dropdown
-            value=""
-            data={{
-              placeholder: "Select a Day",
-              items: [
-                { id: "sun", value: "Sunday" },
-                { id: "mon", value: "Monday" },
-                { id: "tue", value: "Tuesday" },
-                { id: "wed", value: "Wednesday" },
-                { id: "thu", value: "Thursday" },
-                { id: "fri", value: "Friday" },
-                { id: "sat", value: "Saturday" },
-              ],
-            }}
-            onSelect={(value) => {
-              const found = sessions.find((s) => s.value === value);
-              setSelectedSessionData(found?.fullData || null);
-            }}
-          />
+          {activeSessions.length > 1 && (
+            <Dropdown
+              value={activeSessions?.[0]?.sessionName || ""}
+              data={{
+                placeholder: "Select Active Session",
+                items: activeSessions.map((s) => ({
+                  id: s.sessionName,
+                  value: formatLabel(s.sessionName),
+                })),
+              }}
+              onSelect={(value) => {
+                const found = activeSessions.find(
+                  (s) => s.sessionName === value
+                );
+                setSelectedSession(found);
+              }}
+            />
+          )}
         </Box>
       </Box>
       <Box
@@ -109,7 +134,12 @@ export default function Page() {
         }}
       >
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
-          <SystemOverview overviewData = {data?.overviewData}/>
+          <SystemOverview
+            data={{
+              name: selectedSession?.sessionName,
+              stats: { total: "200", checkIns: "150" },
+            }}
+          />
           <QRCodeManagement />
         </Box>
 

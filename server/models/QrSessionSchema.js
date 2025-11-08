@@ -1,51 +1,3 @@
-// const mongoose = require("mongoose");
-
-// const QrSessionSchema = new mongoose.Schema({
-//     sessionId: {
-//         type: String,
-//         required: true,
-//         unique: true
-//     },
-//     sessionName: {
-//         type: String,
-//         required: true
-//     },
-//     sessionType: {
-//         type: String,
-//         enum: ["event", "class"],
-//         required: true
-//     },
-//     startDate: {
-//         type: Date,
-//         required: true,
-//     },
-//     endDate: {
-//         type: Date,
-//         required: true
-//     },
-//     duration: {
-//         type: Number,
-//         required: true
-//     },
-//     autoExpire: {
-//         type: Boolean,
-//         default: false
-//     },
-//     expired: {
-//         type: Boolean,
-//         default: false
-//     },
-//     associatedClass: {
-//         type: String,
-//     },
-//     userId: {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: "StudentProfile"
-//     }
-
-// }, { timestamps: true }
-// )
-
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
 
@@ -53,7 +5,6 @@ const QrSessionSchema = new mongoose.Schema(
   {
     sessionId: {
       type: String,
-      unique: true,
       default: () => uuidv4(),
     },
     sessionName: {
@@ -79,6 +30,11 @@ const QrSessionSchema = new mongoose.Schema(
         },
         message: "End date must be after start date",
       },
+    },
+    token: {
+      type: String,
+      unique: true,
+      required: [true, "Token is required"],
     },
     duration: {
       type: Number,
@@ -110,6 +66,11 @@ const QrSessionSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "StudentProfile",
+    },
+    schoolId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "School",
+      required: true,
     },
   },
   { timestamps: true }
