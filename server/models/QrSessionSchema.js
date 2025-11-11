@@ -65,7 +65,7 @@ const QrSessionSchema = new mongoose.Schema(
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "StudentProfile",
+      ref: "User",
     },
     schoolId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -92,5 +92,9 @@ QrSessionSchema.pre(/^find/, function (next) {
 
   next();
 });
+
+QrSessionSchema.methods.compareToken = function (candidateToken) {
+  return bcrypt.compare(candidateToken, this.token);
+};
 
 module.exports = mongoose.model("QrSession", QrSessionSchema);

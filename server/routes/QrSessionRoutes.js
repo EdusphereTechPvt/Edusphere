@@ -14,6 +14,7 @@ router.post("/add", AuthGuard, RoleGuard(), addOrUpdateQrSession);
 router.post("/get", AuthGuard, RoleGuard(), getSessionDetails);
 router.post("/getQr", AuthGuard, RoleGuard(), getQr);
 router.post("/getAll/", AuthGuard, RoleGuard(), getAllSessions);
+router.post("/scan/", AuthGuard, RoleGuard(), getAllSessions);
 router.delete("/delete/:id", AuthGuard, RoleGuard(), deleteSession);
 
 module.exports = router;

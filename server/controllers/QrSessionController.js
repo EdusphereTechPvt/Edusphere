@@ -144,7 +144,7 @@ const addOrUpdateQrSession = async (req, res) => {
         let existingSession = await QrSession.findOne({
           sessionName,
           sessionType,
-          userId: student._id,
+          userId: student.studentId,
           schoolId
         });
 
@@ -171,7 +171,7 @@ const addOrUpdateQrSession = async (req, res) => {
             autoExpire,
             expired,
             associatedClass,
-            userId: student._id,
+            userId: student.studentId,
             schoolId,
             token: encrypt(crypto.randomBytes(16).toString("hex")),
           });
@@ -357,7 +357,84 @@ const getQr = async (req, res) => {
   }
 };
 
+const scanQr = async (req, res) => {
+  try {
+    const { token } = req.body;
+    const { schoolId } = req.user;
+    if (!token) return res.status(400).json({ status: false, message: "QR token missing" });
+    const sessions = await QrSession.find({ expired: false });
 
+    let matchedSession = null;
+    for (const session of sessions) {
+      const isMatch = await session.compareToken(token);
+      if (isMatch) {
+        matchedSession = session;
+        break;
+      }
+    }
+    if (!matchedSession) return res.status(400).json({ status: false, message: "Invalid or expired QR token" });
+
+    const now = new Date();
+    if (matchedSession.endDate && now > matchedSession.endDate) {
+      matchedSession.expired = true;
+      await matchedSession.save();
+      return res.status(400).json({ status: false, message: "Session has expired" });
+    }
+
+    const userId = req.user?._id || matchedSession.userId;
+    if (!userId) {
+      return res.status(401).json({ status: false, message: "Unauthorized: user not found" });
+    }
+
+    const existingLog = await Log.findOne({
+      userId,
+      sessionId: matchedSession.sessionId,
+      schoolId,
+      exitTime: { $exists: false },
+    });
+
+    let logEntry;
+    if (existingLog) {
+      existingLog.exitTime = now;
+      existingLog.status = "OUT";
+      await existingLog.save();
+      logEntry = existingLog;
+    } else {
+      logEntry = await Log.create({
+        userId,
+        schoolId,
+        sessionId: matchedSession.sessionId,
+        entryTime: now,
+        status: "IN",
+      });
+    }
+
+
+    return res.status(200).json({
+      status: true,
+      message:
+        logEntry.status === "IN"
+          ? "Entry logged successfully"
+          : "Exit logged successfully",
+      data: {
+        sessionId: matchedSession.sessionId,
+        sessionName: matchedSession.sessionName,
+        sessionType: matchedSession.sessionType,
+        status: logEntry.status,
+        time: now,
+      },
+    });
+
+
+  } catch (error) {
+    console.error("QR Scan Error:", err);
+    return res.status(500).json({
+      status: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+}
 
 
 const deleteSession = async (req, res) => {
@@ -390,5 +467,6 @@ module.exports = {
   getSessionDetails,
   deleteSession,
   getAllSessions,
-  getQr
+  getQr,
+  scanQr
 };
